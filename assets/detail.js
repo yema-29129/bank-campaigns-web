@@ -166,14 +166,6 @@ function renderDetail(activity) {
             <div class="detail-stat-grid">${sideGrid}</div>
           </section>
 
-          <section class="detail-side-panel detail-side-panel-action">
-            <div class="detail-side-head">
-              <h2>二维码与路径</h2>
-            </div>
-            <p class="detail-side-copy">如页面入口不清晰，可点击下方查看活动图片或二维码。</p>
-            <button class="primary-btn detail-side-btn" type="button" id="viewPosterBtnSide"${posterUrl ? '' : ' disabled'}>${posterUrl ? '查看图片' : '暂无图片'}</button>
-          </section>
-
           <section class="detail-side-note">
             <span class="detail-section-kicker">提示</span>
             <p>活动规则、名额、页面入口都可能变化，实际请以银行官方页面为准。</p>
@@ -206,13 +198,9 @@ function renderDetail(activity) {
   }
 
   const posterBtn = document.getElementById('viewPosterBtn');
-  const posterBtnSide = document.getElementById('viewPosterBtnSide');
   const openPoster = () => openLightbox(posterUrl);
   if (posterBtn && posterUrl) {
     posterBtn.addEventListener('click', openPoster);
-  }
-  if (posterBtnSide && posterUrl) {
-    posterBtnSide.addEventListener('click', openPoster);
   }
 }
 

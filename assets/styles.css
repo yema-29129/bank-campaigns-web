@@ -598,10 +598,11 @@ input {
 
 .detail-hero h1 {
   margin: 0;
-  max-width: 14ch;
+  max-width: none;
   font-size: clamp(26px, 3.2vw, 40px);
   line-height: 1.14;
   letter-spacing: -0.03em;
+  text-wrap: balance;
 }
 
 .detail-desc {
@@ -781,24 +782,6 @@ input {
   top: 16px;
 }
 
-.detail-side-panel-action {
-  position: static;
-  background:
-    linear-gradient(180deg, rgba(245, 249, 255, 0.98), rgba(238, 244, 252, 0.98));
-}
-
-.detail-side-copy {
-  margin: 0 0 14px;
-  color: #66778f;
-  line-height: 1.75;
-  font-size: 13px;
-}
-
-.detail-side-btn {
-  width: 100%;
-  min-height: 42px;
-}
-
 .detail-side-note p {
   margin: 6px 0 0;
   color: #66778f;
@@ -956,7 +939,6 @@ input {
 
   .detail-hero h1 {
     font-size: 28px;
-    max-width: none;
   }
 
   .detail-metric-grid {
