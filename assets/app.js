@@ -8,7 +8,8 @@ const state = {
   view: 'all',
   bank: '全部',
   time: '全部时间',
-  keyword: ''
+  keyword: '',
+  showExpired: false
 };
 
 const els = {
@@ -135,44 +136,74 @@ function renderTimes() {
 
 function renderCards() {
   els.grid.innerHTML = '';
+  const activeItems = state.filtered.filter((item) => !item.isExpired);
+  const expiredItems = state.filtered.filter((item) => item.isExpired);
 
-  state.filtered.forEach((item) => {
-    const card = document.createElement('a');
-    const cardTone = item.isCredit ? 'tone-credit' : item.isRecurring ? 'tone-recurring' : 'tone-default';
-    card.className = `campaign-card ${cardTone} ${item.isExpired ? 'is-expired' : ''}`;
-    card.href = `./detail.html?id=${encodeURIComponent(item.id)}`;
-
-    const badges = [];
-    item.tags.forEach((tag) => {
-      badges.push(`<span class="badge tag">${escapeHtml(tag)}</span>`);
-    });
-    if (item.isRecurring) {
-      badges.push('<span class="badge recurring">循环活动</span>');
-    }
-    if (item.isExpired) {
-      badges.push('<span class="badge expired">已过期</span>');
-    } else if (item.isSoon) {
-      badges.push('<span class="badge soon">快到期</span>');
-    }
-
-    card.innerHTML = `
-      <div class="card-head">
-        <div class="card-bank">${escapeHtml(item.bankName || '银行活动')}</div>
-        <div class="badge-row">${badges.join('')}</div>
-      </div>
-      <h3 class="card-title">${escapeHtml(item.title || '未命名活动')}</h3>
-      <p class="card-desc">${escapeHtml(item.desc || '暂无活动描述')}</p>
-      <div class="card-meta">
-        <span>有效期：${escapeHtml(item.validFrom || '--')} 至 ${escapeHtml(item.validTo || '--')}</span>
-        <span>${escapeHtml(item.channel || item.cashbackRate || '--')}</span>
-      </div>
-      <div class="card-actions">
-        <span class="primary-btn card-entry">查看详情</span>
-      </div>
-    `;
-
-    els.grid.appendChild(card);
+  activeItems.forEach((item) => {
+    els.grid.appendChild(buildCard(item));
   });
+
+  if (expiredItems.length) {
+    const expiredSection = document.createElement('section');
+    expiredSection.className = 'expired-panel';
+    expiredSection.innerHTML = `
+      <button class="expired-toggle" type="button" id="expiredToggleBtn" aria-expanded="${state.showExpired ? 'true' : 'false'}">
+        <span>已过期活动（${expiredItems.length}）</span>
+        <span class="expired-toggle-icon">${state.showExpired ? '收起' : '展开'}</span>
+      </button>
+      <div class="expired-grid ${state.showExpired ? '' : 'hidden'}" id="expiredGrid"></div>
+    `;
+    els.grid.appendChild(expiredSection);
+
+    const expiredGrid = expiredSection.querySelector('#expiredGrid');
+    expiredItems.forEach((item) => {
+      expiredGrid.appendChild(buildCard(item));
+    });
+
+    const expiredToggleBtn = expiredSection.querySelector('#expiredToggleBtn');
+    expiredToggleBtn.addEventListener('click', () => {
+      state.showExpired = !state.showExpired;
+      renderCards();
+    });
+  }
+}
+
+function buildCard(item) {
+  const card = document.createElement('a');
+  const cardTone = item.isCredit ? 'tone-credit' : item.isRecurring ? 'tone-recurring' : 'tone-default';
+  card.className = `campaign-card ${cardTone} ${item.isExpired ? 'is-expired' : ''}`;
+  card.href = `./detail.html?id=${encodeURIComponent(item.id)}`;
+
+  const badges = [];
+  item.tags.forEach((tag) => {
+    badges.push(`<span class="badge tag">${escapeHtml(tag)}</span>`);
+  });
+  if (item.isRecurring) {
+    badges.push('<span class="badge recurring">循环活动</span>');
+  }
+  if (item.isExpired) {
+    badges.push('<span class="badge expired">已过期</span>');
+  } else if (item.isSoon) {
+    badges.push('<span class="badge soon">快到期</span>');
+  }
+
+  card.innerHTML = `
+    <div class="card-head">
+      <div class="card-bank">${escapeHtml(item.bankName || '银行活动')}</div>
+      <div class="badge-row">${badges.join('')}</div>
+    </div>
+    <h3 class="card-title">${escapeHtml(item.title || '未命名活动')}</h3>
+    <p class="card-desc">${escapeHtml(item.desc || '暂无活动描述')}</p>
+    <div class="card-meta">
+      <span>有效期：${escapeHtml(item.validFrom || '--')} 至 ${escapeHtml(item.validTo || '--')}</span>
+      <span>${escapeHtml(item.channel || item.cashbackRate || '--')}</span>
+    </div>
+    <div class="card-actions">
+      <span class="primary-btn card-entry">查看详情</span>
+    </div>
+  `;
+
+  return card;
 }
 
 function applyFilters() {
@@ -252,6 +283,7 @@ function bindEvents() {
 
     state.view = targetView;
     state.bank = '全部';
+    state.showExpired = false;
 
     Array.from(els.viewTabs.querySelectorAll('.segmented-btn')).forEach((item) => {
       item.classList.toggle('is-active', item.dataset.view === targetView);
