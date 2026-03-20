@@ -1,13 +1,12 @@
 const API_BASE = 'https://mini.vooqqqm.com/api';
 const TIME_OPTIONS = ['全部时间', '3天内', '7天内', '14天内', '30天内'];
-const PRIORITY_TAGS = ['固定活动', '每日签到', '重点推荐'];
+const BANK_FILTER_OPTIONS = ['全部', '工商银行', '农业银行', '建设银行', '中国银行', '其他银行', '信用卡返现', '固定活动', '每日签到', '重点推荐'];
 
 const state = {
   campaigns: [],
   filtered: [],
   view: 'all',
   bank: '全部',
-  tag: '全部标签',
   time: '全部时间',
   keyword: ''
 };
@@ -103,44 +102,14 @@ function setLoadingState({ loading = false, error = false, empty = false } = {})
 }
 
 function renderBankFilters() {
-  const allBanks = new Set(['全部']);
-  const allTags = new Set(['全部标签']);
-
-  PRIORITY_TAGS.forEach((tag) => allTags.add(tag));
-  state.campaigns.forEach((item) => {
-    if (state.view === 'credit' && !item.isCredit) return;
-    if (item.bankName) allBanks.add(item.bankName);
-    item.tags.forEach((tag) => allTags.add(tag));
-  });
-
-  const orderedBanks = Array.from(allBanks);
-  const orderedTags = ['全部标签', ...PRIORITY_TAGS.filter((tag) => allTags.has(tag))];
-  Array.from(allTags)
-    .filter((tag) => tag !== '全部标签' && !PRIORITY_TAGS.includes(tag))
-    .sort((a, b) => a.localeCompare(b, 'zh-CN'))
-    .forEach((tag) => orderedTags.push(tag));
-
   els.bankFilters.innerHTML = '';
-  orderedBanks.forEach((bank) => {
+  BANK_FILTER_OPTIONS.forEach((bank) => {
     const button = document.createElement('button');
     button.type = 'button';
     button.className = `chip ${state.bank === bank ? 'is-active' : ''}`;
     button.textContent = bank;
     button.addEventListener('click', () => {
       state.bank = bank;
-      renderBankFilters();
-      applyFilters();
-    });
-    els.bankFilters.appendChild(button);
-  });
-
-  orderedTags.forEach((tag) => {
-    const button = document.createElement('button');
-    button.type = 'button';
-    button.className = `chip ${state.tag === tag ? 'is-active' : ''}`;
-    button.textContent = tag;
-    button.addEventListener('click', () => {
-      state.tag = tag;
       renderBankFilters();
       applyFilters();
     });
@@ -221,11 +190,7 @@ function applyFilters() {
   }
 
   if (state.bank !== '全部') {
-    result = result.filter((item) => item.bankName === state.bank);
-  }
-
-  if (state.tag !== '全部标签') {
-    result = result.filter((item) => item.tags.includes(state.tag));
+    result = result.filter((item) => matchesBankFilter(item, state.bank));
   }
 
   if (state.time !== '全部时间') {
@@ -268,7 +233,6 @@ function bindEvents() {
 
     state.view = button.dataset.view;
     state.bank = '全部';
-    state.tag = '全部标签';
 
     Array.from(els.viewTabs.querySelectorAll('.segmented-btn')).forEach((item) => {
       item.classList.toggle('is-active', item === button);
@@ -288,7 +252,6 @@ function bindEvents() {
 
     state.view = targetView;
     state.bank = '全部';
-    state.tag = '全部标签';
 
     Array.from(els.viewTabs.querySelectorAll('.segmented-btn')).forEach((item) => {
       item.classList.toggle('is-active', item.dataset.view === targetView);
@@ -332,6 +295,25 @@ function escapeHtml(value) {
     .replace(/>/g, '&gt;')
     .replace(/"/g, '&quot;')
     .replace(/'/g, '&#39;');
+}
+
+function matchesBankFilter(item, selected) {
+  const bankName = String(item.bankName || '');
+  const tags = item.tags || [];
+
+  if (selected === '工商银行') return bankName.includes('工商');
+  if (selected === '农业银行') return bankName.includes('农业');
+  if (selected === '建设银行') return bankName.includes('建设');
+  if (selected === '中国银行') return bankName.includes('中国银行') && !bankName.includes('中国工商') && !bankName.includes('中国农业') && !bankName.includes('中国建设');
+  if (selected === '其他银行') {
+    return !bankName.includes('工商') && !bankName.includes('农业') && !bankName.includes('建设') && !(bankName.includes('中国银行') && !bankName.includes('中国工商') && !bankName.includes('中国农业') && !bankName.includes('中国建设'));
+  }
+  if (selected === '信用卡返现') return item.isCredit || tags.some((tag) => String(tag).includes('返现'));
+  if (selected === '固定活动' || selected === '每日签到' || selected === '重点推荐') {
+    return tags.includes(selected);
+  }
+
+  return true;
 }
 
 bindEvents();
