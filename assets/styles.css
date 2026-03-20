@@ -398,7 +398,7 @@ input {
 
 .filters-grid {
   display: grid;
-  grid-template-columns: minmax(220px, 0.8fr) minmax(260px, 1fr) minmax(260px, 1fr) minmax(220px, 0.8fr);
+  grid-template-columns: minmax(220px, 0.8fr) minmax(520px, 2fr) minmax(220px, 0.8fr);
   gap: 18px 22px;
   align-items: start;
 }
@@ -511,12 +511,8 @@ input {
   grid-column: 2;
 }
 
-.field-group-tag {
-  grid-column: 3;
-}
-
 .field-group-time {
-  grid-column: 4;
+  grid-column: 3;
 }
 
 .legend-row {
@@ -1207,7 +1203,6 @@ input {
 
   .field-group-view,
   .field-group-bank,
-  .field-group-tag,
   .field-group-time {
     grid-column: auto;
   }

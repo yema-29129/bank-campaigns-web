@@ -24,7 +24,6 @@ const els = {
   toggleFiltersBtn: document.getElementById('toggleFiltersBtn'),
   filtersPanel: document.getElementById('filtersPanel'),
   bankFilters: document.getElementById('bankFilters'),
-  tagFilters: document.getElementById('tagFilters'),
   timeFilters: document.getElementById('timeFilters'),
   viewTabs: document.getElementById('viewTabs')
 };
@@ -103,22 +102,46 @@ function setLoadingState({ loading = false, error = false, empty = false } = {})
   els.empty.classList.toggle('hidden', !empty);
 }
 
-function renderBanks() {
+function renderBankFilters() {
   const allBanks = new Set(['全部']);
+  const allTags = new Set(['全部标签']);
+
+  PRIORITY_TAGS.forEach((tag) => allTags.add(tag));
   state.campaigns.forEach((item) => {
     if (state.view === 'credit' && !item.isCredit) return;
     if (item.bankName) allBanks.add(item.bankName);
+    item.tags.forEach((tag) => allTags.add(tag));
   });
 
+  const orderedBanks = Array.from(allBanks);
+  const orderedTags = ['全部标签', ...PRIORITY_TAGS.filter((tag) => allTags.has(tag))];
+  Array.from(allTags)
+    .filter((tag) => tag !== '全部标签' && !PRIORITY_TAGS.includes(tag))
+    .sort((a, b) => a.localeCompare(b, 'zh-CN'))
+    .forEach((tag) => orderedTags.push(tag));
+
   els.bankFilters.innerHTML = '';
-  Array.from(allBanks).forEach((bank) => {
+  orderedBanks.forEach((bank) => {
     const button = document.createElement('button');
     button.type = 'button';
     button.className = `chip ${state.bank === bank ? 'is-active' : ''}`;
     button.textContent = bank;
     button.addEventListener('click', () => {
       state.bank = bank;
-      renderBanks();
+      renderBankFilters();
+      applyFilters();
+    });
+    els.bankFilters.appendChild(button);
+  });
+
+  orderedTags.forEach((tag) => {
+    const button = document.createElement('button');
+    button.type = 'button';
+    button.className = `chip ${state.tag === tag ? 'is-active' : ''}`;
+    button.textContent = tag;
+    button.addEventListener('click', () => {
+      state.tag = tag;
+      renderBankFilters();
       applyFilters();
     });
     els.bankFilters.appendChild(button);
@@ -138,36 +161,6 @@ function renderTimes() {
       applyFilters();
     });
     els.timeFilters.appendChild(button);
-  });
-}
-
-function renderTags() {
-  const tagSet = new Set(['全部标签']);
-
-  PRIORITY_TAGS.forEach((tag) => tagSet.add(tag));
-  state.campaigns.forEach((item) => {
-    if (state.view === 'credit' && !item.isCredit) return;
-    item.tags.forEach((tag) => tagSet.add(tag));
-  });
-
-  const ordered = ['全部标签', ...PRIORITY_TAGS.filter((tag) => tagSet.has(tag))];
-  Array.from(tagSet)
-    .filter((tag) => tag !== '全部标签' && !PRIORITY_TAGS.includes(tag))
-    .sort((a, b) => a.localeCompare(b, 'zh-CN'))
-    .forEach((tag) => ordered.push(tag));
-
-  els.tagFilters.innerHTML = '';
-  ordered.forEach((tag) => {
-    const button = document.createElement('button');
-    button.type = 'button';
-    button.className = `chip ${state.tag === tag ? 'is-active' : ''}`;
-    button.textContent = tag;
-    button.addEventListener('click', () => {
-      state.tag = tag;
-      renderTags();
-      applyFilters();
-    });
-    els.tagFilters.appendChild(button);
   });
 }
 
@@ -281,8 +274,7 @@ function bindEvents() {
       item.classList.toggle('is-active', item === button);
     });
 
-    renderBanks();
-    renderTags();
+    renderBankFilters();
     applyFilters();
   });
 
@@ -302,8 +294,7 @@ function bindEvents() {
       item.classList.toggle('is-active', item.dataset.view === targetView);
     });
 
-    renderBanks();
-    renderTags();
+    renderBankFilters();
     applyFilters();
 
     const targetId = link.getAttribute('href');
@@ -324,8 +315,7 @@ async function fetchCampaigns() {
 
     const data = await response.json();
     state.campaigns = Array.isArray(data) ? data.map(normalizeCampaign).sort(compareCampaign) : [];
-    renderBanks();
-    renderTags();
+    renderBankFilters();
     renderTimes();
     applyFilters();
     setLoadingState({ loading: false, empty: !state.filtered.length });
