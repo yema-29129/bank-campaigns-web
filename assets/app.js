@@ -28,6 +28,28 @@ const els = {
   viewTabs: document.getElementById('viewTabs')
 };
 
+function setMeta(selector, value) {
+  const el = document.querySelector(selector);
+  if (el) el.setAttribute('content', value);
+}
+
+function setHomeMeta() {
+  const isCredit = state.view === 'credit';
+  const title = isCredit
+    ? '信用卡活动专区 | 信用卡返现 | 好羊毛银行活动站'
+    : '银行立减金活动网站 | 微信立减金 | 信用卡返现 | 好羊毛银行活动站';
+  const description = isCredit
+    ? '查看信用卡返现、刷卡优惠、现金红包和信用卡活动，支持按银行、标签和时间快速筛选。'
+    : '薅羊毛·银行/微信立减金/信用卡返现网站，实时更新微信立减金、返现、信用卡返现、信用卡活动、现金红包等信息。';
+
+  document.title = title;
+  setMeta('meta[name="description"]', description);
+  setMeta('meta[property="og:title"]', title);
+  setMeta('meta[property="og:description"]', description);
+  setMeta('meta[name="twitter:title"]', title);
+  setMeta('meta[name="twitter:description"]', description);
+}
+
 function parseDate(str) {
   if (!str) return null;
   let s = String(str).trim().replace(/-/g, '/');
@@ -238,6 +260,7 @@ function applyFilters() {
 
   els.listTitle.textContent = state.view === 'credit' ? '信用卡活动 · 专属专区' : '发现 · 全部活动';
   els.resultSummary.textContent = `共 ${result.length} 条活动，和“好羊毛助手Pro”微信小程序保持实时数据。`;
+  setHomeMeta();
 
   setLoadingState({ empty: !result.length });
   renderCards();

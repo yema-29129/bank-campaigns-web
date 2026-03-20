@@ -33,6 +33,58 @@ const els = {
   lightboxImage: document.getElementById('lightboxImage')
 };
 
+function setMeta(selector, value) {
+  const el = document.querySelector(selector);
+  if (el) el.setAttribute('content', value);
+}
+
+function setCanonical(url) {
+  const el = document.querySelector('link[rel="canonical"]');
+  if (el) el.setAttribute('href', url);
+}
+
+function updateStructuredData(data, url, description) {
+  const script = document.getElementById('detailStructuredData');
+  if (!script) return;
+
+  const payload = {
+    '@context': 'https://schema.org',
+    '@type': 'WebPage',
+    name: `${data.title || '活动详情'} | 好羊毛银行活动站`,
+    url,
+    description,
+    inLanguage: 'zh-CN',
+    isPartOf: {
+      '@type': 'WebSite',
+      name: '好羊毛银行活动站',
+      url: 'https://bank.vooqqqm.com/'
+    }
+  };
+
+  script.textContent = JSON.stringify(payload, null, 2);
+}
+
+function updateDetailMeta(activity) {
+  const title = `${activity.title || '活动详情'} | ${activity.bankName || '银行活动'} | 好羊毛银行活动站`;
+  const description = [
+    activity.desc || '',
+    activity.channel ? `渠道：${activity.channel}` : '',
+    activity.validFrom || activity.validTo ? `时间：${activity.validFrom || '--'} 至 ${activity.validTo || '--'}` : '',
+    activity.region ? `地区：${activity.region}` : ''
+  ].filter(Boolean).join('，').slice(0, 120);
+  const url = `https://bank.vooqqqm.com/detail.html?id=${encodeURIComponent(campaignId)}`;
+
+  document.title = title;
+  setMeta('meta[name="description"]', description || '查看银行立减金活动详情、活动时间、参与路径和二维码图片。');
+  setMeta('meta[property="og:title"]', title);
+  setMeta('meta[property="og:description"]', description || '查看活动时间、参与路径、二维码图片和关键信息。');
+  setMeta('meta[property="og:url"]', url);
+  setMeta('meta[name="twitter:title"]', title);
+  setMeta('meta[name="twitter:description"]', description || '查看活动时间、参与路径、二维码图片和关键信息。');
+  setCanonical(url);
+  updateStructuredData(activity, url, description || '查看银行立减金活动详情、活动时间、参与路径和二维码图片。');
+}
+
 function escapeHtml(value) {
   return String(value)
     .replace(/&/g, '&amp;')
@@ -57,6 +109,7 @@ function normalizeTags(tags) {
 }
 
 function renderDetail(activity) {
+  updateDetailMeta(activity);
   const posterUrl = resolvePosterUrl(activity);
   const isPathUrlLink = /^https?:\/\//i.test(activity.pathUrl || '');
   const metrics = [
