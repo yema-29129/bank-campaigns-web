@@ -208,7 +208,7 @@ function applyFilters() {
   state.filtered = result;
 
   els.listTitle.textContent = state.view === 'credit' ? '信用卡活动 · 专属专区' : '发现 · 全部活动';
-  els.resultSummary.textContent = `共 ${result.length} 条活动，和小程序共用同一套宝塔数据。`;
+  els.resultSummary.textContent = `共 ${result.length} 条活动，和“好羊毛助手Pro”微信小程序保持实时数据。`;
 
   setLoadingState({ empty: !result.length });
   renderCards();
