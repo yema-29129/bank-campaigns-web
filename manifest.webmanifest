@@ -1,0 +1,27 @@
+{
+  "id": "/",
+  "name": "好羊毛银行活动站",
+  "short_name": "好羊毛",
+  "description": "实时查看微信立减金、银行优惠、信用卡返现与现金红包活动。",
+  "start_url": "/?source=pwa",
+  "scope": "/",
+  "display": "standalone",
+  "background_color": "#f3f6fb",
+  "theme_color": "#1e4ed8",
+  "lang": "zh-CN",
+  "categories": ["finance", "shopping", "productivity"],
+  "icons": [
+    {
+      "src": "/assets/favicon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    },
+    {
+      "src": "/assets/favicon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "maskable"
+    }
+  ]
+}

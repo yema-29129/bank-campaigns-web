@@ -132,6 +132,17 @@ body {
   transform: translateY(-1px);
 }
 
+.site-nav-btn {
+  border: 0;
+  background: rgba(31, 94, 255, 0.1);
+  color: var(--brand);
+  cursor: pointer;
+}
+
+.site-nav-btn:hover {
+  background: rgba(31, 94, 255, 0.16);
+}
+
 a {
   color: inherit;
   text-decoration: none;
