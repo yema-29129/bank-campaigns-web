@@ -142,9 +142,10 @@ function renderCards() {
   els.grid.innerHTML = '';
 
   state.filtered.forEach((item) => {
-    const card = document.createElement('article');
+    const card = document.createElement('a');
     const cardTone = item.isCredit ? 'tone-credit' : item.isRecurring ? 'tone-recurring' : 'tone-default';
     card.className = `campaign-card ${cardTone} ${item.isExpired ? 'is-expired' : ''}`;
+    card.href = `./detail.html?id=${encodeURIComponent(item.id)}`;
 
     const badges = [];
     item.tags.forEach((tag) => {
@@ -168,27 +169,9 @@ function renderCards() {
         <span>${escapeHtml(item.channel || item.cashbackRate || '--')}</span>
       </div>
       <div class="card-actions">
-        <a class="primary-btn" href="./detail.html?id=${encodeURIComponent(item.id)}">查看详情</a>
-        ${item.pathUrl ? `<button class="secondary-btn" type="button" data-copy="${escapeHtmlAttr(item.pathUrl)}">复制路径</button>` : ''}
+        <span class="primary-btn card-entry">查看详情</span>
       </div>
     `;
-
-    const copyBtn = card.querySelector('[data-copy]');
-    if (copyBtn) {
-      copyBtn.addEventListener('click', async () => {
-        const value = copyBtn.getAttribute('data-copy') || '';
-        try {
-          await navigator.clipboard.writeText(value);
-          copyBtn.textContent = '已复制';
-          window.setTimeout(() => {
-            copyBtn.textContent = '复制路径';
-          }, 1600);
-        } catch (err) {
-          console.error('复制失败', err);
-          window.alert('复制失败，请手动复制链接。');
-        }
-      });
-    }
 
     els.grid.appendChild(card);
   });
@@ -289,10 +272,6 @@ function escapeHtml(value) {
     .replace(/>/g, '&gt;')
     .replace(/"/g, '&quot;')
     .replace(/'/g, '&#39;');
-}
-
-function escapeHtmlAttr(value) {
-  return escapeHtml(value).replace(/`/g, '&#96;');
 }
 
 bindEvents();
