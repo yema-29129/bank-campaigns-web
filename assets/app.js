@@ -151,6 +151,9 @@ function renderCards() {
     item.tags.forEach((tag) => {
       badges.push(`<span class="badge tag">${escapeHtml(tag)}</span>`);
     });
+    if (item.isRecurring) {
+      badges.push('<span class="badge recurring">循环活动</span>');
+    }
     if (item.isExpired) {
       badges.push('<span class="badge expired">已过期</span>');
     } else if (item.isSoon) {

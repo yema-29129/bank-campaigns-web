@@ -236,6 +236,10 @@ input {
   display: none;
 }
 
+.filters-panel.is-collapsed .legend-row {
+  display: none;
+}
+
 .field > span {
   font-size: 11px;
   font-weight: 700;
@@ -328,6 +332,56 @@ input {
 
 .field-group-time {
   grid-column: 3;
+}
+
+.legend-row {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 10px 14px;
+  margin-top: 16px;
+  padding-top: 14px;
+  border-top: 1px solid rgba(221, 230, 243, 0.9);
+}
+
+.legend-label {
+  color: #62748e;
+  font-size: 11px;
+  font-weight: 800;
+}
+
+.legend-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 10px;
+  border-radius: var(--radius-sm);
+  background: #f4f7fc;
+  color: #52647d;
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.legend-dot {
+  display: inline-block;
+  width: 10px;
+  height: 10px;
+  border-radius: 999px;
+}
+
+.legend-dot-default {
+  background: #d8e6ff;
+  border: 1px solid #aac6ff;
+}
+
+.legend-dot-recurring {
+  background: #cceedd;
+  border: 1px solid #90d7b7;
+}
+
+.legend-dot-credit {
+  background: #ffe7b5;
+  border: 1px solid #f3c86c;
 }
 
 .result-summary {
@@ -453,6 +507,11 @@ input {
 .badge.soon {
   background: #fee2b9;
   color: #b45309;
+}
+
+.badge.recurring {
+  background: #dff7ed;
+  color: #0f766e;
 }
 
 .badge.expired {
@@ -913,6 +972,10 @@ input {
   .filters-grid {
     grid-template-columns: 1fr;
     gap: 10px;
+  }
+
+  .legend-row {
+    gap: 8px;
   }
 
   .field-group-view,
