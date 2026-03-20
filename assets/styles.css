@@ -889,8 +889,8 @@ input {
 .detail-hero h1 {
   margin: 0;
   max-width: none;
-  font-size: clamp(26px, 3.2vw, 40px);
-  line-height: 1.14;
+  font-size: clamp(22px, 2.5vw, 32px);
+  line-height: 1.2;
   letter-spacing: -0.03em;
   text-wrap: balance;
 }
