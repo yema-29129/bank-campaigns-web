@@ -59,7 +59,7 @@ function normalizeTags(tags) {
 function renderDetail(activity) {
   const posterUrl = resolvePosterUrl(activity);
   const isPathUrlLink = /^https?:\/\//i.test(activity.pathUrl || '');
-  const items = [
+  const sideItems = [
     ['适用地区', activity.region || '--'],
     ['消费渠道', activity.channel || '--'],
     ['最低门槛金额', (activity.minAmount || activity.minAmount === 0) ? `${activity.minAmount} 元` : '--'],
@@ -67,53 +67,98 @@ function renderDetail(activity) {
     ['返现比例', activity.cashbackRate || '--'],
     ['活动时间', (activity.validFrom || activity.validTo) ? `${activity.validFrom || '--'} 至 ${activity.validTo || '--'}` : '--'],
     ['重复规则', activity.recurringText || '--'],
-    ['最近更新', activity.updatedDate || '--'],
-    ['获奖内容', activity.awardDesc || '--'],
-    ['活动路径', activity.pathDesc || '--']
+    ['最近更新', activity.updatedDate || '--']
   ];
 
-  const grid = items.map(([label, value]) => `
-    <section class="detail-item">
-      <span class="detail-item-label">${escapeHtml(label)}</span>
-      <p class="detail-item-value">${escapeHtml(value)}</p>
+  const sideGrid = sideItems.map(([label, value]) => `
+    <section class="detail-stat">
+      <span class="detail-stat-label">${escapeHtml(label)}</span>
+      <p class="detail-stat-value">${escapeHtml(value)}</p>
     </section>
   `).join('');
 
+  const tags = (activity.tags || []).map((tag) => `<span class="badge tag">${escapeHtml(tag)}</span>`).join('');
+  const summaryPills = [
+    activity.bankName || '银行活动',
+    activity.channel || '',
+    activity.validTo ? `到期 ${activity.validTo}` : ''
+  ].filter(Boolean).map((text) => `<span class="detail-summary-pill">${escapeHtml(text)}</span>`).join('');
+
   const html = `
     <article class="detail-card">
-      <div class="detail-header">
-        <div>
-          <div class="badge-row">
-            <span class="badge tag">${escapeHtml(activity.bankName || '银行活动')}</span>
-            ${(activity.tags || []).map((tag) => `<span class="badge tag">${escapeHtml(tag)}</span>`).join('')}
+      <section class="detail-hero">
+        <div class="detail-hero-main">
+          <div class="detail-hero-top">
+            <span class="detail-bank-pill">${escapeHtml(activity.bankName || '银行活动')}</span>
+            ${tags ? `<div class="detail-tag-row">${tags}</div>` : ''}
           </div>
           <h1>${escapeHtml(activity.title || '活动详情')}</h1>
           <p class="detail-desc">${escapeHtml(activity.desc || '暂无活动描述')}</p>
-        </div>
-      </div>
-
-      <div class="detail-grid">${grid}</div>
-
-      ${activity.pathUrl ? `
-        <section class="detail-item" style="margin-top: 18px;">
-          <span class="detail-item-label">活动链接</span>
-          <div class="detail-link-row">
-            <span class="detail-link">${escapeHtml(activity.pathUrl)}</span>
-            <div class="card-actions">
-              ${isPathUrlLink ? `<a class="secondary-btn" href="${escapeAttribute(activity.pathUrl)}" target="_blank" rel="noopener noreferrer">打开链接</a>` : ''}
-              <button class="secondary-btn" type="button" id="copyPathBtn">复制路径</button>
-            </div>
-          </div>
-        </section>
-      ` : ''}
-
-      <section class="detail-item" style="margin-top: 18px;">
-        <span class="detail-item-label">活动图片路径</span>
-        <div class="detail-poster-row">
-          <span class="detail-poster-name">活动路径/二维码</span>
-          <button class="primary-btn" type="button" id="viewPosterBtn"${posterUrl ? '' : ' disabled'}>${posterUrl ? '查看图片' : '暂无图片'}</button>
+          <div class="detail-summary-row">${summaryPills}</div>
         </div>
       </section>
+
+      <div class="detail-layout">
+        <section class="detail-main">
+          <section class="detail-section">
+            <div class="detail-section-head">
+              <span class="detail-section-kicker">活动说明</span>
+              <h2>获奖内容</h2>
+            </div>
+            <p class="detail-section-copy">${escapeHtml(activity.awardDesc || '--')}</p>
+          </section>
+
+          <section class="detail-section">
+            <div class="detail-section-head">
+              <span class="detail-section-kicker">参与方式</span>
+              <h2>活动路径</h2>
+            </div>
+            <p class="detail-section-copy">${escapeHtml(activity.pathDesc || '--')}</p>
+          </section>
+
+          ${activity.pathUrl ? `
+            <section class="detail-section detail-section-compact">
+              <div class="detail-section-head">
+                <span class="detail-section-kicker">链接入口</span>
+                <h2>活动链接</h2>
+              </div>
+              <div class="detail-inline-card">
+                <span class="detail-link">${escapeHtml(activity.pathUrl)}</span>
+                <div class="card-actions">
+                  ${isPathUrlLink ? `<a class="secondary-btn" href="${escapeAttribute(activity.pathUrl)}" target="_blank" rel="noopener noreferrer">打开链接</a>` : ''}
+                  <button class="secondary-btn" type="button" id="copyPathBtn">复制路径</button>
+                </div>
+              </div>
+            </section>
+          ` : ''}
+
+          <section class="detail-section detail-section-compact">
+            <div class="detail-section-head">
+              <span class="detail-section-kicker">辅助查看</span>
+              <h2>活动图片路径</h2>
+            </div>
+            <div class="detail-inline-card">
+              <span class="detail-poster-name">活动路径/二维码</span>
+              <button class="primary-btn" type="button" id="viewPosterBtn"${posterUrl ? '' : ' disabled'}>${posterUrl ? '查看图片' : '暂无图片'}</button>
+            </div>
+          </section>
+        </section>
+
+        <aside class="detail-side">
+          <section class="detail-side-panel">
+            <div class="detail-side-head">
+              <span class="detail-section-kicker">关键信息</span>
+              <h2>快速查看</h2>
+            </div>
+            <div class="detail-stat-grid">${sideGrid}</div>
+          </section>
+
+          <section class="detail-side-note">
+            <span class="detail-section-kicker">提示</span>
+            <p>活动规则、名额、页面入口都可能变化，实际请以银行官方页面为准。</p>
+          </section>
+        </aside>
+      </div>
 
       <div class="detail-footer">
         活动内容归所属机构所有，活动奖品随时间推移可能变化，一切活动请以机构官方规则为准。网站端展示仅作信息整理，不构成保证。
