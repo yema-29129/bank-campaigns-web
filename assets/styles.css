@@ -1241,11 +1241,15 @@ input {
   .toolbar,
   .panel-head,
   .detail-topbar,
-  .card-head,
   .card-meta,
   .detail-inline-card {
     flex-direction: column;
     align-items: flex-start;
+  }
+
+  .card-head {
+    flex-direction: row;
+    align-items: center;
   }
 
   .badge-row {
