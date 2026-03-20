@@ -211,8 +211,10 @@ function buildCard(item) {
 
   card.innerHTML = `
     <div class="card-head">
-      <div class="card-bank">${escapeHtml(item.bankName || '银行活动')}</div>
-      <div class="badge-row">${badges.join('')}</div>
+      <div class="badge-row">
+        <div class="card-bank">${escapeHtml(item.bankName || '银行活动')}</div>
+        ${badges.join('')}
+      </div>
     </div>
     <h3 class="card-title">${escapeHtml(item.title || '未命名活动')}</h3>
     <p class="card-desc">${escapeHtml(item.desc || '暂无活动描述')}</p>

@@ -699,9 +699,14 @@ input {
 
 .card-head {
   display: flex;
-  justify-content: space-between;
-  gap: 14px;
-  align-items: flex-start;
+  gap: 10px;
+  align-items: center;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+
+.card-head::-webkit-scrollbar {
+  display: none;
 }
 
 .card-bank {
@@ -715,9 +720,11 @@ input {
 
 .badge-row {
   display: flex;
-  flex-wrap: wrap;
-  justify-content: flex-end;
+  flex-wrap: nowrap;
+  justify-content: flex-start;
+  align-items: center;
   gap: 6px;
+  min-width: max-content;
 }
 
 .badge {
