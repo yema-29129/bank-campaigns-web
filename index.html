@@ -40,42 +40,42 @@
 
     <main class="layout">
       <section class="content">
-        <div class="panel">
-          <div class="panel-head">
-            <h2>筛选条件</h2>
-            <button id="refreshBtn" class="ghost-btn" type="button">刷新数据</button>
-          </div>
-
-          <label class="field">
-            <span>搜索活动</span>
-            <input id="searchInput" type="search" placeholder="输入标题、描述、银行关键词">
-          </label>
-
-          <div class="field">
-            <span>内容分组</span>
-            <div id="viewTabs" class="segmented">
-              <button type="button" class="segmented-btn is-active" data-view="all">发现</button>
-              <button type="button" class="segmented-btn" data-view="credit">信用卡活动</button>
-            </div>
-          </div>
-
-          <div class="field">
-            <span>银行筛选</span>
-            <div id="bankFilters" class="chip-wrap"></div>
-          </div>
-
-          <div class="field">
-            <span>时间筛选</span>
-            <div id="timeFilters" class="chip-wrap"></div>
-          </div>
-        </div>
         <div class="toolbar">
           <div>
             <h2 id="listTitle">发现 · 全部活动</h2>
             <p id="resultSummary" class="result-summary">加载中...</p>
           </div>
           <div class="toolbar-actions">
+            <button id="toggleFiltersBtn" class="ghost-btn" type="button">收起筛选</button>
+            <button id="refreshBtn" class="ghost-btn" type="button">刷新数据</button>
             <a class="toolbar-link" href="./index.html">首页</a>
+          </div>
+        </div>
+
+        <div id="filtersPanel" class="panel filters-panel">
+          <div class="filters-grid">
+            <label class="field field-search">
+              <span>搜索活动</span>
+              <input id="searchInput" type="search" placeholder="输入标题、描述、银行关键词">
+            </label>
+
+            <div class="field">
+              <span>内容分组</span>
+              <div id="viewTabs" class="segmented">
+                <button type="button" class="segmented-btn is-active" data-view="all">发现</button>
+                <button type="button" class="segmented-btn" data-view="credit">信用卡活动</button>
+              </div>
+            </div>
+
+            <div class="field">
+              <span>银行筛选</span>
+              <div id="bankFilters" class="chip-wrap"></div>
+            </div>
+
+            <div class="field">
+              <span>时间筛选</span>
+              <div id="timeFilters" class="chip-wrap"></div>
+            </div>
           </div>
         </div>
 

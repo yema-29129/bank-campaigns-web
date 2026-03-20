@@ -19,6 +19,8 @@ const els = {
   listTitle: document.getElementById('listTitle'),
   searchInput: document.getElementById('searchInput'),
   refreshBtn: document.getElementById('refreshBtn'),
+  toggleFiltersBtn: document.getElementById('toggleFiltersBtn'),
+  filtersPanel: document.getElementById('filtersPanel'),
   bankFilters: document.getElementById('bankFilters'),
   timeFilters: document.getElementById('timeFilters'),
   viewTabs: document.getElementById('viewTabs')
@@ -235,6 +237,11 @@ function bindEvents() {
 
   els.refreshBtn.addEventListener('click', () => {
     fetchCampaigns();
+  });
+
+  els.toggleFiltersBtn.addEventListener('click', () => {
+    const isCollapsed = els.filtersPanel.classList.toggle('is-collapsed');
+    els.toggleFiltersBtn.textContent = isCollapsed ? '展开筛选' : '收起筛选';
   });
 
   els.viewTabs.addEventListener('click', (event) => {
