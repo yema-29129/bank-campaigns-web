@@ -80,6 +80,7 @@ function normalizeCampaign(item) {
     ...item,
     tags: normalizedTags,
     isCredit: hasCreditTag({ ...item, tags: normalizedTags }),
+    isRecurring: Number(item.isRecurring) === 1 || !!item.recurringText,
     isExpired: isExpired(item.validTo),
     isSoon: !isExpired(item.validTo) && isSoon(item.validTo),
     sortTime: getSortTime(item)
@@ -142,7 +143,8 @@ function renderCards() {
 
   state.filtered.forEach((item) => {
     const card = document.createElement('article');
-    card.className = `campaign-card ${item.isExpired ? 'is-expired' : ''}`;
+    const cardTone = item.isCredit ? 'tone-credit' : item.isRecurring ? 'tone-recurring' : 'tone-default';
+    card.className = `campaign-card ${cardTone} ${item.isExpired ? 'is-expired' : ''}`;
 
     const badges = [];
     item.tags.forEach((tag) => {
