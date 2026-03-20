@@ -3,8 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>活动详情 | 银行立减金</title>
-  <meta name="description" content="银行立减金活动详情页">
+  <title>关于我们 | 好羊毛银行活动站</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;700;800&display=swap" rel="stylesheet">
@@ -23,32 +22,18 @@
       <nav class="site-nav" aria-label="主导航">
         <a class="site-nav-link" href="./index.html">首页</a>
         <a class="site-nav-link" href="./index.html#listTitle">发现活动</a>
-        <a class="site-nav-link" href="./index.html#listTitle" data-nav-view="credit">信用卡活动</a>
         <a class="site-nav-link" href="./contact.html">联系方式</a>
       </nav>
     </div>
   </header>
 
-  <div class="detail-shell">
-    <header class="detail-topbar">
-      <a class="ghost-btn" href="./index.html">返回列表</a>
-      <span class="detail-topbar-title">活动详情</span>
-    </header>
-
-    <main id="detailRoot" class="detail-root">
-      <div id="detailLoading" class="state-card">正在加载活动详情...</div>
-      <div id="detailError" class="state-card is-error hidden">活动详情加载失败。</div>
-    </main>
-  </div>
-
-  <div id="imageLightbox" class="lightbox hidden" aria-hidden="true">
-    <div class="lightbox-backdrop" data-close-lightbox="true"></div>
-    <div class="lightbox-dialog">
-      <button class="lightbox-close" type="button" data-close-lightbox="true">关闭</button>
-      <img id="lightboxImage" class="lightbox-image" alt="活动图片">
-      <p class="lightbox-hint">请尽快截图保存</p>
-    </div>
-  </div>
+  <main class="info-shell">
+    <article class="info-card">
+      <h1>关于我们</h1>
+      <p>好羊毛银行活动站专注于整理银行优惠、微信立减金、返现、信用卡返现、信用卡活动、现金红包等公开活动信息，帮助用户更高效地查看和筛选。</p>
+      <p>本站内容主要用于信息整理与展示，方便用户在电脑和手机端同步查看，不代表活动发起机构，不参与活动组织或奖品发放。</p>
+    </article>
+  </main>
 
   <footer class="site-footer">
     <div class="site-footer-inner">
@@ -56,10 +41,9 @@
         <div class="site-footer-logo">薅</div>
         <div>
           <h3>好羊毛银行活动站</h3>
-          <p>网站整理展示微信立减金、返现、信用卡活动等信息，实际活动规则请以银行官方页面为准。</p>
+          <p>整理微信立减金、返现、信用卡返现、信用卡活动、现金红包等信息，帮助用户更快找到值得参与的活动。</p>
         </div>
       </div>
-
       <div class="site-footer-group">
         <h4>网站信息</h4>
         <a href="./about.html">关于我们</a>
@@ -68,19 +52,15 @@
         <a href="./disclaimer.html">免责声明</a>
         <a href="./contact.html">联系方式</a>
       </div>
-
       <div class="site-footer-group">
         <h4>快速入口</h4>
-        <a href="./index.html">返回首页</a>
+        <a href="./index.html">首页</a>
         <a href="./index.html#listTitle">发现活动</a>
-        <a href="./index.html#filtersPanel">筛选条件</a>
       </div>
     </div>
     <div class="site-footer-bottom">
-      <span>© 2026 好羊毛银行活动站。活动内容归所属机构所有。</span>
+      <span>© 2026 好羊毛银行活动站。</span>
     </div>
   </footer>
-
-  <script src="./assets/detail.js"></script>
 </body>
 </html>
