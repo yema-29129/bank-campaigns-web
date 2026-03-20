@@ -30,7 +30,9 @@ const els = {
   loading: document.getElementById('detailLoading'),
   error: document.getElementById('detailError'),
   lightbox: document.getElementById('imageLightbox'),
-  lightboxImage: document.getElementById('lightboxImage')
+  lightboxImage: document.getElementById('lightboxImage'),
+  lightboxError: document.getElementById('lightboxError'),
+  lightboxRawLink: document.getElementById('lightboxRawLink')
 };
 
 function setMeta(selector, value) {
@@ -94,10 +96,18 @@ function escapeHtml(value) {
     .replace(/'/g, '&#39;');
 }
 
+function normalizeMediaUrl(value) {
+  if (!value) return '';
+  if (/^https?:\/\//i.test(value)) return value;
+  if (value.startsWith('//')) return `https:${value}`;
+  if (value.startsWith('/')) return `https://mini.vooqqqm.com${value}`;
+  return `https://mini.vooqqqm.com/${value.replace(/^\.?\//, '')}`;
+}
+
 function resolvePosterUrl(activity) {
   for (const key of POSTER_FIELDS) {
     const value = activity[key];
-    if (typeof value === 'string' && value.trim()) return value.trim();
+    if (typeof value === 'string' && value.trim()) return normalizeMediaUrl(value.trim());
   }
   return '';
 }
@@ -268,6 +278,9 @@ function buildDiscountText(activity) {
 }
 
 function openLightbox(src) {
+  els.lightboxError.classList.add('hidden');
+  els.lightboxImage.classList.remove('hidden');
+  els.lightboxRawLink.href = src;
   els.lightboxImage.src = src;
   els.lightbox.classList.remove('hidden');
   els.lightbox.setAttribute('aria-hidden', 'false');
@@ -277,6 +290,9 @@ function closeLightbox() {
   els.lightbox.classList.add('hidden');
   els.lightbox.setAttribute('aria-hidden', 'true');
   els.lightboxImage.src = '';
+  els.lightboxRawLink.href = '#';
+  els.lightboxError.classList.add('hidden');
+  els.lightboxImage.classList.remove('hidden');
 }
 
 function escapeAttribute(value) {
@@ -318,6 +334,11 @@ els.lightbox.addEventListener('click', (event) => {
 
 document.addEventListener('keydown', (event) => {
   if (event.key === 'Escape') closeLightbox();
+});
+
+els.lightboxImage.addEventListener('error', () => {
+  els.lightboxImage.classList.add('hidden');
+  els.lightboxError.classList.remove('hidden');
 });
 
 fetchDetail();
