@@ -765,10 +765,11 @@ input {
 
 .card-meta {
   display: flex;
-  justify-content: space-between;
+  justify-content: flex-start;
   gap: 10px;
   color: #5f6f87;
   font-size: 11px;
+  flex-wrap: wrap;
 }
 
 .card-actions {
@@ -853,9 +854,17 @@ input {
 
 .detail-hero-tags {
   display: flex;
-  flex-direction: column;
+  flex-direction: row;
   align-items: flex-start;
   gap: 10px;
+  flex-wrap: nowrap;
+  overflow-x: auto;
+  scrollbar-width: none;
+  max-width: 100%;
+}
+
+.detail-hero-tags::-webkit-scrollbar {
+  display: none;
 }
 
 .detail-bank-pill {
@@ -882,7 +891,7 @@ input {
 
 .detail-tag-row {
   display: flex;
-  flex-wrap: wrap;
+  flex-wrap: nowrap;
   gap: 8px;
 }
 

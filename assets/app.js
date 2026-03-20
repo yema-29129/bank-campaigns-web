@@ -218,7 +218,6 @@ function buildCard(item) {
     <p class="card-desc">${escapeHtml(item.desc || '暂无活动描述')}</p>
     <div class="card-meta">
       <span>有效期：${escapeHtml(item.validFrom || '--')} 至 ${escapeHtml(item.validTo || '--')}</span>
-      <span>${escapeHtml(item.channel || item.cashbackRate || '--')}</span>
     </div>
     <div class="card-actions">
       <span class="primary-btn card-entry">查看详情</span>
