@@ -120,7 +120,6 @@ function renderDetail(activity) {
         <section class="detail-main">
           <section class="detail-section detail-section-emphasis">
             <div class="detail-section-head">
-              <span class="detail-section-kicker">活动说明</span>
               <h2>获奖内容</h2>
             </div>
             <p class="detail-section-copy">${escapeHtml(activity.awardDesc || '--')}</p>
@@ -128,7 +127,6 @@ function renderDetail(activity) {
 
           <section class="detail-section">
             <div class="detail-section-head">
-              <span class="detail-section-kicker">参与方式</span>
               <h2>活动路径</h2>
             </div>
             <p class="detail-section-copy">${escapeHtml(activity.pathDesc || '--')}</p>
@@ -137,7 +135,6 @@ function renderDetail(activity) {
           ${activity.pathUrl ? `
             <section class="detail-section detail-section-compact">
               <div class="detail-section-head">
-                <span class="detail-section-kicker">链接入口</span>
                 <h2>活动链接</h2>
               </div>
               <div class="detail-inline-card">
@@ -152,7 +149,6 @@ function renderDetail(activity) {
 
           <section class="detail-section detail-section-compact">
             <div class="detail-section-head">
-              <span class="detail-section-kicker">辅助查看</span>
               <h2>活动图片路径</h2>
             </div>
             <div class="detail-inline-card">
@@ -165,7 +161,6 @@ function renderDetail(activity) {
         <aside class="detail-side">
           <section class="detail-side-panel">
             <div class="detail-side-head">
-              <span class="detail-section-kicker">关键信息</span>
               <h2>快速查看</h2>
             </div>
             <div class="detail-stat-grid">${sideGrid}</div>
@@ -173,7 +168,6 @@ function renderDetail(activity) {
 
           <section class="detail-side-panel detail-side-panel-action">
             <div class="detail-side-head">
-              <span class="detail-section-kicker">图片辅助</span>
               <h2>二维码与路径</h2>
             </div>
             <p class="detail-side-copy">如页面入口不清晰，可点击下方查看活动图片或二维码。</p>

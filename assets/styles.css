@@ -540,7 +540,7 @@ input {
 .detail-hero {
   display: grid;
   grid-template-columns: minmax(0, 1.2fr) minmax(320px, 0.8fr);
-  gap: 18px;
+  gap: 28px;
   padding: 22px;
   border-radius: 24px;
   background:
@@ -551,21 +551,21 @@ input {
 
 .detail-hero-copy {
   display: grid;
-  gap: 12px;
+  gap: 14px;
 }
 
 .detail-hero-top {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 16px;
+  gap: 18px;
 }
 
 .detail-hero-tags {
   display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
-  align-items: center;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 10px;
 }
 
 .detail-bank-pill {
@@ -593,12 +593,12 @@ input {
 .detail-tag-row {
   display: flex;
   flex-wrap: wrap;
-  gap: 6px;
+  gap: 8px;
 }
 
 .detail-hero h1 {
   margin: 0;
-  max-width: 15ch;
+  max-width: 14ch;
   font-size: clamp(26px, 3.2vw, 40px);
   line-height: 1.14;
   letter-spacing: -0.03em;
@@ -615,7 +615,7 @@ input {
 .detail-summary-row {
   display: flex;
   flex-wrap: wrap;
-  gap: 8px;
+  gap: 10px;
 }
 
 .detail-summary-pill {
@@ -632,13 +632,13 @@ input {
 
 .detail-metric-grid {
   display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 10px;
+  grid-template-columns: 1fr;
+  gap: 12px;
   align-content: start;
 }
 
 .detail-metric {
-  padding: 14px;
+  padding: 16px;
   border-radius: 18px;
   background: rgba(255, 255, 255, 0.1);
   border: 1px solid rgba(255, 255, 255, 0.08);
@@ -693,13 +693,6 @@ input {
   padding-bottom: 14px;
 }
 
-.detail-section-head,
-.detail-side-head {
-  display: grid;
-  gap: 4px;
-  margin-bottom: 12px;
-}
-
 .detail-section-kicker {
   font-size: 10px;
   font-weight: 800;
@@ -713,6 +706,7 @@ input {
   margin: 0;
   font-size: 19px;
   line-height: 1.2;
+  margin-bottom: 12px;
 }
 
 .detail-section-copy {
@@ -910,7 +904,6 @@ input {
   .detail-topbar,
   .card-head,
   .card-meta,
-  .detail-hero-top,
   .detail-inline-card {
     flex-direction: column;
     align-items: flex-start;
@@ -924,6 +917,10 @@ input {
   .detail-layout,
   .detail-stat-grid {
     grid-template-columns: 1fr;
+  }
+
+  .detail-hero-top {
+    align-items: flex-start;
   }
 
   .card-title {
