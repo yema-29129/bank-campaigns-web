@@ -59,8 +59,8 @@ body {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 18px;
-  padding: 12px 0;
+  gap: 24px;
+  padding: 14px 0;
 }
 
 .site-brand {
@@ -105,7 +105,7 @@ body {
 .site-nav {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 10px;
   flex-wrap: wrap;
 }
 
@@ -162,8 +162,8 @@ input {
 
 .site-footer-inner {
   display: grid;
-  grid-template-columns: minmax(280px, 1.3fr) minmax(180px, 0.7fr) minmax(180px, 0.7fr);
-  gap: 22px 40px;
+  grid-template-columns: minmax(360px, 1.5fr) minmax(200px, 0.7fr) minmax(200px, 0.7fr);
+  gap: 28px 44px;
   align-items: start;
 }
 
@@ -398,7 +398,7 @@ input {
 
 .filters-grid {
   display: grid;
-  grid-template-columns: minmax(220px, 0.85fr) minmax(320px, 1.45fr) minmax(220px, 0.8fr);
+  grid-template-columns: minmax(220px, 0.8fr) minmax(260px, 1fr) minmax(260px, 1fr) minmax(220px, 0.8fr);
   gap: 18px 22px;
   align-items: start;
 }
@@ -511,8 +511,12 @@ input {
   grid-column: 2;
 }
 
-.field-group-time {
+.field-group-tag {
   grid-column: 3;
+}
+
+.field-group-time {
+  grid-column: 4;
 }
 
 .legend-row {
@@ -529,6 +533,20 @@ input {
   color: #62748e;
   font-size: 11px;
   font-weight: 800;
+}
+
+@media (min-width: 980px) {
+  .site-header {
+    box-shadow: 0 10px 24px rgba(22, 34, 58, 0.04);
+  }
+
+  .site-brand-copy strong {
+    font-size: 17px;
+  }
+
+  .toolbar {
+    align-items: flex-end;
+  }
 }
 
 .legend-chip {
@@ -1189,6 +1207,7 @@ input {
 
   .field-group-view,
   .field-group-bank,
+  .field-group-tag,
   .field-group-time {
     grid-column: auto;
   }

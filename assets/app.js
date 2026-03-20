@@ -1,11 +1,13 @@
 const API_BASE = 'https://mini.vooqqqm.com/api';
 const TIME_OPTIONS = ['全部时间', '3天内', '7天内', '14天内', '30天内'];
+const PRIORITY_TAGS = ['固定活动', '每日签到', '重点推荐'];
 
 const state = {
   campaigns: [],
   filtered: [],
   view: 'all',
   bank: '全部',
+  tag: '全部标签',
   time: '全部时间',
   keyword: ''
 };
@@ -22,6 +24,7 @@ const els = {
   toggleFiltersBtn: document.getElementById('toggleFiltersBtn'),
   filtersPanel: document.getElementById('filtersPanel'),
   bankFilters: document.getElementById('bankFilters'),
+  tagFilters: document.getElementById('tagFilters'),
   timeFilters: document.getElementById('timeFilters'),
   viewTabs: document.getElementById('viewTabs')
 };
@@ -138,6 +141,36 @@ function renderTimes() {
   });
 }
 
+function renderTags() {
+  const tagSet = new Set(['全部标签']);
+
+  PRIORITY_TAGS.forEach((tag) => tagSet.add(tag));
+  state.campaigns.forEach((item) => {
+    if (state.view === 'credit' && !item.isCredit) return;
+    item.tags.forEach((tag) => tagSet.add(tag));
+  });
+
+  const ordered = ['全部标签', ...PRIORITY_TAGS.filter((tag) => tagSet.has(tag))];
+  Array.from(tagSet)
+    .filter((tag) => tag !== '全部标签' && !PRIORITY_TAGS.includes(tag))
+    .sort((a, b) => a.localeCompare(b, 'zh-CN'))
+    .forEach((tag) => ordered.push(tag));
+
+  els.tagFilters.innerHTML = '';
+  ordered.forEach((tag) => {
+    const button = document.createElement('button');
+    button.type = 'button';
+    button.className = `chip ${state.tag === tag ? 'is-active' : ''}`;
+    button.textContent = tag;
+    button.addEventListener('click', () => {
+      state.tag = tag;
+      renderTags();
+      applyFilters();
+    });
+    els.tagFilters.appendChild(button);
+  });
+}
+
 function renderCards() {
   els.grid.innerHTML = '';
 
@@ -198,6 +231,10 @@ function applyFilters() {
     result = result.filter((item) => item.bankName === state.bank);
   }
 
+  if (state.tag !== '全部标签') {
+    result = result.filter((item) => item.tags.includes(state.tag));
+  }
+
   if (state.time !== '全部时间') {
     const days = Number.parseInt(state.time, 10);
     const threshold = Date.now() - days * 24 * 60 * 60 * 1000;
@@ -238,13 +275,42 @@ function bindEvents() {
 
     state.view = button.dataset.view;
     state.bank = '全部';
+    state.tag = '全部标签';
 
     Array.from(els.viewTabs.querySelectorAll('.segmented-btn')).forEach((item) => {
       item.classList.toggle('is-active', item === button);
     });
 
     renderBanks();
+    renderTags();
     applyFilters();
+  });
+
+  document.addEventListener('click', (event) => {
+    const link = event.target.closest('[data-nav-view]');
+    if (!link) return;
+
+    event.preventDefault();
+    const targetView = link.dataset.navView;
+    if (!targetView || !els.viewTabs) return;
+
+    state.view = targetView;
+    state.bank = '全部';
+    state.tag = '全部标签';
+
+    Array.from(els.viewTabs.querySelectorAll('.segmented-btn')).forEach((item) => {
+      item.classList.toggle('is-active', item.dataset.view === targetView);
+    });
+
+    renderBanks();
+    renderTags();
+    applyFilters();
+
+    const targetId = link.getAttribute('href');
+    if (targetId && targetId.startsWith('./index.html#')) {
+      const anchor = document.querySelector(targetId.replace('./index.html', ''));
+      if (anchor) anchor.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
   });
 }
 
@@ -259,6 +325,7 @@ async function fetchCampaigns() {
     const data = await response.json();
     state.campaigns = Array.isArray(data) ? data.map(normalizeCampaign).sort(compareCampaign) : [];
     renderBanks();
+    renderTags();
     renderTimes();
     applyFilters();
     setLoadingState({ loading: false, empty: !state.filtered.length });
