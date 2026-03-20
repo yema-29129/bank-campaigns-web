@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>活动详情 | 银行立减金</title>
+  <meta name="description" content="银行立减金活动详情页">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="./assets/styles.css">
+</head>
+<body>
+  <div class="detail-shell">
+    <header class="detail-topbar">
+      <a class="ghost-btn" href="./index.html">返回列表</a>
+      <span class="detail-topbar-title">活动详情</span>
+    </header>
+
+    <main id="detailRoot" class="detail-root">
+      <div id="detailLoading" class="state-card">正在加载活动详情...</div>
+      <div id="detailError" class="state-card is-error hidden">活动详情加载失败。</div>
+    </main>
+  </div>
+
+  <div id="imageLightbox" class="lightbox hidden" aria-hidden="true">
+    <div class="lightbox-backdrop" data-close-lightbox="true"></div>
+    <div class="lightbox-dialog">
+      <button class="lightbox-close" type="button" data-close-lightbox="true">关闭</button>
+      <img id="lightboxImage" class="lightbox-image" alt="活动图片">
+      <p class="lightbox-hint">请尽快截图保存</p>
+    </div>
+  </div>
+
+  <script src="./assets/detail.js"></script>
+</body>
+</html>

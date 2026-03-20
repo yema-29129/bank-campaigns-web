@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>银行立减金 | 活动网站</title>
+  <meta name="description" content="银行立减金活动网站，支持电脑和手机浏览，内容与小程序同步更新。">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="./assets/styles.css">
+</head>
+<body>
+  <div class="site-shell">
+    <header class="hero">
+      <div class="hero-copy">
+        <span class="eyebrow">Web Edition</span>
+        <h1>银行立减金活动网站</h1>
+        <p class="hero-text">和你现在的小程序共用同一套数据。你在宝塔里更新活动、图片和有效期后，网站端会同步显示。</p>
+        <div class="hero-note">
+          <span class="hero-note-label">提示</span>
+          <p>网站端不使用“看广告解锁图片”这类不适合 AdSense 的交互，后续可接入标准展示广告位。</p>
+        </div>
+      </div>
+      <div class="hero-stats">
+        <div class="stat-card">
+          <span class="stat-label">同步来源</span>
+          <strong>宝塔数据库 / PHP 接口</strong>
+        </div>
+        <div class="stat-card">
+          <span class="stat-label">浏览体验</span>
+          <strong>手机 + 电脑自适应</strong>
+        </div>
+        <div class="stat-card">
+          <span class="stat-label">内容范围</span>
+          <strong>发现 / 信用卡活动 / 活动详情</strong>
+        </div>
+      </div>
+    </header>
+
+    <main class="layout">
+      <aside class="filters">
+        <div class="panel">
+          <div class="panel-head">
+            <h2>筛选条件</h2>
+            <button id="refreshBtn" class="ghost-btn" type="button">刷新数据</button>
+          </div>
+
+          <label class="field">
+            <span>搜索活动</span>
+            <input id="searchInput" type="search" placeholder="输入标题、描述、银行关键词">
+          </label>
+
+          <div class="field">
+            <span>内容分组</span>
+            <div id="viewTabs" class="segmented">
+              <button type="button" class="segmented-btn is-active" data-view="all">发现</button>
+              <button type="button" class="segmented-btn" data-view="credit">信用卡活动</button>
+            </div>
+          </div>
+
+          <div class="field">
+            <span>银行筛选</span>
+            <div id="bankFilters" class="chip-wrap"></div>
+          </div>
+
+          <div class="field">
+            <span>时间筛选</span>
+            <div id="timeFilters" class="chip-wrap"></div>
+          </div>
+        </div>
+
+        <div class="panel info-panel">
+          <h3>内容更新方式</h3>
+          <ol class="steps">
+            <li>在宝塔上传活动图片到你的服务器目录。</li>
+            <li>在数据库 `campaigns` 表更新活动字段和 `posterUrl`。</li>
+            <li>网站和小程序都会从同一套接口读取最新内容。</li>
+          </ol>
+        </div>
+      </aside>
+
+      <section class="content">
+        <div class="toolbar">
+          <div>
+            <h2 id="listTitle">发现 · 全部活动</h2>
+            <p id="resultSummary" class="result-summary">加载中...</p>
+          </div>
+          <div class="toolbar-actions">
+            <a class="toolbar-link" href="./index.html">首页</a>
+          </div>
+        </div>
+
+        <div id="loadingState" class="state-card">正在加载活动数据...</div>
+        <div id="errorState" class="state-card is-error hidden">加载失败，请检查接口是否可访问。</div>
+        <div id="emptyState" class="state-card hidden">没有符合条件的活动，换个筛选试试。</div>
+
+        <div id="cardGrid" class="card-grid"></div>
+      </section>
+    </main>
+  </div>
+
+  <script src="./assets/app.js"></script>
+</body>
+</html>
