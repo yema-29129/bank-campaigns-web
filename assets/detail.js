@@ -1,4 +1,5 @@
 const API_BASE = 'https://mini.vooqqqm.com/api';
+const GROUP_QR_URL = 'https://mini.vooqqqm.com/uploads/fixed/group-wechat-qr.png';
 const POSTER_FIELDS = [
   'posterUrl',
   'posterPath',
@@ -233,6 +234,13 @@ function renderDetail(activity) {
             <span class="detail-section-kicker">提示</span>
             <p>活动规则、名额、页面入口都可能变化，实际请以银行官方页面为准。</p>
           </section>
+
+          <section class="detail-side-note detail-side-promo">
+            <span class="detail-section-kicker">社群福利</span>
+            <h2>加入「薅羊毛微信群·每月最少薅500元」</h2>
+            <p>点击下方按钮即可查看固定微信群二维码，后续扫码进群即可获取更多羊毛线报。</p>
+            <button class="primary-btn detail-promo-btn" type="button" id="viewGroupQrBtn">查看群二维码</button>
+          </section>
         </aside>
       </div>
 
@@ -264,6 +272,11 @@ function renderDetail(activity) {
   const openPoster = () => openLightbox(posterUrl);
   if (posterBtn && posterUrl) {
     posterBtn.addEventListener('click', openPoster);
+  }
+
+  const groupQrBtn = document.getElementById('viewGroupQrBtn');
+  if (groupQrBtn) {
+    groupQrBtn.addEventListener('click', () => openLightbox(GROUP_QR_URL));
   }
 }
 
