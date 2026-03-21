@@ -1,5 +1,5 @@
 const API_BASE = 'https://mini.vooqqqm.com/api';
-const GROUP_QR_URL = 'https://mini.vooqqqm.com/uploads/fixed/group-wechat-qr.png?v=20260321';
+const GROUP_QR_URL = './assets/group-wechat-qr.png?v=20260321';
 const POSTER_FIELDS = [
   'posterUrl',
   'posterPath',
