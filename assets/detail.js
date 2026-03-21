@@ -1,5 +1,5 @@
 const API_BASE = 'https://mini.vooqqqm.com/api';
-const GROUP_QR_URL = 'https://mini.vooqqqm.com/uploads/fixed/group-wechat-qr.png';
+const GROUP_QR_URL = 'https://mini.vooqqqm.com/uploads/fixed/group-wechat-qr.png?v=20260321';
 const POSTER_FIELDS = [
   'posterUrl',
   'posterPath',
@@ -33,8 +33,12 @@ const els = {
   lightbox: document.getElementById('imageLightbox'),
   lightboxImage: document.getElementById('lightboxImage'),
   lightboxError: document.getElementById('lightboxError'),
-  lightboxRawLink: document.getElementById('lightboxRawLink')
+  lightboxRawLink: document.getElementById('lightboxRawLink'),
+  lightboxErrorTitle: document.getElementById('lightboxErrorTitle'),
+  lightboxErrorText: document.getElementById('lightboxErrorText')
 };
+
+let currentLightboxType = 'poster';
 
 function setMeta(selector, value) {
   const el = document.querySelector(selector);
@@ -269,14 +273,14 @@ function renderDetail(activity) {
   }
 
   const posterBtn = document.getElementById('viewPosterBtn');
-  const openPoster = () => openLightbox(posterUrl);
+  const openPoster = () => openLightbox(posterUrl, 'poster');
   if (posterBtn && posterUrl) {
     posterBtn.addEventListener('click', openPoster);
   }
 
   const groupQrBtn = document.getElementById('viewGroupQrBtn');
   if (groupQrBtn) {
-    groupQrBtn.addEventListener('click', () => openLightbox(GROUP_QR_URL));
+    groupQrBtn.addEventListener('click', () => openLightbox(GROUP_QR_URL, 'group'));
   }
 }
 
@@ -290,7 +294,8 @@ function buildDiscountText(activity) {
   return '--';
 }
 
-function openLightbox(src) {
+function openLightbox(src, type = 'poster') {
+  currentLightboxType = type;
   els.lightboxError.classList.add('hidden');
   els.lightboxImage.classList.remove('hidden');
   els.lightboxRawLink.href = src;
@@ -351,6 +356,13 @@ document.addEventListener('keydown', (event) => {
 
 els.lightboxImage.addEventListener('error', () => {
   els.lightboxImage.classList.add('hidden');
+  if (currentLightboxType === 'group') {
+    els.lightboxErrorTitle.textContent = '群二维码暂时无法显示';
+    els.lightboxErrorText.textContent = '固定微信群二维码还没有上传到指定地址，或者图片文件暂时无法公开访问。';
+  } else {
+    els.lightboxErrorTitle.textContent = '图片加载失败';
+    els.lightboxErrorText.textContent = '当前图片地址可能已失效、禁止跨域访问，或者数据库里保存的是不完整路径。';
+  }
   els.lightboxError.classList.remove('hidden');
 });
 
