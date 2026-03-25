@@ -83,31 +83,69 @@ function isSoon(validTo, days = 3) {
   return diff >= 0 && diff <= days * 24 * 60 * 60 * 1000;
 }
 
-function hasCreditTag(item) {
-  const raw = item.tags || [];
-  const list = Array.isArray(raw) ? raw : String(raw).split(/[，,]/);
-  return list.some((tag) => {
-    const t = String(tag).trim();
-    return t.includes('信用卡') || t.includes('刷卡') || t.includes('返现') || t.includes('卡片');
-  });
-}
-
 function normalizeTags(tags) {
   if (Array.isArray(tags)) return tags.filter(Boolean);
   if (!tags) return [];
-  return String(tags).split(/[，,]/).map((item) => item.trim()).filter(Boolean);
+  return String(tags)
+    .split(/[，,]/)
+    .map((item) => item.trim())
+    .filter(Boolean);
+}
+
+function hasCreditTag(item) {
+  // 1. 优先使用后端已经计算好的字段
+  if (item && (item.isCredit === 1 || item.isCredit === true)) {
+    return true;
+  }
+
+  // 2. 兜底：综合 bankName / title / desc / channel / tags 一起判断
+  const bankName = String(item.bankName || '').toLowerCase();
+  const title = String(item.title || '').toLowerCase();
+  const desc = String(item.desc || '').toLowerCase();
+  const channel = String(item.channel || '').toLowerCase();
+
+  const tagsRaw = item.tags || [];
+  const tagsText = Array.isArray(tagsRaw)
+    ? tagsRaw.map((tag) => String(tag).toLowerCase()).join(' ')
+    : String(tagsRaw).toLowerCase();
+
+  const allText = `${bankName} ${title} ${desc} ${channel} ${tagsText}`;
+
+  const keywords = [
+    '信用卡',
+    '刷卡',
+    '返现',
+    '卡片',
+    'visa',
+    'mastercard',
+    '万事达',
+    '运通',
+    'american express',
+    'amex',
+    '银联',
+    'apple pay',
+    'google pay',
+    'paywave',
+    'paypass'
+  ];
+
+  return keywords.some((keyword) => allText.includes(keyword.toLowerCase()));
 }
 
 function normalizeCampaign(item) {
   const normalizedTags = normalizeTags(item.tags);
-  return {
+  const normalized = {
     ...item,
-    tags: normalizedTags,
-    isCredit: hasCreditTag({ ...item, tags: normalizedTags }),
-    isRecurring: Number(item.isRecurring) === 1 || !!item.recurringText,
-    isExpired: isExpired(item.validTo),
-    isSoon: !isExpired(item.validTo) && isSoon(item.validTo),
-    sortTime: getSortTime(item)
+    tags: normalizedTags
+  };
+
+  return {
+    ...normalized,
+    isCredit: hasCreditTag(normalized),
+    isRecurring: Number(normalized.isRecurring) === 1 || !!normalized.recurringText,
+    isExpired: isExpired(normalized.validTo),
+    isSoon: !isExpired(normalized.validTo) && isSoon(normalized.validTo),
+    sortTime: getSortTime(normalized)
   };
 }
 
@@ -200,9 +238,15 @@ function buildCard(item) {
   item.tags.forEach((tag) => {
     badges.push(`<span class="badge tag">${escapeHtml(tag)}</span>`);
   });
+
   if (item.isRecurring) {
     badges.push('<span class="badge recurring">循环活动</span>');
   }
+
+  if (item.isCredit) {
+    badges.push('<span class="badge credit">信用卡</span>');
+  }
+
   if (item.isExpired) {
     badges.push('<span class="badge expired">已过期</span>');
   } else if (item.isSoon) {
@@ -263,7 +307,7 @@ function applyFilters() {
   els.resultSummary.textContent = `共 ${result.length} 条活动，和“好羊毛助手Pro”微信小程序保持实时数据。`;
   setHomeMeta();
 
-  setLoadingState({ empty: !result.length });
+  setLoadingState({ loading: false, error: false, empty: !result.length });
   renderCards();
 }
 
@@ -288,6 +332,7 @@ function bindEvents() {
 
     state.view = button.dataset.view;
     state.bank = '全部';
+    state.showExpired = false;
 
     Array.from(els.viewTabs.querySelectorAll('.segmented-btn')).forEach((item) => {
       item.classList.toggle('is-active', item === button);
@@ -332,15 +377,24 @@ async function fetchCampaigns() {
     const response = await fetch(`${API_BASE}/campaigns.php`, { credentials: 'omit' });
     if (!response.ok) throw new Error(`HTTP ${response.status}`);
 
-    const data = await response.json();
-    state.campaigns = Array.isArray(data) ? data.map(normalizeCampaign).sort(compareCampaign) : [];
+    const payload = await response.json();
+    const ok = payload && payload.code === 0;
+    const list = ok && Array.isArray(payload.data) ? payload.data : [];
+
+    if (!ok) {
+      console.error('网站活动接口返回异常', payload);
+      throw new Error(payload.message || '接口返回异常');
+    }
+
+    state.campaigns = list.map(normalizeCampaign).sort(compareCampaign);
+
     renderBankFilters();
     renderTimes();
     applyFilters();
-    setLoadingState({ loading: false, empty: !state.filtered.length });
+    setLoadingState({ loading: false, error: false, empty: !state.filtered.length });
   } catch (err) {
     console.error('加载活动失败', err);
-    setLoadingState({ loading: false, error: true });
+    setLoadingState({ loading: false, error: true, empty: false });
   }
 }
 
@@ -360,13 +414,37 @@ function matchesBankFilter(item, selected) {
   if (selected === '工商银行') return bankName.includes('工商');
   if (selected === '农业银行') return bankName.includes('农业');
   if (selected === '建设银行') return bankName.includes('建设');
-  if (selected === '中国银行') return bankName.includes('中国银行') && !bankName.includes('中国工商') && !bankName.includes('中国农业') && !bankName.includes('中国建设');
-  if (selected === '其他银行') {
-    return !bankName.includes('工商') && !bankName.includes('农业') && !bankName.includes('建设') && !(bankName.includes('中国银行') && !bankName.includes('中国工商') && !bankName.includes('中国农业') && !bankName.includes('中国建设'));
+  if (selected === '中国银行') {
+    return bankName.includes('中国银行') &&
+      !bankName.includes('中国工商') &&
+      !bankName.includes('中国农业') &&
+      !bankName.includes('中国建设');
   }
-  if (selected === '信用卡返现') return item.isCredit || tags.some((tag) => String(tag).includes('返现'));
-  if (selected === '固定活动' || selected === '每日签到' || selected === '重点推荐') {
-    return tags.includes(selected);
+
+  if (selected === '其他银行') {
+    return !bankName.includes('工商') &&
+      !bankName.includes('农业') &&
+      !bankName.includes('建设') &&
+      !(bankName.includes('中国银行') &&
+        !bankName.includes('中国工商') &&
+        !bankName.includes('中国农业') &&
+        !bankName.includes('中国建设'));
+  }
+
+  if (selected === '信用卡返现') {
+    return item.isCredit || tags.some((tag) => String(tag).includes('返现'));
+  }
+
+  if (selected === '固定活动') {
+    return tags.includes('固定活动');
+  }
+
+  if (selected === '每日签到') {
+    return tags.includes('每日签到') || item.recurringType === 'day' || item.recurringText === '每日签到';
+  }
+
+  if (selected === '重点推荐') {
+    return tags.includes('重点推荐') || String(item.star || '').includes('🌟🌟🌟');
   }
 
   return true;
