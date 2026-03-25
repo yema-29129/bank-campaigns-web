@@ -1,43 +1,47 @@
 const API_BASE = 'https://mini.vooqqqm.com/api';
 const COMMUNITY_QR_URL = 'https://mini.vooqqqm.com/uploads/posters/wechat-group-qrcode.png';
 
+function $(id) {
+  return document.getElementById(id);
+}
+
 const els = {
-  pageTitle: document.getElementById('detailPageTitle'),
-  backBtn: document.getElementById('backBtn'),
+  pageTitle: $('detailPageTitle'),
+  backBtn: $('backBtn'),
 
-  bankBadge: document.getElementById('bankBadge'),
-  mainTitle: document.getElementById('mainTitle'),
-  mainDesc: document.getElementById('mainDesc'),
-  heroChannel: document.getElementById('heroChannel'),
+  bankBadge: $('bankBadge'),
+  mainTitle: $('mainTitle'),
+  mainDesc: $('mainDesc'),
+  heroChannel: $('heroChannel'),
 
-  heroDiscount: document.getElementById('heroDiscount'),
-  heroMinAmount: document.getElementById('heroMinAmount'),
-  heroDate: document.getElementById('heroDate'),
-  heroRegion: document.getElementById('heroRegion'),
+  heroDiscount: $('heroDiscount'),
+  heroMinAmount: $('heroMinAmount'),
+  heroDate: $('heroDate'),
+  heroRegion: $('heroRegion'),
 
-  awardDesc: document.getElementById('awardDesc'),
-  pathDesc: document.getElementById('pathDesc'),
+  awardDesc: $('awardDesc'),
+  pathDesc: $('pathDesc'),
 
-  quickRegion: document.getElementById('quickRegion'),
-  quickChannel: document.getElementById('quickChannel'),
-  quickMinAmount: document.getElementById('quickMinAmount'),
-  quickDiscount: document.getElementById('quickDiscount'),
-  quickCashback: document.getElementById('quickCashback'),
-  quickDate: document.getElementById('quickDate'),
-  quickRecurring: document.getElementById('quickRecurring'),
-  quickUpdated: document.getElementById('quickUpdated'),
+  quickRegion: $('quickRegion'),
+  quickChannel: $('quickChannel'),
+  quickMinAmount: $('quickMinAmount'),
+  quickDiscount: $('quickDiscount'),
+  quickCashback: $('quickCashback'),
+  quickDate: $('quickDate'),
+  quickRecurring: $('quickRecurring'),
+  quickUpdated: $('quickUpdated'),
 
-  pathUrlText: document.getElementById('pathUrlText'),
-  copyPathBtn: document.getElementById('copyPathBtn'),
+  pathUrlText: $('pathUrlText'),
+  copyPathBtn: $('copyPathBtn'),
 
-  posterBtn: document.getElementById('posterBtn'),
-  posterHint: document.getElementById('posterHint'),
+  posterBtn: $('posterBtn'),
+  posterHint: $('posterHint'),
 
-  communityBtn: document.getElementById('communityBtn'),
+  communityBtn: $('communityBtn'),
 
-  loadingState: document.getElementById('loadingState'),
-  errorState: document.getElementById('errorState'),
-  detailContent: document.getElementById('detailContent')
+  loadingState: $('loadingState'),
+  errorState: $('errorState'),
+  detailContent: $('detailContent')
 };
 
 function getIdFromQuery() {
@@ -192,7 +196,13 @@ function renderDetail(data) {
   if (els.pathUrlText) {
     if (pathUrl) {
       els.pathUrlText.textContent = pathUrl;
-      els.pathUrlText.setAttribute('href', pathUrl.startsWith('http') ? pathUrl : '#');
+      if (pathUrl.startsWith('http')) {
+        els.pathUrlText.setAttribute('href', pathUrl);
+        els.pathUrlText.setAttribute('target', '_blank');
+        els.pathUrlText.setAttribute('rel', 'noopener noreferrer');
+      } else {
+        els.pathUrlText.removeAttribute('href');
+      }
     } else {
       els.pathUrlText.textContent = '--';
       els.pathUrlText.removeAttribute('href');
@@ -262,7 +272,6 @@ async function fetchDetail() {
 
     const payload = await response.json();
 
-    // ✅ 兼容新格式：{ code, message, data }
     const ok = payload && payload.code === 0;
     const data = ok ? (payload.data || null) : null;
 
@@ -291,5 +300,7 @@ function bindBaseEvents() {
   }
 }
 
-bindBaseEvents();
-fetchDetail();
+document.addEventListener('DOMContentLoaded', () => {
+  bindBaseEvents();
+  fetchDetail();
+});
