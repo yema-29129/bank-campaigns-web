@@ -150,7 +150,9 @@ function buildDiscountText(activity) {
 }
 
 function formatMultiLineCompact(text) {
-  return escapeHtml(text || '--').replace(/\n+/g, '<br>');
+  return escapeHtml(text || '--')
+    .replace(/\n{2,}/g, '<br><br>')   // 多个换行 → 段落间空一行
+    .replace(/\n/g, '<br>');         // 单个换行 → 正常换行
 }
 
 function ensureRuntimeStyles() {
@@ -193,8 +195,7 @@ function ensureRuntimeStyles() {
 
     /* 这里控制图1、图2的正文行间距 */
     .detail-section-copy.compact-copy {
-      line-height: 1.10 !important;
-      white-space: pre-line;
+      line-height: 1.6 !important;
       margin: 0;
     }
 
