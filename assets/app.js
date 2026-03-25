@@ -107,12 +107,10 @@ function normalizeTags(tags) {
 }
 
 function hasCreditTag(item) {
-  // 优先使用后端已经计算好的字段
   if (item && (item.isCredit === 1 || item.isCredit === true)) {
     return true;
   }
 
-  // 兜底：综合多个字段判断
   const bankName = String(item.bankName || '').toLowerCase();
   const title = String(item.title || '').toLowerCase();
   const desc = String(item.desc || '').toLowerCase();
@@ -169,7 +167,6 @@ function compareCampaign(a, b) {
   const eb = b.isExpired ? 1 : 0;
   if (ea !== eb) return ea - eb;
 
-  // 今日新增优先
   const na = a.isTodayAdded ? 0 : 1;
   const nb = b.isTodayAdded ? 0 : 1;
   if (na !== nb) return na - nb;
@@ -183,11 +180,11 @@ function setLoadingState({ loading = false, error = false, empty = false } = {})
   els.empty.classList.toggle('hidden', !empty);
 }
 
-function injectTodayEntryStyles() {
-  if (document.getElementById('todayEntryStyles')) return;
+function injectRuntimeStyles() {
+  if (document.getElementById('tmhzz-runtime-styles')) return;
 
   const style = document.createElement('style');
-  style.id = 'todayEntryStyles';
+  style.id = 'tmhzz-runtime-styles';
   style.textContent = `
     .today-entry-web {
       margin: 12px 0;
@@ -264,6 +261,37 @@ function injectTodayEntryStyles() {
       opacity: 0.8;
     }
 
+    .filters-swapped {
+      display: grid;
+      grid-template-columns: 1fr 2fr;
+      gap: 28px;
+      align-items: start;
+    }
+
+    .filters-swapped .filter-group {
+      min-width: 0;
+    }
+
+    .filters-swapped .filter-group-time {
+      order: 1;
+    }
+
+    .filters-swapped .filter-group-bank {
+      order: 2;
+    }
+
+    @media (max-width: 900px) {
+      .filters-swapped {
+        grid-template-columns: 1fr;
+        gap: 18px;
+      }
+
+      .filters-swapped .filter-group-time,
+      .filters-swapped .filter-group-bank {
+        order: initial;
+      }
+    }
+
     @media (max-width: 768px) {
       .today-entry-web {
         padding: 12px 14px;
@@ -289,7 +317,7 @@ function injectTodayEntryStyles() {
 function ensureTodayEntry() {
   if (todayEntryEl) return todayEntryEl;
 
-  injectTodayEntryStyles();
+  injectRuntimeStyles();
 
   todayEntryEl = document.createElement('div');
   todayEntryEl.className = 'today-entry-web';
@@ -337,6 +365,25 @@ function updateTodayEntry() {
     countEl.classList.add('hidden');
     countEl.textContent = '';
     subEl.textContent = '今天暂无新活动，也可以点我快速查看';
+  }
+}
+
+function swapFilterLayout() {
+  if (!els.filtersPanel || !els.bankFilters || !els.timeFilters) return;
+
+  injectRuntimeStyles();
+
+  const bankGroup = els.bankFilters.closest('.filter-group');
+  const timeGroup = els.timeFilters.closest('.filter-group');
+
+  if (!bankGroup || !timeGroup) return;
+
+  els.filtersPanel.classList.add('filters-swapped');
+  bankGroup.classList.add('filter-group-bank');
+  timeGroup.classList.add('filter-group-time');
+
+  if (timeGroup.previousElementSibling !== null) {
+    els.filtersPanel.insertBefore(timeGroup, els.filtersPanel.firstChild);
   }
 }
 
@@ -585,6 +632,7 @@ async function fetchCampaigns() {
     state.campaigns = list.map(normalizeCampaign).sort(compareCampaign);
 
     ensureTodayEntry();
+    swapFilterLayout();
     renderBankFilters();
     renderTimes();
     applyFilters();
@@ -652,4 +700,5 @@ function matchesBankFilter(item, selected) {
 bindEvents();
 renderTimes();
 ensureTodayEntry();
+swapFilterLayout();
 fetchCampaigns();
