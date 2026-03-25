@@ -1,5 +1,6 @@
 const API_BASE = 'https://mini.vooqqqm.com/api';
-const GROUP_QR_URL = './assets/group-wechat-qr.png?v=20260321';
+const GROUP_QR_URL = 'https://github.com/yema-29129/bank-campaigns-web/blob/main/assets/group-wechat-qr.png?raw=true';
+
 const POSTER_FIELDS = [
   'posterUrl',
   'posterPath',
@@ -76,9 +77,12 @@ function updateDetailMeta(activity) {
   const description = [
     activity.desc || '',
     activity.channel ? `渠道：${activity.channel}` : '',
-    activity.validFrom || activity.validTo ? `时间：${activity.validFrom || '--'} 至 ${activity.validTo || '--'}` : '',
+    activity.validFrom || activity.validTo
+      ? `时间：${activity.validFrom || '--'} 至 ${activity.validTo || '--'}`
+      : '',
     activity.region ? `地区：${activity.region}` : ''
   ].filter(Boolean).join('，').slice(0, 120);
+
   const url = `https://bank.vooqqqm.com/detail.html?id=${encodeURIComponent(campaignId)}`;
 
   document.title = title;
@@ -93,10 +97,17 @@ function updateDetailMeta(activity) {
 }
 
 function escapeHtml(value) {
-  return String(value)
+  return String(value ?? '')
     .replace(/&/g, '&amp;')
     .replace(/</g, '&lt;')
     .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;');
+}
+
+function escapeAttribute(value) {
+  return String(value ?? '')
+    .replace(/&/g, '&amp;')
     .replace(/"/g, '&quot;')
     .replace(/'/g, '&#39;');
 }
@@ -112,7 +123,9 @@ function normalizeMediaUrl(value) {
 function resolvePosterUrl(activity) {
   for (const key of POSTER_FIELDS) {
     const value = activity[key];
-    if (typeof value === 'string' && value.trim()) return normalizeMediaUrl(value.trim());
+    if (typeof value === 'string' && value.trim()) {
+      return normalizeMediaUrl(value.trim());
+    }
   }
   return '';
 }
@@ -120,19 +133,145 @@ function resolvePosterUrl(activity) {
 function normalizeTags(tags) {
   if (Array.isArray(tags)) return tags.filter(Boolean);
   if (!tags) return [];
-  return String(tags).split(/[，,]/).map((item) => item.trim()).filter(Boolean);
+  return String(tags)
+    .split(/[，,]/)
+    .map((item) => item.trim())
+    .filter(Boolean);
+}
+
+function buildDiscountText(activity) {
+  if (activity.discountMin || activity.discountMin === 0) {
+    return `${activity.discountMin} ~ ${activity.discountMax} 元`;
+  }
+  if (activity.discountAmount || activity.discountAmount === 0) {
+    return `${activity.discountAmount} 元`;
+  }
+  return '--';
+}
+
+function formatMultiLineCompact(text) {
+  return escapeHtml(text || '--').replace(/\n+/g, '<br>');
+}
+
+function ensureRuntimeStyles() {
+  if (document.getElementById('detail-runtime-fix-styles')) return;
+
+  const style = document.createElement('style');
+  style.id = 'detail-runtime-fix-styles';
+  style.textContent = `
+    .detail-metric-grid {
+      display: grid;
+      gap: 14px;
+    }
+
+    .detail-metric-extend {
+      margin-top: 14px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
+    .detail-mini-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 8px 12px;
+      border-radius: 999px;
+      background: rgba(255,255,255,0.12);
+      border: 1px solid rgba(255,255,255,0.10);
+      color: rgba(255,255,255,0.92);
+      font-size: 13px;
+      line-height: 1.2;
+      font-weight: 700;
+      backdrop-filter: blur(8px);
+    }
+
+    .detail-mini-pill strong {
+      color: #ffffff;
+      font-weight: 800;
+    }
+
+    .detail-section-copy.compact-copy {
+      line-height: 1.6 !important;
+      white-space: pre-line;
+    }
+
+    .detail-link-box {
+      display: flex;
+      align-items: center;
+      width: 100%;
+      min-height: 70px;
+      padding: 16px 18px;
+      border-radius: 22px;
+      background: #f8fafc;
+      border: 1px solid #cbd5e1;
+      box-sizing: border-box;
+      overflow: hidden;
+    }
+
+    .detail-link-box .detail-link {
+      display: block;
+      width: 100%;
+      font-size: 16px;
+      line-height: 1.55;
+      font-weight: 800;
+      color: #0f172a;
+      word-break: break-all;
+      overflow-wrap: anywhere;
+    }
+
+    .detail-link-actions {
+      margin-top: 14px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
+    .detail-inline-card.column-card {
+      display: block;
+    }
+
+    .detail-inline-card.column-card .detail-poster-name {
+      display: block;
+    }
+
+    .detail-group-btn-row {
+      margin-top: 14px;
+      display: flex;
+      justify-content: flex-start;
+    }
+
+    @media (max-width: 768px) {
+      .detail-mini-pill {
+        font-size: 12px;
+      }
+
+      .detail-link-actions {
+        flex-direction: column;
+      }
+
+      .detail-link-actions .secondary-btn {
+        width: 100%;
+      }
+    }
+  `;
+  document.head.appendChild(style);
 }
 
 function renderDetail(activity) {
   updateDetailMeta(activity);
+  ensureRuntimeStyles();
+
   const posterUrl = resolvePosterUrl(activity);
   const isPathUrlLink = /^https?:\/\//i.test(activity.pathUrl || '');
+
   const metrics = [
     ['立减金额', buildDiscountText(activity)],
     ['最低门槛', (activity.minAmount || activity.minAmount === 0) ? `${activity.minAmount} 元` : '--'],
     ['活动时间', (activity.validFrom || activity.validTo) ? `${activity.validFrom || '--'} 至 ${activity.validTo || '--'}` : '--'],
     ['适用地区', activity.region || '--']
   ];
+
   const sideItems = [
     ['适用地区', activity.region || '--'],
     ['消费渠道', activity.channel || '--'],
@@ -166,6 +305,12 @@ function renderDetail(activity) {
     activity.validTo ? `到期 ${activity.validTo}` : ''
   ].filter(Boolean).map((text) => `<span class="detail-summary-pill">${escapeHtml(text)}</span>`).join('');
 
+  const heroExtraPills = [
+    activity.validFrom ? `<span class="detail-mini-pill"><span>开始</span><strong>${escapeHtml(activity.validFrom)}</strong></span>` : '',
+    activity.validTo ? `<span class="detail-mini-pill"><span>截止</span><strong>${escapeHtml(activity.validTo)}</strong></span>` : '',
+    tags ? `<span class="detail-mini-pill"><span>标签</span><strong>${escapeHtml((activity.tags || []).join(' / '))}</strong></span>` : ''
+  ].filter(Boolean).join('');
+
   const html = `
     <article class="detail-card">
       <section class="detail-hero">
@@ -177,10 +322,14 @@ function renderDetail(activity) {
             </div>
             <span class="detail-kicker">活动详情</span>
           </div>
+
           <h1>${escapeHtml(activity.title || '活动详情')}</h1>
           <p class="detail-desc">${escapeHtml(activity.desc || '暂无活动描述')}</p>
           <div class="detail-summary-row">${summaryPills}</div>
+
+          ${heroExtraPills ? `<div class="detail-metric-extend">${heroExtraPills}</div>` : ''}
         </div>
+
         <div class="detail-metric-grid">${metricGrid}</div>
       </section>
 
@@ -190,14 +339,14 @@ function renderDetail(activity) {
             <div class="detail-section-head">
               <h2>获奖内容</h2>
             </div>
-            <p class="detail-section-copy">${escapeHtml(activity.awardDesc || '--')}</p>
+            <p class="detail-section-copy compact-copy">${formatMultiLineCompact(activity.awardDesc || '--')}</p>
           </section>
 
           <section class="detail-section">
             <div class="detail-section-head">
               <h2>活动路径</h2>
             </div>
-            <p class="detail-section-copy">${escapeHtml(activity.pathDesc || '--')}</p>
+            <p class="detail-section-copy compact-copy">${formatMultiLineCompact(activity.pathDesc || '--')}</p>
           </section>
 
           ${activity.pathUrl ? `
@@ -205,12 +354,14 @@ function renderDetail(activity) {
               <div class="detail-section-head">
                 <h2>活动链接</h2>
               </div>
-              <div class="detail-inline-card">
+
+              <div class="detail-link-box">
                 <span class="detail-link">${escapeHtml(activity.pathUrl)}</span>
-                <div class="card-actions">
-                  ${isPathUrlLink ? `<a class="secondary-btn" href="${escapeAttribute(activity.pathUrl)}" target="_blank" rel="noopener noreferrer">打开链接</a>` : ''}
-                  <button class="secondary-btn" type="button" id="copyPathBtn">复制路径</button>
-                </div>
+              </div>
+
+              <div class="detail-link-actions">
+                ${isPathUrlLink ? `<a class="secondary-btn" href="${escapeAttribute(activity.pathUrl)}" target="_blank" rel="noopener noreferrer">打开链接</a>` : ''}
+                <button class="secondary-btn" type="button" id="copyPathBtn">复制链接</button>
               </div>
             </section>
           ` : ''}
@@ -219,9 +370,11 @@ function renderDetail(activity) {
             <div class="detail-section-head">
               <h2>活动图片路径</h2>
             </div>
-            <div class="detail-inline-card">
+            <div class="detail-inline-card column-card">
               <span class="detail-poster-name">活动路径/二维码</span>
-              <button class="primary-btn" type="button" id="viewPosterBtn"${posterUrl ? '' : ' disabled'}>${posterUrl ? '查看图片' : '暂无图片'}</button>
+              <div class="detail-group-btn-row">
+                <button class="primary-btn" type="button" id="viewPosterBtn"${posterUrl ? '' : ' disabled'}>${posterUrl ? '查看图片' : '暂无图片'}</button>
+              </div>
             </div>
           </section>
         </section>
@@ -263,19 +416,18 @@ function renderDetail(activity) {
         await navigator.clipboard.writeText(activity.pathUrl);
         copyBtn.textContent = '已复制';
         window.setTimeout(() => {
-          copyBtn.textContent = '复制路径';
+          copyBtn.textContent = '复制链接';
         }, 1600);
       } catch (err) {
-        console.error('复制路径失败', err);
+        console.error('复制链接失败', err);
         window.alert('复制失败，请手动复制。');
       }
     });
   }
 
   const posterBtn = document.getElementById('viewPosterBtn');
-  const openPoster = () => openLightbox(posterUrl, 'poster');
   if (posterBtn && posterUrl) {
-    posterBtn.addEventListener('click', openPoster);
+    posterBtn.addEventListener('click', () => openLightbox(posterUrl, 'poster'));
   }
 
   const groupQrBtn = document.getElementById('viewGroupQrBtn');
@@ -284,22 +436,14 @@ function renderDetail(activity) {
   }
 }
 
-function buildDiscountText(activity) {
-  if (activity.discountMin || activity.discountMin === 0) {
-    return `${activity.discountMin} ~ ${activity.discountMax} 元`;
-  }
-  if (activity.discountAmount || activity.discountAmount === 0) {
-    return `${activity.discountAmount} 元`;
-  }
-  return '--';
-}
-
 function openLightbox(src, type = 'poster') {
   currentLightboxType = type;
+
   els.lightboxError.classList.add('hidden');
   els.lightboxImage.classList.remove('hidden');
-  els.lightboxRawLink.href = src;
   els.lightboxImage.src = src;
+  els.lightboxRawLink.href = src;
+
   els.lightbox.classList.remove('hidden');
   els.lightbox.setAttribute('aria-hidden', 'false');
 }
@@ -313,13 +457,6 @@ function closeLightbox() {
   els.lightboxImage.classList.remove('hidden');
 }
 
-function escapeAttribute(value) {
-  return String(value)
-    .replace(/&/g, '&amp;')
-    .replace(/"/g, '&quot;')
-    .replace(/'/g, '&#39;');
-}
-
 async function fetchDetail() {
   if (!campaignId) {
     els.loading.classList.add('hidden');
@@ -328,13 +465,22 @@ async function fetchDetail() {
   }
 
   try {
-    const response = await fetch(`${API_BASE}/campaign_detail.php?id=${encodeURIComponent(campaignId)}`, { credentials: 'omit' });
+    const response = await fetch(`${API_BASE}/campaign_detail.php?id=${encodeURIComponent(campaignId)}`, {
+      credentials: 'omit'
+    });
+
     if (!response.ok) throw new Error(`HTTP ${response.status}`);
 
-    const data = await response.json();
-    if (!data || data.error) throw new Error(data && data.error ? data.error : 'not_found');
+    const payload = await response.json();
 
+    // ✅ 兼容你现在后端的新格式
+    if (!payload || payload.code !== 0 || !payload.data) {
+      throw new Error(payload && payload.message ? payload.message : 'not_found');
+    }
+
+    const data = payload.data;
     data.tags = normalizeTags(data.tags);
+
     els.loading.classList.add('hidden');
     renderDetail(data);
   } catch (err) {
@@ -344,26 +490,32 @@ async function fetchDetail() {
   }
 }
 
-els.lightbox.addEventListener('click', (event) => {
-  if (event.target.closest('[data-close-lightbox="true"]')) {
-    closeLightbox();
-  }
-});
+if (els.lightbox) {
+  els.lightbox.addEventListener('click', (event) => {
+    if (event.target.closest('[data-close-lightbox="true"]')) {
+      closeLightbox();
+    }
+  });
+}
 
 document.addEventListener('keydown', (event) => {
   if (event.key === 'Escape') closeLightbox();
 });
 
-els.lightboxImage.addEventListener('error', () => {
-  els.lightboxImage.classList.add('hidden');
-  if (currentLightboxType === 'group') {
-    els.lightboxErrorTitle.textContent = '群二维码暂时无法显示';
-    els.lightboxErrorText.textContent = '固定微信群二维码还没有上传到指定地址，或者图片文件暂时无法公开访问。';
-  } else {
-    els.lightboxErrorTitle.textContent = '图片加载失败';
-    els.lightboxErrorText.textContent = '当前图片地址可能已失效、禁止跨域访问，或者数据库里保存的是不完整路径。';
-  }
-  els.lightboxError.classList.remove('hidden');
-});
+if (els.lightboxImage) {
+  els.lightboxImage.addEventListener('error', () => {
+    els.lightboxImage.classList.add('hidden');
+
+    if (currentLightboxType === 'group') {
+      els.lightboxErrorTitle.textContent = '群二维码暂时无法显示';
+      els.lightboxErrorText.textContent = '固定微信群二维码还没有上传到指定地址，或者图片文件暂时无法公开访问。';
+    } else {
+      els.lightboxErrorTitle.textContent = '图片加载失败';
+      els.lightboxErrorText.textContent = '当前图片地址可能已失效、禁止跨域访问，或者数据库里保存的是不完整路径。';
+    }
+
+    els.lightboxError.classList.remove('hidden');
+  });
+}
 
 fetchDetail();
