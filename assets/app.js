@@ -31,6 +31,10 @@ const els = {
 
 let todayEntryEl = null;
 
+function isListPage() {
+  return !!(els.grid && els.bankFilters && els.timeFilters);
+}
+
 function setMeta(selector, value) {
   const el = document.querySelector(selector);
   if (el) el.setAttribute('content', value);
@@ -175,9 +179,9 @@ function compareCampaign(a, b) {
 }
 
 function setLoadingState({ loading = false, error = false, empty = false } = {}) {
-  els.loading.classList.toggle('hidden', !loading);
-  els.error.classList.toggle('hidden', !error);
-  els.empty.classList.toggle('hidden', !empty);
+  if (els.loading) els.loading.classList.toggle('hidden', !loading);
+  if (els.error) els.error.classList.toggle('hidden', !error);
+  if (els.empty) els.empty.classList.toggle('hidden', !empty);
 }
 
 function injectRuntimeStyles() {
@@ -315,6 +319,7 @@ function injectRuntimeStyles() {
 }
 
 function ensureTodayEntry() {
+  if (!isListPage()) return null;
   if (todayEntryEl) return todayEntryEl;
 
   injectRuntimeStyles();
@@ -352,6 +357,8 @@ function ensureTodayEntry() {
 
 function updateTodayEntry() {
   const el = ensureTodayEntry();
+  if (!el) return;
+
   const countEl = el.querySelector('.today-entry-web-count');
   const subEl = el.querySelector('.today-entry-web-sub');
 
@@ -369,7 +376,7 @@ function updateTodayEntry() {
 }
 
 function swapFilterLayout() {
-  if (!els.filtersPanel || !els.bankFilters || !els.timeFilters) return;
+  if (!isListPage() || !els.filtersPanel || !els.bankFilters || !els.timeFilters) return;
 
   injectRuntimeStyles();
 
@@ -388,6 +395,8 @@ function swapFilterLayout() {
 }
 
 function renderBankFilters() {
+  if (!els.bankFilters) return;
+
   els.bankFilters.innerHTML = '';
   BANK_FILTER_OPTIONS.forEach((bank) => {
     const button = document.createElement('button');
@@ -404,6 +413,8 @@ function renderBankFilters() {
 }
 
 function renderTimes() {
+  if (!els.timeFilters) return;
+
   els.timeFilters.innerHTML = '';
   TIME_OPTIONS.forEach((time) => {
     const button = document.createElement('button');
@@ -420,6 +431,8 @@ function renderTimes() {
 }
 
 function renderCards() {
+  if (!els.grid) return;
+
   els.grid.innerHTML = '';
   const activeItems = state.filtered.filter((item) => !item.isExpired);
   const expiredItems = state.filtered.filter((item) => item.isExpired);
@@ -508,6 +521,8 @@ function scrollToResults() {
 }
 
 function applyFilters() {
+  if (!isListPage()) return;
+
   let result = state.campaigns.slice();
 
   if (state.view === 'credit') {
@@ -541,47 +556,62 @@ function applyFilters() {
   result.sort(compareCampaign);
   state.filtered = result;
 
-  els.listTitle.textContent = state.view === 'credit' ? '信用卡活动 · 专属专区' : '发现 · 全部活动';
-  els.resultSummary.textContent = `共 ${result.length} 条活动，和“好羊毛助手Pro”微信小程序保持实时数据。`;
-  setHomeMeta();
+  if (els.listTitle) {
+    els.listTitle.textContent = state.view === 'credit' ? '信用卡活动 · 专属专区' : '发现 · 全部活动';
+  }
 
+  if (els.resultSummary) {
+    els.resultSummary.textContent = `共 ${result.length} 条活动，和“好羊毛助手Pro”微信小程序保持实时数据。`;
+  }
+
+  setHomeMeta();
   setLoadingState({ loading: false, error: false, empty: !result.length });
   renderCards();
   updateTodayEntry();
 }
 
 function bindEvents() {
-  els.searchInput.addEventListener('input', (event) => {
-    state.keyword = event.target.value || '';
-    applyFilters();
-  });
+  if (!isListPage()) return;
 
-  els.refreshBtn.addEventListener('click', () => {
-    fetchCampaigns();
-  });
-
-  els.toggleFiltersBtn.addEventListener('click', () => {
-    const isCollapsed = els.filtersPanel.classList.toggle('is-collapsed');
-    els.toggleFiltersBtn.textContent = isCollapsed ? '展开筛选' : '收起筛选';
-  });
-
-  els.viewTabs.addEventListener('click', (event) => {
-    const button = event.target.closest('[data-view]');
-    if (!button) return;
-
-    state.view = button.dataset.view;
-    state.bank = '全部';
-    state.time = '全部时间';
-    state.showExpired = false;
-
-    Array.from(els.viewTabs.querySelectorAll('.segmented-btn')).forEach((item) => {
-      item.classList.toggle('is-active', item === button);
+  if (els.searchInput) {
+    els.searchInput.addEventListener('input', (event) => {
+      state.keyword = event.target.value || '';
+      applyFilters();
     });
+  }
 
-    renderBankFilters();
-    renderTimes();
-    applyFilters();
-  });
+  if (els.refreshBtn) {
+    els.refreshBtn.addEventListener('click', () => {
+      fetchCampaigns();
+    });
+  }
+
+  if (els.toggleFiltersBtn && els.filtersPanel) {
+    els.toggleFiltersBtn.addEventListener('click', () => {
+      const isCollapsed = els.filtersPanel.classList.toggle('is-collapsed');
+      els.toggleFiltersBtn.textContent = isCollapsed ? '展开筛选' : '收起筛选';
+    });
+  }
+
+  if (els.viewTabs) {
+    els.viewTabs.addEventListener('click', (event) => {
+      const button = event.target.closest('[data-view]');
+      if (!button) return;
+
+      state.view = button.dataset.view;
+      state.bank = '全部';
+      state.time = '全部时间';
+      state.showExpired = false;
+
+      Array.from(els.viewTabs.querySelectorAll('.segmented-btn')).forEach((item) => {
+        item.classList.toggle('is-active', item === button);
+      });
+
+      renderBankFilters();
+      renderTimes();
+      applyFilters();
+    });
+  }
 
   document.addEventListener('click', (event) => {
     const link = event.target.closest('[data-nav-view]');
@@ -613,8 +643,10 @@ function bindEvents() {
 }
 
 async function fetchCampaigns() {
+  if (!isListPage()) return;
+
   setLoadingState({ loading: true, error: false, empty: false });
-  els.grid.innerHTML = '';
+  if (els.grid) els.grid.innerHTML = '';
 
   try {
     const response = await fetch(`${API_BASE}/campaigns.php`, { credentials: 'omit' });
@@ -697,8 +729,14 @@ function matchesBankFilter(item, selected) {
   return true;
 }
 
-bindEvents();
-renderTimes();
-ensureTodayEntry();
-swapFilterLayout();
-fetchCampaigns();
+document.addEventListener('DOMContentLoaded', () => {
+  if (!isListPage()) {
+    return;
+  }
+
+  bindEvents();
+  renderTimes();
+  ensureTodayEntry();
+  swapFilterLayout();
+  fetchCampaigns();
+});
