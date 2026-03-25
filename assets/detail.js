@@ -193,7 +193,7 @@ function ensureRuntimeStyles() {
 
     /* 这里控制图1、图2的正文行间距 */
     .detail-section-copy.compact-copy {
-      line-height: 1.20 !important;
+      line-height: 1.10 !important;
       white-space: pre-line;
       margin: 0;
     }
@@ -334,7 +334,6 @@ function renderDetail(activity) {
   const heroExtraPills = [
     activity.validFrom ? `<span class="detail-mini-pill"><span>开始</span><strong>${escapeHtml(activity.validFrom)}</strong></span>` : '',
     activity.validTo ? `<span class="detail-mini-pill"><span>截止</span><strong>${escapeHtml(activity.validTo)}</strong></span>` : '',
-    tags ? `<span class="detail-mini-pill"><span>标签</span><strong>${escapeHtml((activity.tags || []).join(' / '))}</strong></span>` : ''
   ].filter(Boolean).join('');
 
   const html = `
