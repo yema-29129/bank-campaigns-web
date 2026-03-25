@@ -215,7 +215,7 @@ function ensureRuntimeStyles() {
     .detail-text-paragraph {
       margin: 0 0 14px 0;
       line-height: 1.7;
-      font-size: 18px;
+      font-size: 17px;
       color: inherit;
       font-weight: inherit;
       word-break: break-word;
