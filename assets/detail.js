@@ -241,9 +241,11 @@ function ensureRuntimeStyles() {
     .detail-link-box .detail-link {
       display: block;
       width: 100%;
-      font-size: 16px;
-      line-height: 1.55;
-      font-weight: 800;
+
+      font-size: 14px;          /* 👈 原来15 → 再小一号 */
+      line-height: 1.6;
+      font-weight: 500;         /* 👈 更轻一点，更高级 */
+
       color: #0f172a;
       word-break: break-all;
       overflow-wrap: anywhere;
@@ -274,18 +276,30 @@ function ensureRuntimeStyles() {
       display: inline-flex;
       align-items: center;
       justify-content: center;
-      min-width: 120px;
-      height: 42px;
-      padding: 0 18px;
+    
+      min-width: 110px;         /* 👈 原来120 */
+      height: 40px;             /* 👈 原来42 → 更精致 */
+      padding: 0 16px;          /* 👈 原来18 */
+    
       border-radius: 999px;
+    
       background: linear-gradient(135deg, #2563eb, #3b82f6);
       color: #ffffff !important;
       border: none;
       text-decoration: none;
-      font-size: 14px;
-      font-weight: 700;
-      box-shadow: 0 10px 20px rgba(37, 99, 235, 0.18);
+    
+      font-size: 14px;          /* 👈 原来14（保持） */
+      font-weight: 600;         /* 👈 原来700 → 降一点更舒服 */
+    
+      box-shadow: 0 6px 14px rgba(37, 99, 235, 0.15); /* 👈 阴影也柔一点 */
+    
       cursor: pointer;
+      transition: all 0.2s ease;
+    }
+    
+    .detail-link-actions .secondary-btn:hover {
+      opacity: 0.95;
+      transform: translateY(-1px);
     }
 
     .detail-link-actions .secondary-btn:hover {
