@@ -215,8 +215,8 @@ function ensureRuntimeStyles() {
     .detail-text-paragraph {
       margin: 0 0 14px 0;
       line-height: 1.7;
+      font-size: 18px;
       color: inherit;
-      font-size: inherit;
       font-weight: inherit;
       word-break: break-word;
     }
@@ -309,6 +309,7 @@ function ensureRuntimeStyles() {
       .detail-text-paragraph {
         margin-bottom: 12px;
         line-height: 1.65;
+        font-size: 17px;
       }
     }
   `;
