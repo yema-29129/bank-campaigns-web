@@ -149,12 +149,6 @@ function buildDiscountText(activity) {
   return '--';
 }
 
-/**
- * ✅ 核心修复：
- * 把文本按“空行”切成段落
- * 每段内部单换行正常换行
- * 段落之间只保留一个小间距
- */
 function renderCompactParagraphs(text) {
   const raw = String(text || '--').replace(/\r\n/g, '\n').replace(/\r/g, '\n').trim();
 
@@ -213,7 +207,6 @@ function ensureRuntimeStyles() {
       font-weight: 800;
     }
 
-    /* ✅ 这块是图1、图2的最终解决方案 */
     .detail-text-block {
       margin: 0;
       padding: 0;
@@ -281,16 +274,16 @@ function ensureRuntimeStyles() {
       display: inline-flex;
       align-items: center;
       justify-content: center;
-      min-width: 132px;
-      height: 48px;
-      padding: 0 22px;
+      min-width: 120px;
+      height: 42px;
+      padding: 0 18px;
       border-radius: 999px;
       background: linear-gradient(135deg, #2563eb, #3b82f6);
       color: #ffffff !important;
       border: none;
       text-decoration: none;
-      font-size: 16px;
-      font-weight: 800;
+      font-size: 14px;
+      font-weight: 700;
       box-shadow: 0 10px 20px rgba(37, 99, 235, 0.18);
       cursor: pointer;
     }
