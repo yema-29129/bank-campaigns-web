@@ -149,10 +149,30 @@ function buildDiscountText(activity) {
   return '--';
 }
 
-function formatMultiLineCompact(text) {
-  return escapeHtml(text || '--')
-    .replace(/\n{2,}/g, '<br><br>')   // 多个换行 → 段落间空一行
-    .replace(/\n/g, '<br>');         // 单个换行 → 正常换行
+/**
+ * ✅ 核心修复：
+ * 把文本按“空行”切成段落
+ * 每段内部单换行正常换行
+ * 段落之间只保留一个小间距
+ */
+function renderCompactParagraphs(text) {
+  const raw = String(text || '--').replace(/\r\n/g, '\n').replace(/\r/g, '\n').trim();
+
+  if (!raw) {
+    return `<div class="detail-text-block"><div class="detail-text-paragraph">--</div></div>`;
+  }
+
+  const paragraphs = raw
+    .split(/\n\s*\n+/)
+    .map(item => item.trim())
+    .filter(Boolean);
+
+  const html = paragraphs.map(item => {
+    const inner = escapeHtml(item).replace(/\n/g, '<br>');
+    return `<div class="detail-text-paragraph">${inner}</div>`;
+  }).join('');
+
+  return `<div class="detail-text-block">${html}</div>`;
 }
 
 function ensureRuntimeStyles() {
@@ -193,10 +213,23 @@ function ensureRuntimeStyles() {
       font-weight: 800;
     }
 
-    /* 这里控制图1、图2的正文行间距 */
-    .detail-section-copy.compact-copy {
-      line-height: 1.6 !important;
+    /* ✅ 这块是图1、图2的最终解决方案 */
+    .detail-text-block {
       margin: 0;
+      padding: 0;
+    }
+
+    .detail-text-paragraph {
+      margin: 0 0 14px 0;
+      line-height: 1.7;
+      color: inherit;
+      font-size: inherit;
+      font-weight: inherit;
+      word-break: break-word;
+    }
+
+    .detail-text-paragraph:last-child {
+      margin-bottom: 0;
     }
 
     .detail-link-box {
@@ -244,7 +277,6 @@ function ensureRuntimeStyles() {
       justify-content: flex-start;
     }
 
-    /* 这里把图3按钮改成和“查看群二维码”同款主按钮 */
     .detail-link-actions .secondary-btn {
       display: inline-flex;
       align-items: center;
@@ -279,6 +311,11 @@ function ensureRuntimeStyles() {
 
       .detail-link-actions .secondary-btn {
         width: 100%;
+      }
+
+      .detail-text-paragraph {
+        margin-bottom: 12px;
+        line-height: 1.65;
       }
     }
   `;
@@ -334,7 +371,7 @@ function renderDetail(activity) {
 
   const heroExtraPills = [
     activity.validFrom ? `<span class="detail-mini-pill"><span>开始</span><strong>${escapeHtml(activity.validFrom)}</strong></span>` : '',
-    activity.validTo ? `<span class="detail-mini-pill"><span>截止</span><strong>${escapeHtml(activity.validTo)}</strong></span>` : '',
+    activity.validTo ? `<span class="detail-mini-pill"><span>截止</span><strong>${escapeHtml(activity.validTo)}</strong></span>` : ''
   ].filter(Boolean).join('');
 
   const html = `
@@ -365,14 +402,14 @@ function renderDetail(activity) {
             <div class="detail-section-head">
               <h2>获奖内容</h2>
             </div>
-            <p class="detail-section-copy compact-copy">${formatMultiLineCompact(activity.awardDesc || '--')}</p>
+            ${renderCompactParagraphs(activity.awardDesc || '--')}
           </section>
 
           <section class="detail-section">
             <div class="detail-section-head">
               <h2>活动路径</h2>
             </div>
-            <p class="detail-section-copy compact-copy">${formatMultiLineCompact(activity.pathDesc || '--')}</p>
+            ${renderCompactParagraphs(activity.pathDesc || '--')}
           </section>
 
           ${activity.pathUrl ? `
