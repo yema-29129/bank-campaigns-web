@@ -323,7 +323,7 @@ function ensureRuntimeStyles() {
       .detail-text-paragraph {
         margin-bottom: 12px;
         line-height: 1.65;
-        font-size: 17px;
+        font-size: 16px;
       }
     }
   `;
