@@ -1,5 +1,5 @@
 const API_BASE = 'https://mini.vooqqqm.com/api';
-const TIME_OPTIONS = ['全部时间', '3天内', '7天内', '14天内', '30天内'];
+const TIME_OPTIONS = ['全部时间', '今日新增', '3天内', '7天内', '14天内', '30天内'];
 const BANK_FILTER_OPTIONS = ['全部', '工商银行', '农业银行', '建设银行', '中国银行', '其他银行', '信用卡返现', '固定活动', '每日签到', '重点推荐'];
 
 const state = {
@@ -9,7 +9,8 @@ const state = {
   bank: '全部',
   time: '全部时间',
   keyword: '',
-  showExpired: false
+  showExpired: false,
+  todayNewCount: 0
 };
 
 const els = {
@@ -27,6 +28,8 @@ const els = {
   timeFilters: document.getElementById('timeFilters'),
   viewTabs: document.getElementById('viewTabs')
 };
+
+let todayEntryEl = null;
 
 function setMeta(selector, value) {
   const el = document.querySelector(selector);
@@ -83,6 +86,17 @@ function isSoon(validTo, days = 3) {
   return diff >= 0 && diff <= days * 24 * 60 * 60 * 1000;
 }
 
+function isTodayAdded(item) {
+  const d = parseDate(item.updatedAt || item.createdAt);
+  if (!d) return false;
+  const now = new Date();
+  return (
+    d.getFullYear() === now.getFullYear() &&
+    d.getMonth() === now.getMonth() &&
+    d.getDate() === now.getDate()
+  );
+}
+
 function normalizeTags(tags) {
   if (Array.isArray(tags)) return tags.filter(Boolean);
   if (!tags) return [];
@@ -93,12 +107,12 @@ function normalizeTags(tags) {
 }
 
 function hasCreditTag(item) {
-  // 1. 优先使用后端已经计算好的字段
+  // 优先使用后端已经计算好的字段
   if (item && (item.isCredit === 1 || item.isCredit === true)) {
     return true;
   }
 
-  // 2. 兜底：综合 bankName / title / desc / channel / tags 一起判断
+  // 兜底：综合多个字段判断
   const bankName = String(item.bankName || '').toLowerCase();
   const title = String(item.title || '').toLowerCase();
   const desc = String(item.desc || '').toLowerCase();
@@ -145,6 +159,7 @@ function normalizeCampaign(item) {
     isRecurring: Number(normalized.isRecurring) === 1 || !!normalized.recurringText,
     isExpired: isExpired(normalized.validTo),
     isSoon: !isExpired(normalized.validTo) && isSoon(normalized.validTo),
+    isTodayAdded: isTodayAdded(normalized),
     sortTime: getSortTime(normalized)
   };
 }
@@ -153,6 +168,12 @@ function compareCampaign(a, b) {
   const ea = a.isExpired ? 1 : 0;
   const eb = b.isExpired ? 1 : 0;
   if (ea !== eb) return ea - eb;
+
+  // 今日新增优先
+  const na = a.isTodayAdded ? 0 : 1;
+  const nb = b.isTodayAdded ? 0 : 1;
+  if (na !== nb) return na - nb;
+
   return b.sortTime - a.sortTime;
 }
 
@@ -160,6 +181,163 @@ function setLoadingState({ loading = false, error = false, empty = false } = {})
   els.loading.classList.toggle('hidden', !loading);
   els.error.classList.toggle('hidden', !error);
   els.empty.classList.toggle('hidden', !empty);
+}
+
+function injectTodayEntryStyles() {
+  if (document.getElementById('todayEntryStyles')) return;
+
+  const style = document.createElement('style');
+  style.id = 'todayEntryStyles';
+  style.textContent = `
+    .today-entry-web {
+      margin: 12px 0;
+      padding: 14px 16px;
+      border-radius: 18px;
+      background: linear-gradient(135deg, #fff7ed, #ffedd5);
+      border: 1px solid #fed7aa;
+      color: #9a3412;
+      box-shadow: 0 10px 22px rgba(249, 115, 22, 0.08);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      cursor: pointer;
+      transition: transform 0.16s ease, box-shadow 0.16s ease;
+    }
+
+    .today-entry-web:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 14px 28px rgba(249, 115, 22, 0.12);
+    }
+
+    .today-entry-web-left {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      min-width: 0;
+    }
+
+    .today-entry-web-icon {
+      font-size: 22px;
+      line-height: 1;
+      flex-shrink: 0;
+    }
+
+    .today-entry-web-texts {
+      min-width: 0;
+    }
+
+    .today-entry-web-title {
+      font-size: 18px;
+      font-weight: 800;
+      color: #c2410c;
+      line-height: 1.2;
+    }
+
+    .today-entry-web-sub {
+      margin-top: 4px;
+      font-size: 13px;
+      color: #9a3412;
+      line-height: 1.45;
+    }
+
+    .today-entry-web-right {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-shrink: 0;
+    }
+
+    .today-entry-web-count {
+      padding: 6px 10px;
+      border-radius: 999px;
+      background: #fdba74;
+      color: #7c2d12;
+      font-size: 13px;
+      font-weight: 800;
+    }
+
+    .today-entry-web-arrow {
+      font-size: 28px;
+      color: #c2410c;
+      line-height: 1;
+      opacity: 0.8;
+    }
+
+    @media (max-width: 768px) {
+      .today-entry-web {
+        padding: 12px 14px;
+        border-radius: 16px;
+      }
+
+      .today-entry-web-title {
+        font-size: 16px;
+      }
+
+      .today-entry-web-sub {
+        font-size: 12px;
+      }
+
+      .today-entry-web-count {
+        font-size: 12px;
+      }
+    }
+  `;
+  document.head.appendChild(style);
+}
+
+function ensureTodayEntry() {
+  if (todayEntryEl) return todayEntryEl;
+
+  injectTodayEntryStyles();
+
+  todayEntryEl = document.createElement('div');
+  todayEntryEl.className = 'today-entry-web';
+  todayEntryEl.innerHTML = `
+    <div class="today-entry-web-left">
+      <div class="today-entry-web-icon">🕘</div>
+      <div class="today-entry-web-texts">
+        <div class="today-entry-web-title">今日新增</div>
+        <div class="today-entry-web-sub">今天暂无新活动，也可以点我快速查看</div>
+      </div>
+    </div>
+    <div class="today-entry-web-right">
+      <div class="today-entry-web-count hidden"></div>
+      <div class="today-entry-web-arrow">›</div>
+    </div>
+  `;
+
+  todayEntryEl.addEventListener('click', () => {
+    state.time = '今日新增';
+    renderTimes();
+    applyFilters();
+    scrollToResults();
+  });
+
+  const searchWrap = els.searchInput ? els.searchInput.closest('.search-wrap') : null;
+  if (searchWrap && searchWrap.parentNode) {
+    searchWrap.parentNode.insertBefore(todayEntryEl, searchWrap);
+  }
+
+  return todayEntryEl;
+}
+
+function updateTodayEntry() {
+  const el = ensureTodayEntry();
+  const countEl = el.querySelector('.today-entry-web-count');
+  const subEl = el.querySelector('.today-entry-web-sub');
+
+  state.todayNewCount = state.campaigns.filter((item) => item.isTodayAdded).length;
+
+  if (state.todayNewCount > 0) {
+    countEl.classList.remove('hidden');
+    countEl.textContent = `${state.todayNewCount}条`;
+    subEl.textContent = `今天有 ${state.todayNewCount} 条新活动，点我快速查看`;
+  } else {
+    countEl.classList.add('hidden');
+    countEl.textContent = '';
+    subEl.textContent = '今天暂无新活动，也可以点我快速查看';
+  }
 }
 
 function renderBankFilters() {
@@ -273,6 +451,15 @@ function buildCard(item) {
   return card;
 }
 
+function scrollToResults() {
+  if (!els.grid) return;
+  const top = els.grid.getBoundingClientRect().top + window.scrollY - 120;
+  window.scrollTo({
+    top: top > 0 ? top : 0,
+    behavior: 'smooth'
+  });
+}
+
 function applyFilters() {
   let result = state.campaigns.slice();
 
@@ -292,12 +479,16 @@ function applyFilters() {
   }
 
   if (state.time !== '全部时间') {
-    const days = Number.parseInt(state.time, 10);
-    const threshold = Date.now() - days * 24 * 60 * 60 * 1000;
-    result = result.filter((item) => {
-      const d = parseDate(item.updatedAt || item.createdAt || item.validFrom || item.validTo);
-      return !d || d.getTime() >= threshold;
-    });
+    if (state.time === '今日新增') {
+      result = result.filter((item) => item.isTodayAdded);
+    } else {
+      const days = Number.parseInt(state.time, 10);
+      const threshold = Date.now() - days * 24 * 60 * 60 * 1000;
+      result = result.filter((item) => {
+        const d = parseDate(item.updatedAt || item.createdAt || item.validFrom || item.validTo);
+        return !d || d.getTime() >= threshold;
+      });
+    }
   }
 
   result.sort(compareCampaign);
@@ -309,6 +500,7 @@ function applyFilters() {
 
   setLoadingState({ loading: false, error: false, empty: !result.length });
   renderCards();
+  updateTodayEntry();
 }
 
 function bindEvents() {
@@ -332,6 +524,7 @@ function bindEvents() {
 
     state.view = button.dataset.view;
     state.bank = '全部';
+    state.time = '全部时间';
     state.showExpired = false;
 
     Array.from(els.viewTabs.querySelectorAll('.segmented-btn')).forEach((item) => {
@@ -339,6 +532,7 @@ function bindEvents() {
     });
 
     renderBankFilters();
+    renderTimes();
     applyFilters();
   });
 
@@ -352,6 +546,7 @@ function bindEvents() {
 
     state.view = targetView;
     state.bank = '全部';
+    state.time = '全部时间';
     state.showExpired = false;
 
     Array.from(els.viewTabs.querySelectorAll('.segmented-btn')).forEach((item) => {
@@ -359,6 +554,7 @@ function bindEvents() {
     });
 
     renderBankFilters();
+    renderTimes();
     applyFilters();
 
     const targetId = link.getAttribute('href');
@@ -388,9 +584,12 @@ async function fetchCampaigns() {
 
     state.campaigns = list.map(normalizeCampaign).sort(compareCampaign);
 
+    ensureTodayEntry();
     renderBankFilters();
     renderTimes();
     applyFilters();
+    updateTodayEntry();
+
     setLoadingState({ loading: false, error: false, empty: !state.filtered.length });
   } catch (err) {
     console.error('加载活动失败', err);
@@ -452,4 +651,5 @@ function matchesBankFilter(item, selected) {
 
 bindEvents();
 renderTimes();
+ensureTodayEntry();
 fetchCampaigns();
