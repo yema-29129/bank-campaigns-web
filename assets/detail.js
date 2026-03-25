@@ -191,9 +191,11 @@ function ensureRuntimeStyles() {
       font-weight: 800;
     }
 
+    /* 这里控制图1、图2的正文行间距 */
     .detail-section-copy.compact-copy {
-      line-height: 1.6 !important;
+      line-height: 1.35 !important;
       white-space: pre-line;
+      margin: 0;
     }
 
     .detail-link-box {
@@ -239,6 +241,30 @@ function ensureRuntimeStyles() {
       margin-top: 14px;
       display: flex;
       justify-content: flex-start;
+    }
+
+    /* 这里把图3按钮改成和“查看群二维码”同款主按钮 */
+    .detail-link-actions .secondary-btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-width: 132px;
+      height: 48px;
+      padding: 0 22px;
+      border-radius: 999px;
+      background: linear-gradient(135deg, #2563eb, #3b82f6);
+      color: #ffffff !important;
+      border: none;
+      text-decoration: none;
+      font-size: 16px;
+      font-weight: 800;
+      box-shadow: 0 10px 20px rgba(37, 99, 235, 0.18);
+      cursor: pointer;
+    }
+
+    .detail-link-actions .secondary-btn:hover {
+      opacity: 0.96;
+      transform: translateY(-1px);
     }
 
     @media (max-width: 768px) {
@@ -439,6 +465,11 @@ function renderDetail(activity) {
 function openLightbox(src, type = 'poster') {
   currentLightboxType = type;
 
+  if (!els.lightbox) {
+    window.open(src, '_blank', 'noopener,noreferrer');
+    return;
+  }
+
   els.lightboxError.classList.add('hidden');
   els.lightboxImage.classList.remove('hidden');
   els.lightboxImage.src = src;
@@ -449,6 +480,8 @@ function openLightbox(src, type = 'poster') {
 }
 
 function closeLightbox() {
+  if (!els.lightbox) return;
+
   els.lightbox.classList.add('hidden');
   els.lightbox.setAttribute('aria-hidden', 'true');
   els.lightboxImage.src = '';
@@ -457,10 +490,24 @@ function closeLightbox() {
   els.lightboxImage.classList.remove('hidden');
 }
 
+function unwrapDetailPayload(payload) {
+  if (!payload) return null;
+
+  if (payload.code === 0 && payload.data) {
+    return payload.data;
+  }
+
+  if (!payload.code && !payload.message && (payload.id || payload.title || payload.bankName)) {
+    return payload;
+  }
+
+  return null;
+}
+
 async function fetchDetail() {
   if (!campaignId) {
-    els.loading.classList.add('hidden');
-    els.error.classList.remove('hidden');
+    if (els.loading) els.loading.classList.add('hidden');
+    if (els.error) els.error.classList.remove('hidden');
     return;
   }
 
@@ -472,21 +519,20 @@ async function fetchDetail() {
     if (!response.ok) throw new Error(`HTTP ${response.status}`);
 
     const payload = await response.json();
+    const data = unwrapDetailPayload(payload);
 
-    // ✅ 兼容你现在后端的新格式
-    if (!payload || payload.code !== 0 || !payload.data) {
+    if (!data) {
       throw new Error(payload && payload.message ? payload.message : 'not_found');
     }
 
-    const data = payload.data;
     data.tags = normalizeTags(data.tags);
 
-    els.loading.classList.add('hidden');
+    if (els.loading) els.loading.classList.add('hidden');
     renderDetail(data);
   } catch (err) {
     console.error('加载详情失败', err);
-    els.loading.classList.add('hidden');
-    els.error.classList.remove('hidden');
+    if (els.loading) els.loading.classList.add('hidden');
+    if (els.error) els.error.classList.remove('hidden');
   }
 }
 
