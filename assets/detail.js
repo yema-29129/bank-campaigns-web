@@ -193,7 +193,7 @@ function ensureRuntimeStyles() {
 
     /* 这里控制图1、图2的正文行间距 */
     .detail-section-copy.compact-copy {
-      line-height: 1.35 !important;
+      line-height: 1.20 !important;
       white-space: pre-line;
       margin: 0;
     }
