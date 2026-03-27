@@ -690,6 +690,7 @@ input[type="search"] {
   grid-column: 3;
   grid-row: 2;
   min-width: 0;
+  padding-inline: 18px;
 }
 
 .field-group-bank > span {
@@ -698,22 +699,23 @@ input[type="search"] {
 
 .field-group-bank .chip-wrap {
   display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 14px 16px;
-  align-items: stretch;
+  grid-template-columns: repeat(3, minmax(148px, 180px));
+  justify-content: center;
+  gap: 14px 18px;
+  align-items: start;
 }
 
 .field-group-bank .chip {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  min-height: 52px;
+  min-height: 42px;
   width: 100%;
-  padding: 0 14px;
-  border-radius: 18px;
+  padding: 0 16px;
+  border-radius: 16px;
   text-align: center;
-  font-size: 13px;
-  font-weight: 700;
+  font-size: 12px;
+  font-weight: 600;
 }
 
 .field-group-time {
