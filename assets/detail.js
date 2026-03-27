@@ -165,7 +165,6 @@ function buildShareText(activity) {
   const lines = [
     `活动标题：${activity.title || '银行活动'}`,
     `立减金额：${buildDiscountText(activity)}`,
-    `最低门槛：${(activity.minAmount || activity.minAmount === 0) ? `${activity.minAmount} 元` : '--'}`,
     `活动时间：${(activity.validFrom || activity.validTo) ? `${activity.validFrom || '--'} 至 ${activity.validTo || '--'}` : '--'}`,
     `活动链接：${getDetailUrl()}`
   ];
