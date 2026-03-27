@@ -31,6 +31,13 @@ const els = {
   root: document.getElementById('detailRoot'),
   loading: document.getElementById('detailLoading'),
   error: document.getElementById('detailError'),
+  shareDock: document.getElementById('shareDock'),
+  shareSheet: document.getElementById('shareSheet'),
+  shareDockBtn: document.getElementById('shareDockBtn'),
+  sharePreview: document.getElementById('sharePreview'),
+  shareSystemBtn: document.getElementById('shareSystemBtn'),
+  shareCopyTextBtn: document.getElementById('shareCopyTextBtn'),
+  shareCopyLinkBtn: document.getElementById('shareCopyLinkBtn'),
   lightbox: document.getElementById('imageLightbox'),
   lightboxImage: document.getElementById('lightboxImage'),
   lightboxError: document.getElementById('lightboxError'),
@@ -40,6 +47,7 @@ const els = {
 };
 
 let currentLightboxType = 'poster';
+let currentActivity = null;
 
 function setMeta(selector, value) {
   const el = document.querySelector(selector);
@@ -147,6 +155,22 @@ function buildDiscountText(activity) {
     return `${activity.discountAmount} 元`;
   }
   return '--';
+}
+
+function getDetailUrl() {
+  return `https://bank.vooqqqm.com/detail.html?id=${encodeURIComponent(campaignId || '')}`;
+}
+
+function buildShareText(activity) {
+  const lines = [
+    `活动标题：${activity.title || '银行活动'}`,
+    `立减金额：${buildDiscountText(activity)}`,
+    `最低门槛：${(activity.minAmount || activity.minAmount === 0) ? `${activity.minAmount} 元` : '--'}`,
+    `活动时间：${(activity.validFrom || activity.validTo) ? `${activity.validFrom || '--'} 至 ${activity.validTo || '--'}` : '--'}`,
+    `活动链接：${getDetailUrl()}`
+  ];
+
+  return lines.join('\n');
 }
 
 function renderCompactParagraphs(text) {
@@ -331,6 +355,7 @@ function ensureRuntimeStyles() {
 }
 
 function renderDetail(activity) {
+  currentActivity = activity;
   updateDetailMeta(activity);
   ensureRuntimeStyles();
 
@@ -352,7 +377,7 @@ function renderDetail(activity) {
     ['返现比例', activity.cashbackRate || '--'],
     ['活动时间', (activity.validFrom || activity.validTo) ? `${activity.validFrom || '--'} 至 ${activity.validTo || '--'}` : '--'],
     ['重复规则', activity.recurringText || '--'],
-    ['最近更新', activity.updatedDate || '--']
+    ['最近更新', activity.updatedDate || activity.updatedAt || activity.createdAt || '--']
   ];
 
   const sideGrid = sideItems.map(([label, value]) => `
@@ -505,6 +530,118 @@ function renderDetail(activity) {
   if (groupQrBtn) {
     groupQrBtn.addEventListener('click', () => openLightbox(GROUP_QR_URL, 'group'));
   }
+
+  bindShareActions(activity);
+}
+
+function setCopiedState(button, idleText, activeText = '已复制') {
+  if (!button) return;
+  button.textContent = activeText;
+  window.setTimeout(() => {
+    button.textContent = idleText;
+  }, 1600);
+}
+
+function openShareSheet() {
+  if (!els.shareSheet || !currentActivity) return;
+
+  if (els.sharePreview) {
+    els.sharePreview.textContent = buildShareText(currentActivity);
+  }
+
+  els.shareSheet.classList.remove('hidden');
+  els.shareSheet.setAttribute('aria-hidden', 'false');
+
+  if (els.shareDockBtn) {
+    els.shareDockBtn.setAttribute('aria-expanded', 'true');
+  }
+}
+
+function closeShareSheet() {
+  if (!els.shareSheet) return;
+
+  els.shareSheet.classList.add('hidden');
+  els.shareSheet.setAttribute('aria-hidden', 'true');
+
+  if (els.shareDockBtn) {
+    els.shareDockBtn.setAttribute('aria-expanded', 'false');
+  }
+}
+
+async function copyText(value) {
+  await navigator.clipboard.writeText(value);
+}
+
+function bindShareActions(activity) {
+  if (els.shareDock) {
+    els.shareDock.classList.remove('hidden');
+  }
+
+  if (els.sharePreview) {
+    els.sharePreview.textContent = buildShareText(activity);
+  }
+
+  if (els.shareDockBtn && !els.shareDockBtn.dataset.bound) {
+    els.shareDockBtn.dataset.bound = 'true';
+    els.shareDockBtn.addEventListener('click', () => {
+      openShareSheet();
+    });
+  }
+
+  if (els.shareSystemBtn && !els.shareSystemBtn.dataset.bound) {
+    els.shareSystemBtn.dataset.bound = 'true';
+    els.shareSystemBtn.addEventListener('click', async () => {
+      if (!currentActivity) return;
+
+      if (!navigator.share) {
+        window.alert('当前浏览器暂不支持系统分享，请使用下面的复制按钮。');
+        return;
+      }
+
+      try {
+        await navigator.share({
+          title: `${currentActivity.title || '银行活动'} | ${buildDiscountText(currentActivity)}`,
+          text: buildShareText(currentActivity),
+          url: getDetailUrl()
+        });
+      } catch (err) {
+        if (err && err.name === 'AbortError') return;
+        console.error('系统分享失败', err);
+        window.alert('系统分享失败，请改用复制分享文案。');
+      }
+    });
+  }
+
+  if (els.shareCopyTextBtn && !els.shareCopyTextBtn.dataset.bound) {
+    els.shareCopyTextBtn.dataset.bound = 'true';
+    els.shareCopyTextBtn.addEventListener('click', async () => {
+      if (!currentActivity) return;
+
+      try {
+        await copyText(buildShareText(currentActivity));
+        setCopiedState(els.shareCopyTextBtn, '复制分享文案');
+      } catch (err) {
+        console.error('复制分享文案失败', err);
+        window.alert('复制失败，请稍后重试。');
+      }
+    });
+  }
+
+  if (els.shareCopyLinkBtn && !els.shareCopyLinkBtn.dataset.bound) {
+    els.shareCopyLinkBtn.dataset.bound = 'true';
+    els.shareCopyLinkBtn.addEventListener('click', async () => {
+      if (!currentActivity) return;
+
+      try {
+        const shareLine = `${currentActivity.title || '银行活动'}｜立减金额 ${buildDiscountText(currentActivity)}｜${getDetailUrl()}`;
+        await copyText(shareLine);
+        setCopiedState(els.shareCopyLinkBtn, '复制分享链接');
+      } catch (err) {
+        console.error('复制分享链接失败', err);
+        window.alert('复制失败，请稍后重试。');
+      }
+    });
+  }
 }
 
 function openLightbox(src, type = 'poster') {
@@ -589,8 +726,19 @@ if (els.lightbox) {
   });
 }
 
+if (els.shareSheet) {
+  els.shareSheet.addEventListener('click', (event) => {
+    if (event.target.closest('[data-close-share="true"]')) {
+      closeShareSheet();
+    }
+  });
+}
+
 document.addEventListener('keydown', (event) => {
-  if (event.key === 'Escape') closeLightbox();
+  if (event.key === 'Escape') {
+    closeLightbox();
+    closeShareSheet();
+  }
 });
 
 if (els.lightboxImage) {

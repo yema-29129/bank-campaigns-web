@@ -9,8 +9,7 @@ const state = {
   bank: '全部',
   time: '全部时间',
   keyword: '',
-  showExpired: false,
-  todayNewCount: 0
+  showExpired: false
 };
 
 const els = {
@@ -26,10 +25,9 @@ const els = {
   filtersPanel: document.getElementById('filtersPanel'),
   bankFilters: document.getElementById('bankFilters'),
   timeFilters: document.getElementById('timeFilters'),
+  quickTimeFilters: document.getElementById('quickTimeFilters'),
   viewTabs: document.getElementById('viewTabs')
 };
-
-let todayEntryEl = null;
 
 function isListPage() {
   return !!(els.grid && els.bankFilters && els.timeFilters);
@@ -184,216 +182,6 @@ function setLoadingState({ loading = false, error = false, empty = false } = {})
   if (els.empty) els.empty.classList.toggle('hidden', !empty);
 }
 
-function injectRuntimeStyles() {
-  if (document.getElementById('tmhzz-runtime-styles')) return;
-
-  const style = document.createElement('style');
-  style.id = 'tmhzz-runtime-styles';
-  style.textContent = `
-    .today-entry-web {
-      margin: 12px 0;
-      padding: 14px 16px;
-      border-radius: 18px;
-      background: linear-gradient(135deg, #fff7ed, #ffedd5);
-      border: 1px solid #fed7aa;
-      color: #9a3412;
-      box-shadow: 0 10px 22px rgba(249, 115, 22, 0.08);
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      gap: 12px;
-      cursor: pointer;
-      transition: transform 0.16s ease, box-shadow 0.16s ease;
-    }
-
-    .today-entry-web:hover {
-      transform: translateY(-1px);
-      box-shadow: 0 14px 28px rgba(249, 115, 22, 0.12);
-    }
-
-    .today-entry-web-left {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      min-width: 0;
-    }
-
-    .today-entry-web-icon {
-      font-size: 22px;
-      line-height: 1;
-      flex-shrink: 0;
-    }
-
-    .today-entry-web-texts {
-      min-width: 0;
-    }
-
-    .today-entry-web-title {
-      font-size: 18px;
-      font-weight: 800;
-      color: #c2410c;
-      line-height: 1.2;
-    }
-
-    .today-entry-web-sub {
-      margin-top: 4px;
-      font-size: 13px;
-      color: #9a3412;
-      line-height: 1.45;
-    }
-
-    .today-entry-web-right {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      flex-shrink: 0;
-    }
-
-    .today-entry-web-count {
-      padding: 6px 10px;
-      border-radius: 999px;
-      background: #fdba74;
-      color: #7c2d12;
-      font-size: 13px;
-      font-weight: 800;
-    }
-
-    .today-entry-web-arrow {
-      font-size: 28px;
-      color: #c2410c;
-      line-height: 1;
-      opacity: 0.8;
-    }
-
-    .filters-swapped {
-      display: grid;
-      grid-template-columns: 1fr 2fr;
-      gap: 28px;
-      align-items: start;
-    }
-
-    .filters-swapped .filter-group {
-      min-width: 0;
-    }
-
-    .filters-swapped .filter-group-time {
-      order: 1;
-    }
-
-    .filters-swapped .filter-group-bank {
-      order: 2;
-    }
-
-    @media (max-width: 900px) {
-      .filters-swapped {
-        grid-template-columns: 1fr;
-        gap: 18px;
-      }
-
-      .filters-swapped .filter-group-time,
-      .filters-swapped .filter-group-bank {
-        order: initial;
-      }
-    }
-
-    @media (max-width: 768px) {
-      .today-entry-web {
-        padding: 12px 14px;
-        border-radius: 16px;
-      }
-
-      .today-entry-web-title {
-        font-size: 16px;
-      }
-
-      .today-entry-web-sub {
-        font-size: 12px;
-      }
-
-      .today-entry-web-count {
-        font-size: 12px;
-      }
-    }
-  `;
-  document.head.appendChild(style);
-}
-
-function ensureTodayEntry() {
-  if (!isListPage()) return null;
-  if (todayEntryEl) return todayEntryEl;
-
-  injectRuntimeStyles();
-
-  todayEntryEl = document.createElement('div');
-  todayEntryEl.className = 'today-entry-web';
-  todayEntryEl.innerHTML = `
-    <div class="today-entry-web-left">
-      <div class="today-entry-web-icon">🕘</div>
-      <div class="today-entry-web-texts">
-        <div class="today-entry-web-title">今日新增</div>
-        <div class="today-entry-web-sub">今天暂无新活动，也可以点我快速查看</div>
-      </div>
-    </div>
-    <div class="today-entry-web-right">
-      <div class="today-entry-web-count hidden"></div>
-      <div class="today-entry-web-arrow">›</div>
-    </div>
-  `;
-
-  todayEntryEl.addEventListener('click', () => {
-    state.time = '今日新增';
-    renderTimes();
-    applyFilters();
-    scrollToResults();
-  });
-
-  const searchWrap = els.searchInput ? els.searchInput.closest('.search-wrap') : null;
-  if (searchWrap && searchWrap.parentNode) {
-    searchWrap.parentNode.insertBefore(todayEntryEl, searchWrap);
-  }
-
-  return todayEntryEl;
-}
-
-function updateTodayEntry() {
-  const el = ensureTodayEntry();
-  if (!el) return;
-
-  const countEl = el.querySelector('.today-entry-web-count');
-  const subEl = el.querySelector('.today-entry-web-sub');
-
-  state.todayNewCount = state.campaigns.filter((item) => item.isTodayAdded).length;
-
-  if (state.todayNewCount > 0) {
-    countEl.classList.remove('hidden');
-    countEl.textContent = `${state.todayNewCount}条`;
-    subEl.textContent = `今天有 ${state.todayNewCount} 条新活动，点我快速查看`;
-  } else {
-    countEl.classList.add('hidden');
-    countEl.textContent = '';
-    subEl.textContent = '今天暂无新活动，也可以点我快速查看';
-  }
-}
-
-function swapFilterLayout() {
-  if (!isListPage() || !els.filtersPanel || !els.bankFilters || !els.timeFilters) return;
-
-  injectRuntimeStyles();
-
-  const bankGroup = els.bankFilters.closest('.filter-group');
-  const timeGroup = els.timeFilters.closest('.filter-group');
-
-  if (!bankGroup || !timeGroup) return;
-
-  els.filtersPanel.classList.add('filters-swapped');
-  bankGroup.classList.add('filter-group-bank');
-  timeGroup.classList.add('filter-group-time');
-
-  if (timeGroup.previousElementSibling !== null) {
-    els.filtersPanel.insertBefore(timeGroup, els.filtersPanel.firstChild);
-  }
-}
-
 function renderBankFilters() {
   if (!els.bankFilters) return;
 
@@ -427,6 +215,69 @@ function renderTimes() {
       applyFilters();
     });
     els.timeFilters.appendChild(button);
+  });
+}
+
+function getCampaignsBeforeTimeFilter() {
+  let result = state.campaigns.slice();
+
+  if (state.view === 'credit') {
+    result = result.filter((item) => item.isCredit);
+  }
+
+  if (state.keyword.trim()) {
+    const kw = state.keyword.trim();
+    result = result.filter((item) => {
+      return `${item.title || ''} ${item.desc || ''} ${item.bankName || ''}`.includes(kw);
+    });
+  }
+
+  if (state.bank !== '全部') {
+    result = result.filter((item) => matchesBankFilter(item, state.bank));
+  }
+
+  return result;
+}
+
+function renderQuickTimeFilters() {
+  if (!els.quickTimeFilters) return;
+
+  const options = [
+    { label: '今日新增', value: '今日新增' },
+    { label: '近3日新增', value: '3天内' }
+  ];
+
+  els.quickTimeFilters.innerHTML = '';
+
+  const baseItems = getCampaignsBeforeTimeFilter();
+
+  options.forEach(({ label, value }) => {
+    const count = value === '今日新增'
+      ? baseItems.filter((item) => item.isTodayAdded).length
+      : baseItems.filter((item) => {
+        const d = parseDate(item.updatedAt || item.createdAt || item.validFrom || item.validTo);
+        if (!d) return false;
+        return d.getTime() >= Date.now() - 3 * 24 * 60 * 60 * 1000;
+      }).length;
+
+    const button = document.createElement('button');
+    button.type = 'button';
+    button.className = `quick-filter-card ${state.time === value ? 'is-active' : ''}`;
+    button.innerHTML = `
+      <span class="quick-filter-card-label">${label}</span>
+      <strong class="quick-filter-card-count">${count} 条</strong>
+      <span class="quick-filter-card-desc">${value === '今日新增' ? '查看今天新上线活动' : '查看最近 3 天更新活动'}</span>
+    `;
+
+    button.addEventListener('click', () => {
+      state.time = value;
+      renderTimes();
+      renderQuickTimeFilters();
+      applyFilters();
+      scrollToResults();
+    });
+
+    els.quickTimeFilters.appendChild(button);
   });
 }
 
@@ -523,22 +374,7 @@ function scrollToResults() {
 function applyFilters() {
   if (!isListPage()) return;
 
-  let result = state.campaigns.slice();
-
-  if (state.view === 'credit') {
-    result = result.filter((item) => item.isCredit);
-  }
-
-  if (state.keyword.trim()) {
-    const kw = state.keyword.trim();
-    result = result.filter((item) => {
-      return `${item.title || ''} ${item.desc || ''} ${item.bankName || ''}`.includes(kw);
-    });
-  }
-
-  if (state.bank !== '全部') {
-    result = result.filter((item) => matchesBankFilter(item, state.bank));
-  }
+  let result = getCampaignsBeforeTimeFilter();
 
   if (state.time !== '全部时间') {
     if (state.time === '今日新增') {
@@ -567,7 +403,7 @@ function applyFilters() {
   setHomeMeta();
   setLoadingState({ loading: false, error: false, empty: !result.length });
   renderCards();
-  updateTodayEntry();
+  renderQuickTimeFilters();
 }
 
 function bindEvents() {
@@ -609,6 +445,7 @@ function bindEvents() {
 
       renderBankFilters();
       renderTimes();
+      renderQuickTimeFilters();
       applyFilters();
     });
   }
@@ -632,6 +469,7 @@ function bindEvents() {
 
     renderBankFilters();
     renderTimes();
+    renderQuickTimeFilters();
     applyFilters();
 
     const targetId = link.getAttribute('href');
@@ -663,12 +501,10 @@ async function fetchCampaigns() {
 
     state.campaigns = list.map(normalizeCampaign).sort(compareCampaign);
 
-    ensureTodayEntry();
-    swapFilterLayout();
     renderBankFilters();
     renderTimes();
+    renderQuickTimeFilters();
     applyFilters();
-    updateTodayEntry();
 
     setLoadingState({ loading: false, error: false, empty: !state.filtered.length });
   } catch (err) {
@@ -736,7 +572,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
   bindEvents();
   renderTimes();
-  ensureTodayEntry();
-  swapFilterLayout();
+  renderQuickTimeFilters();
   fetchCampaigns();
 });

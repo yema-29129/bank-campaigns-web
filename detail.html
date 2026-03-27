@@ -82,6 +82,29 @@
     </main>
   </div>
 
+  <div id="shareDock" class="share-dock hidden" aria-label="分享活动">
+    <button id="shareDockBtn" class="share-dock-btn" type="button" aria-haspopup="dialog" aria-expanded="false">
+      <span class="share-dock-icon" aria-hidden="true">↗</span>
+      <span class="share-dock-text">分享</span>
+    </button>
+  </div>
+
+  <div id="shareSheet" class="share-sheet hidden" aria-hidden="true">
+    <div class="share-sheet-backdrop" data-close-share="true"></div>
+    <div class="share-sheet-dialog" role="dialog" aria-modal="true" aria-labelledby="shareSheetTitle">
+      <button class="share-sheet-close" type="button" data-close-share="true">关闭</button>
+      <p class="share-sheet-kicker">活动分享</p>
+      <h2 id="shareSheetTitle">分享这条活动</h2>
+      <p id="sharePreview" class="share-sheet-preview"></p>
+      <div class="share-sheet-actions">
+        <button id="shareSystemBtn" class="primary-btn" type="button">系统分享</button>
+        <button id="shareCopyTextBtn" class="secondary-btn" type="button">复制分享文案</button>
+        <button id="shareCopyLinkBtn" class="secondary-btn" type="button">复制分享链接</button>
+      </div>
+      <p class="share-sheet-hint">分享内容会带上活动标题、立减金额和活动链接。</p>
+    </div>
+  </div>
+
   <div id="imageLightbox" class="lightbox hidden" aria-hidden="true">
     <div class="lightbox-backdrop" data-close-lightbox="true"></div>
     <div class="lightbox-dialog">

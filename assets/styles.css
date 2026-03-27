@@ -614,6 +614,55 @@ input {
   align-content: flex-start;
 }
 
+.quick-filter-row {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+  margin-top: 10px;
+}
+
+.quick-filter-card {
+  display: grid;
+  gap: 4px;
+  padding: 12px 14px;
+  border: 1px solid rgba(212, 223, 240, 0.95);
+  border-radius: 18px;
+  background: linear-gradient(180deg, rgba(250, 252, 255, 0.98), rgba(243, 248, 255, 0.96));
+  color: #52637c;
+  cursor: pointer;
+  text-align: left;
+  transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+}
+
+.quick-filter-card:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 10px 22px rgba(31, 94, 255, 0.1);
+}
+
+.quick-filter-card.is-active {
+  border-color: rgba(31, 94, 255, 0.36);
+  background: linear-gradient(135deg, rgba(31, 94, 255, 0.12), rgba(29, 155, 240, 0.14));
+  box-shadow: 0 12px 28px rgba(31, 94, 255, 0.14);
+}
+
+.quick-filter-card-label {
+  font-size: 13px;
+  font-weight: 800;
+  color: #203148;
+}
+
+.quick-filter-card-count {
+  font-size: 19px;
+  line-height: 1.2;
+  color: var(--brand);
+}
+
+.quick-filter-card-desc {
+  font-size: 11px;
+  line-height: 1.45;
+  color: #72839a;
+}
+
 .chip {
   font-size: 12px;
   font-weight: 600;
@@ -627,11 +676,11 @@ input {
 }
 
 .field-group-bank {
-  grid-column: 2;
+  grid-column: 3;
 }
 
 .field-group-time {
-  grid-column: 3;
+  grid-column: 2;
 }
 
 .legend-row {
@@ -944,6 +993,133 @@ input {
 .detail-root {
   display: grid;
   gap: 16px;
+}
+
+.share-dock {
+  position: fixed;
+  right: max(18px, calc((100vw - 1320px) / 2 + 12px));
+  top: 50%;
+  z-index: 120;
+  transform: translateY(-50%);
+}
+
+.share-dock-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 88px;
+  padding: 14px 16px;
+  border: 0;
+  border-radius: 20px;
+  background: rgba(255, 255, 255, 0.96);
+  color: #27405f;
+  box-shadow: 0 18px 42px rgba(18, 32, 51, 0.16);
+  cursor: pointer;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.share-dock-btn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 22px 48px rgba(18, 32, 51, 0.2);
+}
+
+.share-dock-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 34px;
+  height: 34px;
+  border-radius: 999px;
+  background: linear-gradient(135deg, var(--brand), var(--brand-2));
+  color: #ffffff;
+  font-size: 18px;
+  font-weight: 800;
+}
+
+.share-dock-text {
+  font-size: 14px;
+  font-weight: 800;
+}
+
+.share-sheet {
+  position: fixed;
+  inset: 0;
+  z-index: 140;
+}
+
+.share-sheet-backdrop {
+  position: absolute;
+  inset: 0;
+  background: rgba(15, 23, 42, 0.34);
+  backdrop-filter: blur(8px);
+}
+
+.share-sheet-dialog {
+  position: relative;
+  width: min(460px, calc(100vw - 24px));
+  margin: max(72px, 14vh) auto 0;
+  padding: 22px;
+  border-radius: 26px;
+  background: rgba(255, 255, 255, 0.98);
+  border: 1px solid rgba(219, 227, 239, 0.96);
+  box-shadow: 0 28px 60px rgba(15, 23, 42, 0.24);
+}
+
+.share-sheet-close {
+  position: absolute;
+  top: 14px;
+  right: 14px;
+  border: 0;
+  background: rgba(238, 244, 251, 0.96);
+  color: #51627b;
+  border-radius: 999px;
+  padding: 8px 12px;
+  cursor: pointer;
+}
+
+.share-sheet-kicker {
+  margin: 0 0 8px;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #74859b;
+}
+
+.share-sheet-dialog h2 {
+  margin: 0;
+  font-size: 24px;
+  line-height: 1.2;
+}
+
+.share-sheet-preview {
+  margin: 14px 0 0;
+  padding: 16px;
+  border-radius: 18px;
+  background: linear-gradient(180deg, rgba(247, 250, 255, 0.98), rgba(240, 246, 255, 0.96));
+  border: 1px solid rgba(212, 223, 240, 0.9);
+  color: #203148;
+  line-height: 1.75;
+  white-space: pre-line;
+}
+
+.share-sheet-actions {
+  display: grid;
+  gap: 10px;
+  margin-top: 16px;
+}
+
+.share-sheet-actions .primary-btn,
+.share-sheet-actions .secondary-btn {
+  width: 100%;
+  justify-content: center;
+}
+
+.share-sheet-hint {
+  margin: 12px 0 0;
+  color: #6a7b93;
+  font-size: 12px;
+  line-height: 1.6;
 }
 
 .detail-card {
@@ -1421,6 +1597,10 @@ input {
     gap: 10px;
   }
 
+  .quick-filter-row {
+    grid-template-columns: 1fr;
+  }
+
   .legend-row {
     gap: 8px;
   }
@@ -1465,5 +1645,21 @@ input {
 
   .detail-side-promo {
     min-height: 0;
+  }
+
+  .share-dock {
+    right: 12px;
+    top: auto;
+    bottom: 18px;
+    transform: none;
+  }
+
+  .share-dock-btn {
+    min-width: auto;
+    padding: 12px 14px;
+  }
+
+  .share-dock-text {
+    display: none;
   }
 }
