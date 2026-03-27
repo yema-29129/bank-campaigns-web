@@ -265,8 +265,7 @@ function renderQuickTimeFilters() {
     button.className = `quick-filter-card ${state.time === value ? 'is-active' : ''}`;
     button.innerHTML = `
       <span class="quick-filter-card-label">${label}</span>
-      <strong class="quick-filter-card-count">${count} 条</strong>
-      <span class="quick-filter-card-desc">${value === '今日新增' ? '查看今天新上线活动' : '查看最近 3 天更新活动'}</span>
+      <strong class="quick-filter-card-count">${count}</strong>
     `;
 
     button.addEventListener('click', () => {

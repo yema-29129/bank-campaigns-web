@@ -524,6 +524,7 @@ input {
 
 .field-search {
   grid-column: 1 / -1;
+  grid-row: 1;
   margin-top: 0;
 }
 
@@ -615,22 +616,23 @@ input {
 }
 
 .quick-filter-row {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
+  display: flex;
+  flex-wrap: wrap;
   gap: 10px;
   margin-top: 10px;
 }
 
 .quick-filter-card {
-  display: grid;
-  gap: 4px;
-  padding: 12px 14px;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 38px;
+  padding: 0 12px;
   border: 1px solid rgba(212, 223, 240, 0.95);
-  border-radius: 18px;
-  background: linear-gradient(180deg, rgba(250, 252, 255, 0.98), rgba(243, 248, 255, 0.96));
+  border-radius: 999px;
+  background: rgba(245, 248, 253, 0.98);
   color: #52637c;
   cursor: pointer;
-  text-align: left;
   transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
 }
 
@@ -641,26 +643,29 @@ input {
 
 .quick-filter-card.is-active {
   border-color: rgba(31, 94, 255, 0.36);
-  background: linear-gradient(135deg, rgba(31, 94, 255, 0.12), rgba(29, 155, 240, 0.14));
-  box-shadow: 0 12px 28px rgba(31, 94, 255, 0.14);
+  background: linear-gradient(135deg, rgba(31, 94, 255, 0.1), rgba(29, 155, 240, 0.12));
+  box-shadow: 0 8px 18px rgba(31, 94, 255, 0.12);
 }
 
 .quick-filter-card-label {
-  font-size: 13px;
-  font-weight: 800;
+  font-size: 12px;
+  font-weight: 700;
   color: #203148;
 }
 
 .quick-filter-card-count {
-  font-size: 19px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 24px;
+  height: 24px;
+  padding: 0 8px;
+  border-radius: 999px;
+  background: rgba(31, 94, 255, 0.1);
+  font-size: 12px;
+  font-weight: 800;
   line-height: 1.2;
   color: var(--brand);
-}
-
-.quick-filter-card-desc {
-  font-size: 11px;
-  line-height: 1.45;
-  color: #72839a;
 }
 
 .chip {
@@ -673,14 +678,17 @@ input {
 
 .field-group-view {
   grid-column: 1;
+  grid-row: 2;
 }
 
 .field-group-bank {
   grid-column: 3;
+  grid-row: 2;
 }
 
 .field-group-time {
   grid-column: 2;
+  grid-row: 2;
 }
 
 .legend-row {
@@ -1598,7 +1606,7 @@ input {
   }
 
   .quick-filter-row {
-    grid-template-columns: 1fr;
+    gap: 8px;
   }
 
   .legend-row {
