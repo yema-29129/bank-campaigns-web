@@ -59,8 +59,13 @@ function setMeta(selector, value) {
 }
 
 function setCanonical(url) {
-  const el = document.querySelector('link[rel="canonical"]');
-  if (el) el.setAttribute('href', url);
+  let el = document.querySelector('link[rel="canonical"]');
+  if (!el) {
+    el = document.createElement('link');
+    el.rel = 'canonical';
+    document.head.appendChild(el);
+  }
+  el.href = url;
 }
 
 function updateStructuredData(data, url, description) {
