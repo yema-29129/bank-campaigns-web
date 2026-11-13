@@ -1,4 +1,5 @@
 const API_BASE = 'https://mini.vooqqqm.com/api';
+const DETAIL_LOAD_TIMEOUT = 12000;
 const GROUP_QR_URL = 'https://github.com/yema-29129/bank-campaigns-web/blob/main/assets/group-wechat-qr.png?raw=true';
 
 const POSTER_FIELDS = [
@@ -31,6 +32,8 @@ const els = {
   root: document.getElementById('detailRoot'),
   loading: document.getElementById('detailLoading'),
   error: document.getElementById('detailError'),
+  errorMessage: document.getElementById('detailErrorMessage'),
+  retry: document.getElementById('detailRetryBtn'),
   shareDock: document.getElementById('shareDock'),
   shareSheet: document.getElementById('shareSheet'),
   shareDockBtn: document.getElementById('shareDockBtn'),
@@ -48,6 +51,7 @@ const els = {
 
 let currentLightboxType = 'poster';
 let currentActivity = null;
+let detailRequestPending = false;
 
 function setMeta(selector, value) {
   const el = document.querySelector(selector);
@@ -686,15 +690,24 @@ function unwrapDetailPayload(payload) {
 }
 
 async function fetchDetail() {
+  if (detailRequestPending) return;
   if (!campaignId) {
     if (els.loading) els.loading.classList.add('hidden');
     if (els.error) els.error.classList.remove('hidden');
+    if (els.errorMessage) els.errorMessage.textContent = '此链接缺少活动编号，请返回列表选择活动。';
+    if (els.retry) els.retry.hidden = true;
     return;
   }
 
+  detailRequestPending = true;
+  if (els.loading) els.loading.classList.remove('hidden');
+  if (els.error) els.error.classList.add('hidden');
+  const controller = new AbortController();
+  const timeout = setTimeout(() => controller.abort(), DETAIL_LOAD_TIMEOUT);
   try {
     const response = await fetch(`${API_BASE}/campaign_detail.php?id=${encodeURIComponent(campaignId)}`, {
-      credentials: 'omit'
+      credentials: 'omit',
+      signal: controller.signal
     });
 
     if (!response.ok) throw new Error(`HTTP ${response.status}`);
@@ -714,8 +727,16 @@ async function fetchDetail() {
     console.error('加载详情失败', err);
     if (els.loading) els.loading.classList.add('hidden');
     if (els.error) els.error.classList.remove('hidden');
+    if (els.errorMessage) els.errorMessage.textContent = controller.signal.aborted
+      ? '活动详情加载超时，请重试。'
+      : '活动详情加载失败，请重试。';
+  } finally {
+    clearTimeout(timeout);
+    detailRequestPending = false;
   }
 }
+
+if (els.retry) els.retry.addEventListener('click', fetchDetail);
 
 if (els.lightbox) {
   els.lightbox.addEventListener('click', (event) => {

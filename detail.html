@@ -21,9 +21,7 @@
   <meta name="twitter:description" content="查看活动时间、参与路径、二维码图片和关键信息。">
   <link rel="icon" type="image/svg+xml" href="./assets/favicon.svg">
   <link rel="shortcut icon" href="./assets/favicon.svg">
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;700;800&display=swap" rel="stylesheet">
+  <link rel="preconnect" href="https://mini.vooqqqm.com" crossorigin>
   <link rel="stylesheet" href="./assets/styles.css">
   <script id="detailStructuredData" type="application/ld+json">
   {
@@ -77,8 +75,11 @@
     </header>
 
     <main id="detailRoot" class="detail-root">
-      <div id="detailLoading" class="state-card">正在加载活动详情...</div>
-      <div id="detailError" class="state-card is-error hidden">活动详情加载失败。</div>
+      <div id="detailLoading" class="state-card" role="status">正在加载活动详情...</div>
+      <div id="detailError" class="state-card is-error hidden" role="alert">
+        <span id="detailErrorMessage">活动详情加载失败。</span>
+        <button id="detailRetryBtn" class="ghost-btn" type="button">重新加载</button>
+      </div>
     </main>
   </div>
 
@@ -151,6 +152,6 @@
     </div>
   </footer>
 
-  <script src="./assets/detail.js?v=20261113-detail-type"></script>
+  <script async src="./assets/detail.js?v=20261113-load"></script>
 </body>
 </html>
