@@ -68,6 +68,22 @@ function setCanonical(url) {
   el.href = url;
 }
 
+async function preferPublishedDetail(id, activity, description) {
+  if (!/^\d+$/.test(id)) return;
+  try {
+    const response = await fetch('./activities/manifest.json');
+    if (!response.ok) return;
+    const { activities } = await response.json();
+    if (activities.some((entry) => entry.id === id && entry.status === 'current')) {
+      const canonical = new URL(`./activities/${id}.html`, window.location.href).href;
+      setCanonical(canonical);
+      updateStructuredData(activity, canonical, description);
+    }
+  } catch {
+    // Keep the live detail canonical if the public directory is unavailable.
+  }
+}
+
 function updateStructuredData(data, url, description) {
   const script = document.getElementById('detailStructuredData');
   if (!script) return;
@@ -101,16 +117,18 @@ function updateDetailMeta(activity) {
   ].filter(Boolean).join('，').slice(0, 120);
 
   const url = `https://bank.vooqqqm.com/detail.html?id=${encodeURIComponent(campaignId)}`;
+  const structuredDescription = description || '查看银行立减金活动详情、活动时间、参与路径和二维码图片。';
 
   document.title = title;
-  setMeta('meta[name="description"]', description || '查看银行立减金活动详情、活动时间、参与路径和二维码图片。');
+  setMeta('meta[name="description"]', structuredDescription);
   setMeta('meta[property="og:title"]', title);
   setMeta('meta[property="og:description"]', description || '查看活动时间、参与路径、二维码图片和关键信息。');
   setMeta('meta[property="og:url"]', url);
   setMeta('meta[name="twitter:title"]', title);
   setMeta('meta[name="twitter:description"]', description || '查看活动时间、参与路径、二维码图片和关键信息。');
   setCanonical(url);
-  updateStructuredData(activity, url, description || '查看银行立减金活动详情、活动时间、参与路径和二维码图片。');
+  updateStructuredData(activity, url, structuredDescription);
+  void preferPublishedDetail(campaignId, activity, structuredDescription);
 }
 
 function escapeHtml(value) {

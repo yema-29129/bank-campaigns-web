@@ -7,6 +7,14 @@
   padding-inline-start: 1.25rem;
 }
 
+.detail-metric-grid {
+  margin: 0;
+}
+
+.detail-metric-value {
+  margin: 0;
+}
+
 .info-card .activity-directory {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(min(100%, 280px), 1fr));

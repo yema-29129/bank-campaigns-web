@@ -1,12 +1,13 @@
 #!/usr/bin/env python3
-"""Build the pilot activity directory and detail pages from the public feed.
+"""Build the activity directory and detail pages from the public feed.
 
 From the site checkout:
   curl --fail --silent --show-error https://mini.vooqqqm.com/api/campaigns.php -o /tmp/bank-seo-feed.json
   python3 tools/generate-activity-pages.py /tmp/bank-seo-feed.json --as-of YYYY-MM-DD
 
-Review changed activity rules and source URLs before publishing. This command
-also updates sitemap.xml to match the published selection.
+Review the generated changes before publishing. Only complete, current rows
+with approved sources enter the directory and sitemap. Previously published
+URLs remain readable when a campaign ends or no longer has a valid feed entry.
 """
 
 import argparse
@@ -15,6 +16,7 @@ from html import escape
 import json
 from pathlib import Path
 import re
+import sys
 from urllib.parse import urlsplit
 import xml.etree.ElementTree as ET
 
@@ -22,11 +24,6 @@ SITE = "https://bank.vooqqqm.com"
 SITE_NAME = "好羊毛银行活动站"
 DIRECTORY = f"{SITE}/activities/"
 OUTPUT = Path(__file__).resolve().parents[1] / "activities"
-SELECTED_IDS = (
-    "489", "488", "486", "485", "480", "477", "476", "466", "462", "457",
-    "446", "424", "411", "408", "407", "400", "398", "386", "382", "363",
-    "331", "323", "288", "197", "165",
-)
 SOURCE_HOSTS = frozenset({
     "www.icbcasia.com", "www.dbs.com.hk", "creditcard.ecitic.com", "ccb.cn",
     "www.unionpayintl.com", "www.zyebank.com.cn", "www.abchina.com",
@@ -34,52 +31,93 @@ SOURCE_HOSTS = frozenset({
     "www.psbc.com", "creditcard.cib.com.cn", "www.yantaibank.net",
     "cschannel.alipay.com", "creditcard.cmbc.com.cn", "www.cqcbank.com",
 })
+# The banks use these hosts for public assets and supporting documents.
+# Keep them separate from the approved primary activity sources.
+SUPPORTING_DOCUMENT_HOSTS = frozenset({"v.icbc.com.cn", "cdn.zaticdn.com", "ccc.spdb.com.cn"})
+EMBEDDED_SOURCE_HOSTS = SOURCE_HOSTS | SUPPORTING_DOCUMENT_HOSTS
+MANUAL_REVIEW_IDS = frozenset({"354"})
+TEXT_FIELDS = (
+    "title", "desc", "bankName", "awardDesc", "pathDesc",
+    "region", "consumeChannel", "channel",
+)
+REQUIRED_FIELDS = ("title", "desc", "bankName", "awardDesc", "pathDesc")
+EMBEDDED_URL = re.compile(r'https?://[^\s<>"\u3000-\u303f\uff00-\uffef]+', re.IGNORECASE)
+INDEX_ROBOTS = "index,follow,max-image-preview:large"
+ARCHIVE_ROBOTS = "noindex,follow"
+STATUS_MESSAGES = {
+    "ended": "活动已结束。下方为历史资料，请查看精选活动目录了解近期优惠。",
+    "upcoming": "活动尚未开始，实际参与日期请以官方规则为准。",
+    "unavailable": "当前活动资料暂时无法核实。下方为此前发布的历史资料。",
+}
+STATUS_MARKER = "<!-- activity-status -->"
 
 
-def safe_source(url):
+def safe_source(url, hosts=SOURCE_HOSTS, require_path=True):
     try:
         parsed = urlsplit(url)
     except ValueError:
         return False
     return (
         parsed.scheme == "https"
-        and parsed.netloc.lower() in SOURCE_HOSTS
-        and bool(parsed.path and parsed.path != "/")
+        and parsed.netloc.lower() in hosts
+        and (not require_path or bool(parsed.path and parsed.path != "/"))
+        and "\\" not in url
         and not any(char.isspace() or ord(char) < 32 for char in url)
     )
 
 
+def parse_entry(activity_id, row, as_of):
+    start = date.fromisoformat(row["validFrom"])
+    end = date.fromisoformat(row["validTo"])
+    lastmod = date.fromisoformat((row.get("updatedAtRaw") or row.get("updatedAt") or row["createdAt"])[:10])
+    if start > end or lastmod > as_of:
+        raise ValueError("Inconsistent activity dates.")
+
+    entry = {key: (row.get(key) or "").strip() for key in TEXT_FIELDS}
+    if not all(entry[key] for key in REQUIRED_FIELDS):
+        raise ValueError("Incomplete public activity information.")
+
+    sources = tuple(dict.fromkeys((row.get("pathUrl") or "").split()))
+    if activity_id in MANUAL_REVIEW_IDS or not sources or not all(map(safe_source, sources)):
+        raise ValueError("Source requires manual review.")
+    for value in entry.values():
+        if any(
+            not safe_source(url.rstrip(").,;!?]"), EMBEDDED_SOURCE_HOSTS, require_path=False)
+            for url in EMBEDDED_URL.findall(value)
+        ):
+            raise ValueError("Embedded URL requires manual review.")
+
+    status = "ended" if end < as_of else "upcoming" if start > as_of else "current"
+    entry.update(
+        id=activity_id, validFrom=start.isoformat(), validTo=end.isoformat(),
+        lastmod=lastmod.isoformat(), sources=sources, status=status,
+    )
+    return entry
+
+
 def select_activities(feed, as_of):
-    if feed.get("code") not in (0, 200):
+    if not isinstance(feed, dict) or feed.get("code") not in (0, 200):
         raise ValueError("The campaign feed reported an error.")
-    by_id = {str(row["id"]): row for row in feed["data"]}
-    selected = []
-    for activity_id in SELECTED_IDS:
-        row = by_id[activity_id]
-        start = date.fromisoformat(row["validFrom"])
-        end = date.fromisoformat(row["validTo"])
-        if not start <= as_of <= end:
-            raise ValueError(f"Activity {activity_id} is outside its published dates.")
+    rows = feed.get("data")
+    if not isinstance(rows, list) or not rows:
+        raise ValueError("The campaign feed contains no rows.")
 
-        entry = {key: (row.get(key) or "").strip() for key in (
-            "title", "desc", "bankName", "awardDesc", "pathDesc",
-            "region", "consumeChannel", "channel",
-        )}
-        if not all(entry[key] for key in ("title", "desc", "bankName", "awardDesc", "pathDesc")):
-            raise ValueError(f"Activity {activity_id} lacks a title, issuer, summary, rules or instructions.")
-
-        sources = tuple(dict.fromkeys((row.get("pathUrl") or "").split()))
-        if not sources or not all(safe_source(url) for url in sources):
-            raise ValueError(f"Activity {activity_id} needs a review of its source links.")
-        entry.update(
-            id=activity_id, validFrom=start.isoformat(), validTo=end.isoformat(),
-            lastmod=date.fromisoformat(row["updatedAt"][:10]).isoformat(), sources=sources,
-        )
-        selected.append(entry)
-    return selected
+    selected = {}
+    seen = set()
+    rejected = 0
+    for row in rows:
+        activity_id = str(row.get("id", "")) if isinstance(row, dict) else ""
+        if not re.fullmatch(r"[1-9][0-9]*", activity_id) or activity_id in seen:
+            raise ValueError("The campaign feed contains an invalid or duplicate ID.")
+        seen.add(activity_id)
+        try:
+            selected[activity_id] = parse_entry(activity_id, row, as_of)
+        except (AttributeError, KeyError, TypeError, ValueError):
+            rejected += 1
+    return selected, rejected
 
 
-def document(title, summary, url, kind, body, lastmod=None):
+def document(title, summary, url, kind, body, lastmod=None, indexable=True):
     page_title = f"{title} | {SITE_NAME}"
     schema = {
         "@context": "https://schema.org",
@@ -94,6 +132,7 @@ def document(title, summary, url, kind, body, lastmod=None):
         schema["dateModified"] = lastmod
     schema_text = json.dumps(schema, ensure_ascii=False).replace("<", "\\u003c")
     og_type = "article" if lastmod else "website"
+    robots = INDEX_ROBOTS if indexable else ARCHIVE_ROBOTS
     return f"""<!doctype html>
 <html lang="zh-CN">
 <head>
@@ -101,7 +140,7 @@ def document(title, summary, url, kind, body, lastmod=None):
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>{escape(page_title)}</title>
   <meta name="description" content="{escape(summary)}">
-  <meta name="robots" content="index,follow,max-image-preview:large">
+  <meta name="robots" content="{robots}">
   <link rel="canonical" href="{url}">
   <meta property="og:locale" content="zh_CN">
   <meta property="og:type" content="{og_type}">
@@ -162,6 +201,18 @@ def prose(value):
     )
 
 
+def status_notice(status):
+    message = STATUS_MESSAGES.get(status)
+    return f'<p class="detail-section">{message}</p>' if message else ""
+
+
+def fact(label, value):
+    return f"""            <div class="detail-metric">
+              <dt class="detail-metric-label">{label}</dt>
+              <dd class="detail-metric-value">{value}</dd>
+            </div>"""
+
+
 def detail(entry):
     title = entry["title"]
     summary = entry["desc"]
@@ -170,8 +221,12 @@ def detail(entry):
         f'              <li><a class="detail-link" href="{escape(url)}">查看来源（{urlsplit(url).hostname}）</a></li>'
         for url in entry["sources"]
     )
-    context = " · ".join(filter(None, (entry["region"], entry["consumeChannel"], entry["channel"])))
-    context_markup = f'<p class="detail-desc">{escape(context)}</p>' if context else ""
+    facts = [fact("活动机构", escape(entry["bankName"])), fact("活动时间", period(entry))]
+    for key, label in (("region", "适用地区"), ("consumeChannel", "消费场景"), ("channel", "支付渠道")):
+        if entry[key]:
+            facts.append(fact(label, escape(entry[key])))
+    facts_markup = "\n".join(facts)
+    status = entry["status"]
     body = f"""  <div class="detail-shell">
     <header class="detail-topbar">
       <a class="ghost-btn" href="/activities/">返回精选活动</a>
@@ -180,32 +235,28 @@ def detail(entry):
       <article class="detail-card">
         <header class="detail-hero">
           <div class="detail-hero-copy">
-            <span class="detail-bank-pill">{escape(entry["bankName"])}</span>
             <h1>{escape(title)}</h1>
             <p class="detail-desc">{escape(summary)}</p>
-            {context_markup}
           </div>
-          <div class="detail-metric-grid">
-            <div class="detail-metric">
-              <span class="detail-metric-label">活动时间</span>
-              <strong class="detail-metric-value">{period(entry)}</strong>
-            </div>
-          </div>
+          <dl class="detail-metric-grid">
+{facts_markup}
+          </dl>
         </header>
+        {STATUS_MARKER}{status_notice(status)}
         <div class="detail-layout">
           <div class="detail-main">
             <section class="detail-section detail-section-emphasis">
-              <div class="detail-section-head"><h2>获奖内容</h2></div>
+              <div class="detail-section-head"><h2>优惠内容与条件</h2></div>
 {prose(entry["awardDesc"])}
             </section>
             <section class="detail-section">
-              <div class="detail-section-head"><h2>活动路径</h2></div>
+              <div class="detail-section-head"><h2>参与方式</h2></div>
 {prose(entry["pathDesc"])}
             </section>
           </div>
           <aside class="detail-side">
             <section class="detail-side-panel">
-              <div class="detail-side-head"><h2>活动来源</h2></div>
+              <div class="detail-side-head"><h2>官方来源</h2></div>
               <ul class="activity-sources">
 {sources}
               </ul>
@@ -217,7 +268,20 @@ def detail(entry):
       </article>
     </main>
   </div>"""
-    return document(title, summary, f"{DIRECTORY}{activity_id}.html", "WebPage", body, entry["lastmod"])
+    return document(title, summary, f"{DIRECTORY}{activity_id}.html", "WebPage", body, entry["lastmod"], indexable=status == "current")
+
+
+def preserve_detail(html, status):
+    html = html.replace(f'content="{INDEX_ROBOTS}"', f'content="{ARCHIVE_ROBOTS}"', 1)
+    # The marker makes this update idempotent on generated pages. The fallback
+    # inserts the notice before the rules on pages from the original pilot.
+    marker = STATUS_MARKER
+    if marker not in html:
+        html = html.replace('        <div class="detail-layout">', f'        {marker}\n        <div class="detail-layout">', 1)
+    return re.sub(
+        re.escape(marker) + r'(?:<p class="detail-section">[^<]*</p>)?',
+        lambda _: marker + status_notice(status), html, count=1,
+    )
 
 
 def directory(entries):
@@ -232,6 +296,7 @@ def directory(entries):
     <section class="info-card">
       <h1>{title}</h1>
       <p>{summary}</p>
+      <p>共 {len(entries)} 项。活动名额、参与资格与有效期以官方公告为准。</p>
       <p><a href="/#listTitle">浏览和筛选全部活动</a></p>
       <ul class="activity-directory">
 {cards}
@@ -241,7 +306,7 @@ def directory(entries):
     return document(title, summary, DIRECTORY, "CollectionPage", body)
 
 
-def write_sitemap(entries):
+def sitemap_xml(entries):
     root = ET.Element("urlset", xmlns="http://www.sitemaps.org/schemas/sitemap/0.9")
     for path in ("/", "/about.html", "/terms.html", "/privacy.html", "/disclaimer.html", "/contact.html", "/activities/"):
         ET.SubElement(ET.SubElement(root, "url"), "loc").text = f"{SITE}{path}"
@@ -250,8 +315,7 @@ def write_sitemap(entries):
         ET.SubElement(url, "loc").text = f'{DIRECTORY}{entry["id"]}.html'
         ET.SubElement(url, "lastmod").text = entry["lastmod"]
     ET.indent(root, space="  ")
-    sitemap = '<?xml version="1.0" encoding="UTF-8"?>\n' + ET.tostring(root, encoding="unicode") + "\n"
-    (OUTPUT.parent / "sitemap.xml").write_text(sitemap, encoding="utf-8")
+    return '<?xml version="1.0" encoding="UTF-8"?>\n' + ET.tostring(root, encoding="unicode") + "\n"
 
 
 def main():
@@ -260,25 +324,46 @@ def main():
     parser.add_argument("--as-of", required=True, type=date.fromisoformat)
     args = parser.parse_args()
     feed = json.loads(args.feed.read_text(encoding="utf-8"))
-    entries = select_activities(feed, args.as_of)
-    manifest = {
-        "activities": [{key: row[key] for key in ("id", "lastmod", "validTo")} for row in entries],
-    }
+    selected, rejected = select_activities(feed, args.as_of)
+    current = [entry for entry in selected.values() if entry["status"] == "current"]
+    current.sort(key=lambda entry: (entry["lastmod"], int(entry["id"])), reverse=True)
+    if not current:
+        raise ValueError("No current, complete activities with approved sources; published files are untouched.")
+
     manifest_path = OUTPUT / "manifest.json"
-    previous_ids = set()
-    if manifest_path.exists():
-        previous = json.loads(manifest_path.read_text(encoding="utf-8"))
-        previous_ids = {row["id"] for row in previous["activities"]}
+    previous = json.loads(manifest_path.read_text(encoding="utf-8"))["activities"] if manifest_path.exists() else []
+    published = {entry["id"]: entry for entry in current}
+    pages = {entry["id"]: detail(entry) for entry in current}
+    for old in previous:
+        activity_id = old["id"]
+        if not re.fullmatch(r"[1-9][0-9]*", activity_id):
+            raise ValueError("Invalid ID in the activity manifest.")
+        if activity_id in published:
+            continue
+        if activity_id in selected:
+            entry = selected[activity_id]
+            pages[activity_id] = detail(entry)
+        else:
+            html = (OUTPUT / f"{activity_id}.html").read_text(encoding="utf-8")
+            status = "ended" if date.fromisoformat(old["validTo"]) < args.as_of else "unavailable"
+            entry = {**old, "status": status}
+            pages[activity_id] = preserve_detail(html, status)
+        published[activity_id] = entry
+
+    manifest = {"activities": [
+        {key: entry[key] for key in ("id", "lastmod", "validTo", "status")}
+        for entry in published.values()
+    ]}
+    directory_html = directory(current)
+    sitemap = sitemap_xml(current)
     OUTPUT.mkdir(exist_ok=True)
-    (OUTPUT / "index.html").write_text(directory(entries), encoding="utf-8")
-    for entry in entries:
-        (OUTPUT / f'{entry["id"]}.html').write_text(detail(entry), encoding="utf-8")
-    for activity_id in previous_ids.difference(SELECTED_IDS):
-        if re.fullmatch(r"[0-9]+", activity_id):
-            (OUTPUT / f"{activity_id}.html").unlink(missing_ok=True)
+    for activity_id, html in pages.items():
+        (OUTPUT / f"{activity_id}.html").write_text(html, encoding="utf-8")
+    (OUTPUT / "index.html").write_text(directory_html, encoding="utf-8")
+    (OUTPUT.parent / "sitemap.xml").write_text(sitemap, encoding="utf-8")
     manifest_path.write_text(json.dumps(manifest, indent=2) + "\n", encoding="utf-8")
-    write_sitemap(entries)
-    print(f"Wrote {len(entries)} activity pages, the directory, and the sitemap.")
+    print(f"Wrote {len(current)} current pages and {len(published) - len(current)} archived or unavailable pages, plus the directory and sitemap.")
+    print(f"Skipped {rejected} feed rows with incomplete information or sources requiring review.", file=sys.stderr)
 
 
 if __name__ == "__main__":

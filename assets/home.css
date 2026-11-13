@@ -94,6 +94,12 @@
   text-underline-offset: 3px;
 }
 
+.home-page .intro-activity-links {
+  display: inline-flex;
+  flex-wrap: wrap;
+  column-gap: 14px;
+}
+
 .home-page .intro-load-notice {
   margin-inline-start: 10px;
   color: var(--directory-muted);

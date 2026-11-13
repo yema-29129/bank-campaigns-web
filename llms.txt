@@ -1,0 +1,14 @@
+# 好羊毛银行活动站
+
+> 整理银行与支付机构发布的公开优惠，包括微信立减金、信用卡返现和现金红包。每篇活动详情列出有效期、参与方式和可核对的来源。
+
+## 活动
+
+- [精选银行活动](https://bank.vooqqqm.com/activities/): 附公开来源的活动目录。目录及详情正文可直接读取。
+- [全部活动与筛选](https://bank.vooqqqm.com/): 实时活动列表，可按银行、场景、卡种和时间筛选。
+- [站点地图](https://bank.vooqqqm.com/sitemap.xml): 当前公开页面的网址。
+
+## 关于本站
+
+- [关于我们](https://bank.vooqqqm.com/about.html): 活动整理方式和内容来源。
+- [免责声明](https://bank.vooqqqm.com/disclaimer.html): 活动日期、参与资格和名额以所属机构公告为准。
