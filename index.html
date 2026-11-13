@@ -25,6 +25,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="./assets/styles.css">
+  <link rel="stylesheet" href="./assets/home.css?v=20261113-directory">
   <script type="application/ld+json">
   {
     "@context": "https://schema.org",
@@ -62,7 +63,7 @@
     gtag('config', 'G-2C78TMMNY4');
   </script>
 </head>
-<body>
+<body class="home-page">
   <header class="site-header">
     <div class="site-header-inner">
       <a class="site-brand" href="./index.html">
@@ -82,76 +83,66 @@
   </header>
 
   <div class="site-shell">
-    <header class="hero">
-      <div class="hero-copy">
-        <span class="eyebrow">Web Edition</span>
-        <h1>薅羊毛·银行/微信立减金/信用卡返现网站</h1>
-        <p class="hero-text">一起薅羊毛，实时更新微信立减金、返现、信用卡返现、信用卡活动、现金红包等等信息，天天薅羊毛、实时薅羊毛。</p>
-        <div class="hero-note">
-          <span class="hero-note-label">提示</span>
-          <p>活动内容归所属机构所有，活动奖品随时间推移可能变化，一切活动请以机构官方规则为准。网站端展示仅作信息整理，不构成保证。</p>
-        </div>
+    <header class="directory-intro">
+      <div class="intro-copy">
+        <h1>发现银行优惠</h1>
+        <p>查找微信立减金、信用卡返现和现金红包。活动规则以所属机构公告为准。</p>
       </div>
-      <div class="hero-stats">
-        <div class="stat-card">
-          <span class="stat-label">实时更新</span>
-          <strong>每天都有新活动线报</strong>
-        </div>
-        <div class="stat-card">
-          <span class="stat-label">活动覆盖</span>
-          <strong>微信立减金、返现、信用卡返现、信用卡活动、现金红包</strong>
-        </div>
-        <div class="stat-card">
-          <span class="stat-label">使用体验</span>
-          <strong>电脑查活动，手机随手截图</strong>
-        </div>
-      </div>
+      <label class="field field-search">
+        <span>搜索活动</span>
+        <input id="searchInput" type="search" placeholder="输入活动关键词或银行名称">
+      </label>
     </header>
 
     <main class="layout">
       <section class="content">
-        <div class="toolbar">
-          <div>
-            <h2 id="listTitle">发现 · 全部活动</h2>
-            <p id="resultSummary" class="result-summary">加载中...</p>
-          </div>
-          <div class="toolbar-actions">
-            <button id="toggleFiltersBtn" class="ghost-btn" type="button">收起筛选</button>
-            <button id="refreshBtn" class="ghost-btn" type="button">刷新数据</button>
-            <a class="toolbar-link" href="./index.html">首页</a>
-          </div>
-        </div>
-
-        <div id="filtersPanel" class="panel filters-panel">
+        <div id="filtersPanel" class="panel filters-panel" aria-label="活动筛选">
           <div class="filters-grid">
-            <label class="field field-search">
-              <span>搜索活动</span>
-              <input id="searchInput" type="search" placeholder="输入标题、描述、银行关键词">
-            </label>
-
-            <div class="field field-group-view">
-              <span>内容分组</span>
-              <div id="viewTabs" class="segmented">
-                <button type="button" class="segmented-btn is-active" data-view="all">发现</button>
-                <button type="button" class="segmented-btn" data-view="credit">信用卡活动</button>
+            <div class="filter-section field-group-view">
+              <div class="filter-heading" id="cardTypeLabel">按卡种筛选</div>
+              <div id="viewTabs" class="segmented" role="group" aria-labelledby="cardTypeLabel">
+                <button type="button" class="segmented-btn is-active" aria-pressed="true" data-view="all">全部卡种</button>
+                <button type="button" class="segmented-btn" aria-pressed="false" data-view="debit">仅储蓄卡</button>
+                <button type="button" class="segmented-btn" aria-pressed="false" data-view="credit">仅信用卡</button>
               </div>
             </div>
 
-            <div class="field field-group-time">
-              <span>时间筛选</span>
-              <div id="timeFilters" class="chip-wrap"></div>
-              <div id="quickTimeFilters" class="quick-filter-row" aria-label="快速新增筛选"></div>
-            </div>
+            <details class="filter-section field-group-scene" open>
+              <summary class="filter-heading">
+                <span>按场景筛选 · <span id="activeSceneLabel">全部</span></span>
+                <span class="filter-toggle" aria-hidden="true"><span class="filter-collapse">收起</span><span class="filter-expand">展开</span></span>
+              </summary>
+              <div id="sceneFilters" class="chip-wrap" role="group" aria-label="按场景筛选"></div>
+            </details>
 
-            <div class="field field-group-bank">
-              <span>按银行筛选</span>
-              <div id="bankFilters" class="chip-wrap"></div>
+            <details class="filter-section field-group-bank" open>
+              <summary class="filter-heading">
+                <span>按银行筛选 · <span id="activeBankLabel">全部</span></span>
+                <span class="filter-toggle" aria-hidden="true"><span class="filter-collapse">收起</span><span class="filter-expand">展开</span></span>
+              </summary>
+              <div id="bankFilters" class="chip-wrap" role="group" aria-label="按银行筛选"></div>
+            </details>
+
+            <div class="filter-section field-group-time">
+              <div class="filter-heading" id="timeFilterLabel">按时间筛选</div>
+              <div id="timeFilters" class="chip-wrap" role="group" aria-labelledby="timeFilterLabel"></div>
             </div>
           </div>
+        </div>
 
+        <div id="quickTimeFilters" class="shortcut-grid" role="group" aria-label="快捷筛选"></div>
+
+        <div class="toolbar">
+          <div>
+            <h2 id="listTitle">全部活动</h2>
+            <p id="resultSummary" class="result-summary" role="status">加载中...</p>
+          </div>
+          <div class="toolbar-actions">
+            <button id="resetFiltersBtn" class="ghost-btn" type="button">清除筛选</button>
+            <button id="refreshBtn" class="ghost-btn" type="button">刷新数据</button>
+          </div>
           <div class="legend-row" aria-label="颜色说明">
-            <span class="legend-label">颜色说明</span>
-            <span class="legend-chip"><i class="legend-dot legend-dot-default"></i>普通储蓄卡活动</span>
+            <span class="legend-chip"><i class="legend-dot legend-dot-default"></i>普通活动</span>
             <span class="legend-chip"><i class="legend-dot legend-dot-recurring"></i>循环活动</span>
             <span class="legend-chip"><i class="legend-dot legend-dot-credit"></i>信用卡活动</span>
           </div>
@@ -198,6 +189,6 @@
     </div>
   </footer>
 
-  <script src="./assets/app.js"></script>
+  <script src="./assets/app.js?v=20261113-directory"></script>
 </body>
 </html>

@@ -1,14 +1,103 @@
 const API_BASE = 'https://mini.vooqqqm.com/api';
 const TIME_OPTIONS = ['全部时间', '今日新增', '3天内', '7天内', '14天内', '30天内'];
-const BANK_FILTER_OPTIONS = ['全部', '工商银行', '农业银行', '建设银行', '中国银行', '其他银行', '信用卡返现', '固定活动', '每日签到', '重点推荐'];
+const EXPIRING_SOON_DAYS = 20;
+const BANK_MATCHERS = [
+  ['工行', /工商|工行/],
+  ['农行', /农业|农行/],
+  ['建行', /建设|建行/],
+  ['中行', /中国银行|中行|中银/],
+  ['交行', /交通|交行/],
+  ['邮储', /邮储|邮政储蓄/],
+  ['招行', /招商|招行/],
+  ['中信', /中信/],
+  ['光大', /光大/],
+  ['华夏', /华夏/],
+  ['民生', /民生/],
+  ['广发', /广发/],
+  ['平安', /平安/],
+  ['兴业', /兴业/],
+  ['浦发', /浦发|浦东发展/],
+  ['浙商', /浙商/],
+  ['渤海', /渤海/],
+  ['恒丰', /恒丰/]
+];
+const BANK_FILTER_OPTIONS = [
+  '全部', ...BANK_MATCHERS.map(([label]) => label), '其他银行',
+  '信用卡返现', '固定活动', '每日签到', '重点推荐'
+];
+const SHORTCUTS = [
+  { key: 'all', label: '全部活动', description: '清除筛选查看全部' },
+  { key: 'food', label: '吃喝', description: '餐饮茶咖与外卖', scene: '吃喝' },
+  { key: 'shopping', label: '购物', description: '商超购物优惠', scene: '购物' },
+  { key: 'travel', label: '出行', description: '交通酒店与机票', scene: '出行' },
+  { key: 'overseas', label: '境外游', description: '境外出行消费', scene: '境外游' },
+  { key: 'life', label: '生活', description: '缴费与日常服务', scene: '生活' },
+  { key: 'today', label: '今日新增', description: '今天收录的活动', time: '今日新增' },
+  { key: 'expiring', label: '快到期', description: '20 天内到期', expiring: true }
+];
+
+// 与小程序 pages/utils/campaign_scene.js 使用同一组场景分类规则。
+// Explicit scenario metadata wins. Legacy records use concrete merchants/services only.
+const SCENE_OPTIONS = ['全部', '吃喝', '购物', '出行', '境外游', '生活', '会员权益', '通用优惠'];
+
+// A card's issuing country or bank name is not the campaign's travel destination.
+function overseasDestination(region) {
+  return String(region || '').split(/[·；;，,]/)
+    .filter(part => !/发卡|发行|持卡|信用卡客户|银行客户|身份证|居民/.test(part))
+    .join(' ');
+}
+
+function isOverseasTravel(activity, tags) {
+  // Keep eligibility, bank names and app/payment channels out of destination inference.
+  const text = [activity.title, activity.desc, tags.join(' ')].join(' ');
+  const destination = overseasDestination(activity.region);
+  const abroad = /境外|海外|国外|出境|香港|澳门|台湾|日本|韩国|泰国|新加坡|马来西亚|越南|印尼|印度尼西亚|菲律宾|柬埔寨|老挝|欧洲|英国|法国|德国|意大利|西班牙|瑞士|北美|美国|加拿大|澳大利亚|澳洲|新西兰|阿联酋|迪拜/;
+  const travelUse = /旅游|旅行|度假|机票|航空|航班|酒店|订房|住宿|交通|公交|地铁|的士|出租车|打车|租车|机场|贵宾厅|休息室|景点|门票|乐园|游轮|邮轮|八达通|西瓜卡|餐饮|餐厅|茶饮|外卖|咖啡|购物|商场|商户|门市|零售|便利店|超市|购机|消费|签账|流量|漫游|上网卡|eSIM|Apple Pay|手机Pay|SOGO|Klook|Agoda|Trip\.com/i;
+  const explicitTravel = /境外游|出境游|出国游|海外游|国际机票|国际航班|全球(?:指定)?酒店/;
+  if (explicitTravel.test(text + ' ' + destination)) return true;
+
+  // Match actual overseas services, not phrases such as "境外银联卡" or "香港发卡".
+  const overseasService = /(?:境外|海外|国外|出境)(?:线下|线上|网上|指定|合资格|手机Pay|手机支付|Apple Pay|交通|旅游|旅行|酒店|机票|购物|流量|漫游|消费|签账)/i;
+  const serviceText = text.replace(/(?:不含|不适用|不包括|不支持|不参与|排除)(?:境外|海外)[^。；;，,\n]*/g, '');
+  if (overseasService.test(serviceText)) return true;
+  if (abroad.test(destination) && travelUse.test(text)) return true;
+
+  // Some older records say "全国" for eligibility, while describing the destination.
+  const destinationService = /(?:香港|澳门|台湾|日本|韩国|泰国|新加坡|欧洲|美国|英国|澳洲)(?:、(?:中国)?(?:香港|澳门|台湾))?(?:的|指定)?(?:交通|公交|地铁|的士|餐饮|购物|消费|酒店|机票|流量|漫游|机场)/;
+  return destinationService.test(serviceText);
+}
+
+function classifyScenes(activity = {}) {
+  const explicit = activity.scenes || activity.scene || activity.sceneCategory;
+  const values = Array.isArray(explicit) ? explicit : String(explicit || '').split(/[,，、|]/);
+  const known = values.map(v => String(v).trim()).filter(v => SCENE_OPTIONS.includes(v) && v !== '全部');
+  if (known.length) return [...new Set(known)];
+  const tags = Array.isArray(activity.tags) ? activity.tags : [];
+  const text = [activity.title, activity.channel, activity.consumeChannel, ...tags].join(' ');
+  const rules = [
+    ['吃喝', /肯德基|麦当劳|星巴克|瑞幸|茶百道|喜茶|奈雪|餐饮|餐厅|咖啡|茶咖|奶茶|外卖|饿了么|美团外卖/],
+    ['购物', /京东|淘宝|天猫|拼多多|唯品会|苏宁|山姆|盒马|超市|商超|购物|百货|抖音商城|抖音购物/],
+    ['出行', /滴滴|打车|出租车|公交|地铁|八达通|高铁|铁路|机票|航空|酒店|携程|去哪儿|同程旅行|租车|加油|充电桩/],
+    ['生活', /话费|流量包|水费|电费|燃气|生活缴费|宽带|物业费|洗衣|洗车|快递/],
+    ['会员权益', /会员|VIP|贵宾厅|机场休息室|视频月卡|视频年卡/i]
+  ];
+  const matched = rules.filter(([, pattern]) => pattern.test(text)).map(([scene]) => scene);
+  // Preserve all previous categories, including the generic-discount fallback.
+  if (!matched.length && /通用优惠|通用立减金|全渠道|任意消费|不限商户/.test(text)) matched.push('通用优惠');
+  if (isOverseasTravel(activity, tags)) matched.push('境外游');
+  return matched;
+}
 
 const state = {
   campaigns: [],
   filtered: [],
   view: 'all',
   bank: '全部',
+  scene: '全部',
   time: '全部时间',
   keyword: '',
+  expiring: false,
+  loadStatus: 'loading',
   showExpired: false
 };
 
@@ -23,7 +112,11 @@ const els = {
   refreshBtn: document.getElementById('refreshBtn'),
   toggleFiltersBtn: document.getElementById('toggleFiltersBtn'),
   filtersPanel: document.getElementById('filtersPanel'),
+  resetFiltersBtn: document.getElementById('resetFiltersBtn'),
+  sceneFilters: document.getElementById('sceneFilters'),
   bankFilters: document.getElementById('bankFilters'),
+  activeSceneLabel: document.getElementById('activeSceneLabel'),
+  activeBankLabel: document.getElementById('activeBankLabel'),
   timeFilters: document.getElementById('timeFilters'),
   quickTimeFilters: document.getElementById('quickTimeFilters'),
   viewTabs: document.getElementById('viewTabs')
@@ -79,7 +172,7 @@ function isExpired(validTo) {
   return d.getTime() < todayStart.getTime();
 }
 
-function isSoon(validTo, days = 3) {
+function isSoon(validTo, days = EXPIRING_SOON_DAYS) {
   const d = parseDate(validTo);
   if (!d) return false;
   const now = new Date();
@@ -88,8 +181,20 @@ function isSoon(validTo, days = 3) {
   return diff >= 0 && diff <= days * 24 * 60 * 60 * 1000;
 }
 
+function getCreatedDate(item) {
+  const fields = [
+    'createdAt', 'created_at', 'createTime', 'create_time', 'createDate', 'create_date',
+    'firstSeenAt', 'first_seen_at', 'addedAt', 'added_at', 'addTime', 'add_time'
+  ];
+  for (const field of fields) {
+    const date = parseDate(item[field]);
+    if (date) return date;
+  }
+  return null;
+}
+
 function isTodayAdded(item) {
-  const d = parseDate(item.updatedAt || item.createdAt);
+  const d = getCreatedDate(item);
   if (!d) return false;
   const now = new Date();
   return (
@@ -109,41 +214,28 @@ function normalizeTags(tags) {
 }
 
 function hasCreditTag(item) {
-  if (item && (item.isCredit === 1 || item.isCredit === true)) {
-    return true;
-  }
+  if (Number(item.isCredit) === 1) return true;
+  const text = [item.bankName, item.title, item.desc, item.channel, ...item.tags].join(' ');
+  return /信用卡|贷记卡|credit card/i.test(text);
+}
 
-  const bankName = String(item.bankName || '').toLowerCase();
-  const title = String(item.title || '').toLowerCase();
-  const desc = String(item.desc || '').toLowerCase();
-  const channel = String(item.channel || '').toLowerCase();
+function isDailyCampaign(item) {
+  return item.tags.some(tag => String(tag).includes('每日签到')) ||
+    item.recurringType === 'day' || /每日|签到/.test(item.recurringText || '');
+}
 
-  const tagsRaw = item.tags || [];
-  const tagsText = Array.isArray(tagsRaw)
-    ? tagsRaw.map((tag) => String(tag).toLowerCase()).join(' ')
-    : String(tagsRaw).toLowerCase();
+function isFixedCampaign(item) {
+  return !isDailyCampaign(item) && (
+    item.tags.some(tag => String(tag).includes('固定活动')) ||
+    ['week', 'month', 'quarter', 'year'].includes(item.recurringType) ||
+    /每周|每月|每季|每年|固定活动|长期/.test(item.recurringText || '')
+  );
+}
 
-  const allText = `${bankName} ${title} ${desc} ${channel} ${tagsText}`;
-
-  const keywords = [
-    '信用卡',
-    '刷卡',
-    '返现',
-    '卡片',
-    'visa',
-    'mastercard',
-    '万事达',
-    '运通',
-    'american express',
-    'amex',
-    '银联',
-    'apple pay',
-    'google pay',
-    'paywave',
-    'paypass'
-  ];
-
-  return keywords.some((keyword) => allText.includes(keyword.toLowerCase()));
+function hasCashbackEvidence(item) {
+  const amounts = String(item.cashbackRate || '').match(/\d+(?:\.\d+)?/g) || [];
+  if (amounts.some(value => Number(value) > 0)) return true;
+  return /返现/.test([item.title, item.desc, item.channel, item.cashbackText, ...item.tags].join(' '));
 }
 
 function normalizeCampaign(item) {
@@ -156,10 +248,13 @@ function normalizeCampaign(item) {
   return {
     ...normalized,
     isCredit: hasCreditTag(normalized),
+    sceneLabels: classifyScenes(normalized),
     isRecurring: Number(normalized.isRecurring) === 1 || !!normalized.recurringText,
     isExpired: isExpired(normalized.validTo),
-    isSoon: !isExpired(normalized.validTo) && isSoon(normalized.validTo),
+    isSoon: !isFixedCampaign(normalized) && !isDailyCampaign(normalized) && isSoon(normalized.validTo),
     isTodayAdded: isTodayAdded(normalized),
+    referenceTime: (getCreatedDate(normalized) ||
+      parseDate(normalized.updatedAt || normalized.validFrom || normalized.validTo))?.getTime() ?? null,
     sortTime: getSortTime(normalized)
   };
 }
@@ -182,102 +277,118 @@ function setLoadingState({ loading = false, error = false, empty = false } = {})
   if (els.empty) els.empty.classList.toggle('hidden', !empty);
 }
 
-function renderBankFilters() {
-  if (!els.bankFilters) return;
-
-  els.bankFilters.innerHTML = '';
-  BANK_FILTER_OPTIONS.forEach((bank) => {
+function mountChips(container, key, options) {
+  if (!container) return;
+  options.forEach((option) => {
     const button = document.createElement('button');
     button.type = 'button';
-    button.className = `chip ${state.bank === bank ? 'is-active' : ''}`;
-    button.textContent = bank;
+    button.className = 'chip';
+    button.dataset.filterValue = option;
+    button.textContent = option;
     button.addEventListener('click', () => {
-      state.bank = bank;
-      renderBankFilters();
+      state[key] = option;
       applyFilters();
     });
-    els.bankFilters.appendChild(button);
+    container.appendChild(button);
   });
 }
 
-function renderTimes() {
-  if (!els.timeFilters) return;
-
-  els.timeFilters.innerHTML = '';
-  TIME_OPTIONS.forEach((time) => {
-    const button = document.createElement('button');
-    button.type = 'button';
-    button.className = `chip ${state.time === time ? 'is-active' : ''}`;
-    button.textContent = time;
-    button.addEventListener('click', () => {
-      state.time = time;
-      renderTimes();
-      applyFilters();
-    });
-    els.timeFilters.appendChild(button);
-  });
+function setSelected(button, selected) {
+  button.classList.toggle('is-active', selected);
+  button.setAttribute('aria-pressed', String(selected));
 }
 
-function getCampaignsBeforeTimeFilter() {
-  let result = state.campaigns.slice();
-
-  if (state.view === 'credit') {
-    result = result.filter((item) => item.isCredit);
-  }
-
-  if (state.keyword.trim()) {
-    const kw = state.keyword.trim();
-    result = result.filter((item) => {
-      return `${item.title || ''} ${item.desc || ''} ${item.bankName || ''}`.includes(kw);
-    });
-  }
-
-  if (state.bank !== '全部') {
-    result = result.filter((item) => matchesBankFilter(item, state.bank));
-  }
-
-  return result;
-}
-
-function renderQuickTimeFilters() {
-  if (!els.quickTimeFilters) return;
-
-  const options = [
-    { label: '今日新增', value: '今日新增' },
-    { label: '近3日新增', value: '3天内' }
+function syncFilterControls() {
+  const groups = [
+    [els.viewTabs, '[data-view]', 'view', state.view],
+    [els.sceneFilters, '[data-filter-value]', 'filterValue', state.scene],
+    [els.bankFilters, '[data-filter-value]', 'filterValue', state.bank],
+    [els.timeFilters, '[data-filter-value]', 'filterValue', state.time]
   ];
+  for (const [container, selector, key, value] of groups) {
+    if (!container) continue;
+    container.querySelectorAll(selector).forEach(button => setSelected(button, button.dataset[key] === value));
+  }
+  if (els.activeSceneLabel) els.activeSceneLabel.textContent = state.scene;
+  if (els.activeBankLabel) els.activeBankLabel.textContent = state.bank;
+  if (els.resetFiltersBtn) els.resetFiltersBtn.disabled = hasDefaultFilters();
+}
 
-  els.quickTimeFilters.innerHTML = '';
+function hasDefaultFilters() {
+  return state.view === 'all' && state.bank === '全部' && state.scene === '全部' &&
+    state.time === '全部时间' && !state.keyword.trim() && !state.expiring;
+}
 
-  const baseItems = getCampaignsBeforeTimeFilter();
+function resetFilters() {
+  Object.assign(state, {
+    view: 'all', bank: '全部', scene: '全部', time: '全部时间',
+    keyword: '', expiring: false, showExpired: false
+  });
+  if (els.searchInput) els.searchInput.value = '';
+}
 
-  options.forEach(({ label, value }) => {
-    const count = value === '今日新增'
-      ? baseItems.filter((item) => item.isTodayAdded).length
-      : baseItems.filter((item) => {
-        const d = parseDate(item.updatedAt || item.createdAt || item.validFrom || item.validTo);
-        if (!d) return false;
-        return d.getTime() >= Date.now() - 3 * 24 * 60 * 60 * 1000;
-      }).length;
+function matchesTimeFilter(item, time) {
+  if (time === '全部时间') return true;
+  if (time === '今日新增') return item.isTodayAdded;
+  const threshold = Date.now() - Number.parseInt(time, 10) * 24 * 60 * 60 * 1000;
+  return item.referenceTime === null || item.referenceTime >= threshold;
+}
 
+function matchesScope(item) {
+  if (state.view === 'credit' && !item.isCredit) return false;
+  if (state.view === 'debit' && item.isCredit) return false;
+  if (!matchesBankFilter(item, state.bank)) return false;
+  const keyword = state.keyword.trim().toLowerCase();
+  return !keyword || [item.title, item.desc, item.bankName].join(' ').toLowerCase().includes(keyword);
+}
+
+function matchesFilters(item, { scene, time, expiring }) {
+  return (scene === '全部' || item.sceneLabels.includes(scene)) &&
+    matchesTimeFilter(item, time) && (!expiring || item.isSoon);
+}
+
+function mountShortcuts() {
+  if (!els.quickTimeFilters) return;
+  for (const shortcut of SHORTCUTS) {
     const button = document.createElement('button');
     button.type = 'button';
-    button.className = `quick-filter-card ${state.time === value ? 'is-active' : ''}`;
+    button.className = 'shortcut-card';
+    button.dataset.shortcut = shortcut.key;
     button.innerHTML = `
-      <span class="quick-filter-card-label">${label}</span>
-      <strong class="quick-filter-card-count">${count}</strong>
+      <strong>${shortcut.label}</strong>
+      <span class="shortcut-count"><b>—</b><span>条</span></span>
+      <small>${shortcut.description}</small>
     `;
 
     button.addEventListener('click', () => {
-      state.time = value;
-      renderTimes();
-      renderQuickTimeFilters();
+      if (shortcut.key === 'all') resetFilters();
+      if (shortcut.scene) state.scene = state.scene === shortcut.scene ? '全部' : shortcut.scene;
+      if (shortcut.time) state.time = state.time === shortcut.time ? '全部时间' : shortcut.time;
+      if (shortcut.expiring) state.expiring = !state.expiring;
       applyFilters();
       scrollToResults();
     });
 
     els.quickTimeFilters.appendChild(button);
-  });
+  }
+}
+
+function updateShortcuts(scope) {
+  if (!els.quickTimeFilters) return;
+  for (const shortcut of SHORTCUTS) {
+    const button = els.quickTimeFilters.querySelector(`[data-shortcut="${shortcut.key}"]`);
+    const isAll = shortcut.key === 'all';
+    const active = isAll ? hasDefaultFilters() :
+      shortcut.scene === state.scene || shortcut.time === state.time || Boolean(shortcut.expiring && state.expiring);
+    const candidate = {
+      scene: shortcut.scene || state.scene,
+      time: shortcut.time || state.time,
+      expiring: shortcut.expiring || state.expiring
+    };
+    const count = isAll ? state.campaigns.length : scope.filter(item => matchesFilters(item, candidate)).length;
+    setSelected(button, active);
+    button.querySelector('.shortcut-count b').textContent = state.loadStatus === 'ready' ? String(count) : '—';
+  }
 }
 
 function renderCards() {
@@ -373,36 +484,29 @@ function scrollToResults() {
 function applyFilters() {
   if (!isListPage()) return;
 
-  let result = getCampaignsBeforeTimeFilter();
+  const scope = state.campaigns.filter(matchesScope);
+  syncFilterControls();
+  updateShortcuts(scope);
+  if (state.loadStatus !== 'ready') return;
 
-  if (state.time !== '全部时间') {
-    if (state.time === '今日新增') {
-      result = result.filter((item) => item.isTodayAdded);
-    } else {
-      const days = Number.parseInt(state.time, 10);
-      const threshold = Date.now() - days * 24 * 60 * 60 * 1000;
-      result = result.filter((item) => {
-        const d = parseDate(item.updatedAt || item.createdAt || item.validFrom || item.validTo);
-        return !d || d.getTime() >= threshold;
-      });
-    }
-  }
-
-  result.sort(compareCampaign);
+  const result = scope.filter(item => matchesFilters(item, state));
   state.filtered = result;
 
   if (els.listTitle) {
-    els.listTitle.textContent = state.view === 'credit' ? '信用卡活动 · 专属专区' : '发现 · 全部活动';
+    const titles = { all: '全部活动', debit: '储蓄卡活动', credit: '信用卡活动' };
+    els.listTitle.textContent = titles[state.view];
   }
 
   if (els.resultSummary) {
-    els.resultSummary.textContent = `共 ${result.length} 条活动，和“好羊毛助手Pro”微信小程序保持实时数据。`;
+    const expiredCount = result.filter(item => item.isExpired).length;
+    els.resultSummary.textContent = expiredCount
+      ? `共 ${result.length} 条 · 含 ${expiredCount} 条已过期`
+      : `共 ${result.length} 条活动`;
   }
 
   setHomeMeta();
   setLoadingState({ loading: false, error: false, empty: !result.length });
   renderCards();
-  renderQuickTimeFilters();
 }
 
 function bindEvents() {
@@ -415,36 +519,27 @@ function bindEvents() {
     });
   }
 
-  if (els.refreshBtn) {
-    els.refreshBtn.addEventListener('click', () => {
-      fetchCampaigns();
-    });
-  }
+  if (els.refreshBtn) els.refreshBtn.addEventListener('click', fetchCampaigns);
+  if (els.resetFiltersBtn) els.resetFiltersBtn.addEventListener('click', () => {
+    resetFilters();
+    applyFilters();
+  });
 
   if (els.toggleFiltersBtn && els.filtersPanel) {
     els.toggleFiltersBtn.addEventListener('click', () => {
       const isCollapsed = els.filtersPanel.classList.toggle('is-collapsed');
       els.toggleFiltersBtn.textContent = isCollapsed ? '展开筛选' : '收起筛选';
+      els.toggleFiltersBtn.setAttribute('aria-expanded', String(!isCollapsed));
     });
   }
 
   if (els.viewTabs) {
     els.viewTabs.addEventListener('click', (event) => {
       const button = event.target.closest('[data-view]');
-      if (!button) return;
+      if (!button || !['all', 'debit', 'credit'].includes(button.dataset.view)) return;
 
       state.view = button.dataset.view;
-      state.bank = '全部';
-      state.time = '全部时间';
       state.showExpired = false;
-
-      Array.from(els.viewTabs.querySelectorAll('.segmented-btn')).forEach((item) => {
-        item.classList.toggle('is-active', item === button);
-      });
-
-      renderBankFilters();
-      renderTimes();
-      renderQuickTimeFilters();
       applyFilters();
     });
   }
@@ -455,20 +550,10 @@ function bindEvents() {
 
     event.preventDefault();
     const targetView = link.dataset.navView;
-    if (!targetView || !els.viewTabs) return;
+    if (!['all', 'debit', 'credit'].includes(targetView) || !els.viewTabs) return;
 
+    resetFilters();
     state.view = targetView;
-    state.bank = '全部';
-    state.time = '全部时间';
-    state.showExpired = false;
-
-    Array.from(els.viewTabs.querySelectorAll('.segmented-btn')).forEach((item) => {
-      item.classList.toggle('is-active', item.dataset.view === targetView);
-    });
-
-    renderBankFilters();
-    renderTimes();
-    renderQuickTimeFilters();
     applyFilters();
 
     const targetId = link.getAttribute('href');
@@ -482,33 +567,32 @@ function bindEvents() {
 async function fetchCampaigns() {
   if (!isListPage()) return;
 
+  state.loadStatus = 'loading';
+  if (els.refreshBtn) els.refreshBtn.disabled = true;
+  if (els.resultSummary) els.resultSummary.textContent = '正在加载活动…';
   setLoadingState({ loading: true, error: false, empty: false });
   if (els.grid) els.grid.innerHTML = '';
+  updateShortcuts([]);
 
   try {
     const response = await fetch(`${API_BASE}/campaigns.php`, { credentials: 'omit' });
     if (!response.ok) throw new Error(`HTTP ${response.status}`);
 
     const payload = await response.json();
-    const ok = payload && payload.code === 0;
-    const list = ok && Array.isArray(payload.data) ? payload.data : [];
-
-    if (!ok) {
-      console.error('网站活动接口返回异常', payload);
-      throw new Error(payload.message || '接口返回异常');
+    if (payload?.code !== 0 || !Array.isArray(payload.data)) {
+      throw new Error(payload?.message || '接口返回异常');
     }
 
-    state.campaigns = list.map(normalizeCampaign).sort(compareCampaign);
-
-    renderBankFilters();
-    renderTimes();
-    renderQuickTimeFilters();
+    state.campaigns = payload.data.map(normalizeCampaign).sort(compareCampaign);
+    state.loadStatus = 'ready';
     applyFilters();
-
-    setLoadingState({ loading: false, error: false, empty: !state.filtered.length });
   } catch (err) {
+    state.loadStatus = 'error';
     console.error('加载活动失败', err);
+    if (els.resultSummary) els.resultSummary.textContent = '暂未载入活动';
     setLoadingState({ loading: false, error: true, empty: false });
+  } finally {
+    if (els.refreshBtn) els.refreshBtn.disabled = false;
   }
 }
 
@@ -522,46 +606,20 @@ function escapeHtml(value) {
 }
 
 function matchesBankFilter(item, selected) {
+  if (selected === '全部') return true;
   const bankName = String(item.bankName || '');
-  const tags = item.tags || [];
-
-  if (selected === '工商银行') return bankName.includes('工商');
-  if (selected === '农业银行') return bankName.includes('农业');
-  if (selected === '建设银行') return bankName.includes('建设');
-  if (selected === '中国银行') {
-    return bankName.includes('中国银行') &&
-      !bankName.includes('中国工商') &&
-      !bankName.includes('中国农业') &&
-      !bankName.includes('中国建设');
-  }
-
-  if (selected === '其他银行') {
-    return !bankName.includes('工商') &&
-      !bankName.includes('农业') &&
-      !bankName.includes('建设') &&
-      !(bankName.includes('中国银行') &&
-        !bankName.includes('中国工商') &&
-        !bankName.includes('中国农业') &&
-        !bankName.includes('中国建设'));
-  }
 
   if (selected === '信用卡返现') {
-    return item.isCredit || tags.some((tag) => String(tag).includes('返现'));
+    return item.isCredit && hasCashbackEvidence(item);
   }
-
-  if (selected === '固定活动') {
-    return tags.includes('固定活动');
-  }
-
-  if (selected === '每日签到') {
-    return tags.includes('每日签到') || item.recurringType === 'day' || item.recurringText === '每日签到';
-  }
-
+  if (selected === '固定活动') return isFixedCampaign(item);
+  if (selected === '每日签到') return isDailyCampaign(item);
   if (selected === '重点推荐') {
-    return tags.includes('重点推荐') || String(item.star || '').includes('🌟🌟🌟');
+    return item.tags.some(tag => String(tag).includes('重点推荐')) ||
+      (String(item.star || '').match(/🌟/g) || []).length >= 3;
   }
-
-  return true;
+  const bank = BANK_MATCHERS.find(([, pattern]) => pattern.test(bankName));
+  return (bank?.[0] || '其他银行') === selected;
 }
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -570,7 +628,15 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   bindEvents();
-  renderTimes();
-  renderQuickTimeFilters();
+  const query = new URLSearchParams(window.location.search).get('q');
+  if (query && els.searchInput) {
+    state.keyword = query;
+    els.searchInput.value = query;
+  }
+  mountChips(els.sceneFilters, 'scene', SCENE_OPTIONS);
+  mountChips(els.bankFilters, 'bank', BANK_FILTER_OPTIONS);
+  mountChips(els.timeFilters, 'time', TIME_OPTIONS);
+  mountShortcuts();
+  syncFilterControls();
   fetchCampaigns();
 });
