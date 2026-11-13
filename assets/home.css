@@ -85,6 +85,25 @@
   line-height: 1.65;
 }
 
+.home-page .intro-results-link {
+  display: inline-block;
+  margin-top: 8px;
+  color: var(--directory-blue);
+  font-size: 13px;
+  font-weight: 700;
+  text-underline-offset: 3px;
+}
+
+.home-page .intro-load-notice {
+  margin-inline-start: 10px;
+  color: var(--directory-muted);
+  font-size: 12px;
+}
+
+.home-page #retryLoadBtn {
+  margin-inline-start: 8px;
+}
+
 .home-page .filters-panel {
   padding: clamp(15px, 2.6vw, 25px);
   margin-bottom: 15px;

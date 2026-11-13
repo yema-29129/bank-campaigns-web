@@ -25,7 +25,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="./assets/styles.css">
-  <link rel="stylesheet" href="./assets/home.css?v=20261113-directory">
+  <link rel="stylesheet" href="./assets/home.css?v=20261113-list">
   <script type="application/ld+json">
   {
     "@context": "https://schema.org",
@@ -87,6 +87,8 @@
       <div class="intro-copy">
         <h1>发现银行优惠</h1>
         <p>查找微信立减金、信用卡返现和现金红包。活动规则以所属机构公告为准。</p>
+        <a class="intro-results-link" href="#listTitle">查看活动列表</a>
+        <span id="loadNotice" class="intro-load-notice" role="status">正在加载活动…</span>
       </div>
       <label class="field field-search">
         <span>搜索活动</span>
@@ -135,7 +137,7 @@
         <div class="toolbar">
           <div>
             <h2 id="listTitle">全部活动</h2>
-            <p id="resultSummary" class="result-summary" role="status">加载中...</p>
+            <p id="resultSummary" class="result-summary">加载中...</p>
           </div>
           <div class="toolbar-actions">
             <button id="resetFiltersBtn" class="ghost-btn" type="button">清除筛选</button>
@@ -149,7 +151,10 @@
         </div>
 
         <div id="loadingState" class="state-card">正在加载活动数据...</div>
-        <div id="errorState" class="state-card is-error hidden">加载失败，请检查接口是否可访问。</div>
+        <div id="errorState" class="state-card is-error hidden">
+          <span id="loadErrorMessage">活动暂时加载失败。</span>
+          <button id="retryLoadBtn" class="ghost-btn" type="button">重新加载</button>
+        </div>
         <div id="emptyState" class="state-card hidden">没有符合条件的活动，换个筛选试试。</div>
 
         <div id="cardGrid" class="card-grid"></div>
@@ -189,6 +194,7 @@
     </div>
   </footer>
 
-  <script src="./assets/app.js?v=20261113-directory"></script>
+  <script async src="./assets/app.js?v=20261113-list"></script>
+  <noscript><p class="state-card">请启用 JavaScript 后刷新，以查看活动列表。</p></noscript>
 </body>
 </html>

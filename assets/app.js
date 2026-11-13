@@ -1,4 +1,5 @@
 const API_BASE = 'https://mini.vooqqqm.com/api';
+const CAMPAIGN_LOAD_TIMEOUT = 12000;
 const TIME_OPTIONS = ['全部时间', '今日新增', '3天内', '7天内', '14天内', '30天内'];
 const EXPIRING_SOON_DAYS = 20;
 const BANK_MATCHERS = [
@@ -98,6 +99,7 @@ const state = {
   keyword: '',
   expiring: false,
   loadStatus: 'loading',
+  requestPending: false,
   showExpired: false
 };
 
@@ -110,6 +112,9 @@ const els = {
   listTitle: document.getElementById('listTitle'),
   searchInput: document.getElementById('searchInput'),
   refreshBtn: document.getElementById('refreshBtn'),
+  retryLoadBtn: document.getElementById('retryLoadBtn'),
+  loadNotice: document.getElementById('loadNotice'),
+  loadErrorMessage: document.getElementById('loadErrorMessage'),
   toggleFiltersBtn: document.getElementById('toggleFiltersBtn'),
   filtersPanel: document.getElementById('filtersPanel'),
   resetFiltersBtn: document.getElementById('resetFiltersBtn'),
@@ -245,6 +250,8 @@ function normalizeCampaign(item) {
     tags: normalizedTags
   };
 
+  const referenceDate = getCreatedDate(normalized) ||
+    parseDate(normalized.updatedAt || normalized.validFrom || normalized.validTo);
   return {
     ...normalized,
     isCredit: hasCreditTag(normalized),
@@ -253,8 +260,7 @@ function normalizeCampaign(item) {
     isExpired: isExpired(normalized.validTo),
     isSoon: !isFixedCampaign(normalized) && !isDailyCampaign(normalized) && isSoon(normalized.validTo),
     isTodayAdded: isTodayAdded(normalized),
-    referenceTime: (getCreatedDate(normalized) ||
-      parseDate(normalized.updatedAt || normalized.validFrom || normalized.validTo))?.getTime() ?? null,
+    referenceTime: referenceDate ? referenceDate.getTime() : null,
     sortTime: getSortTime(normalized)
   };
 }
@@ -520,6 +526,7 @@ function bindEvents() {
   }
 
   if (els.refreshBtn) els.refreshBtn.addEventListener('click', fetchCampaigns);
+  if (els.retryLoadBtn) els.retryLoadBtn.addEventListener('click', fetchCampaigns);
   if (els.resetFiltersBtn) els.resetFiltersBtn.addEventListener('click', () => {
     resetFilters();
     applyFilters();
@@ -565,33 +572,53 @@ function bindEvents() {
 }
 
 async function fetchCampaigns() {
-  if (!isListPage()) return;
-
-  state.loadStatus = 'loading';
+  if (!isListPage() || state.requestPending) return;
+  state.requestPending = true;
+  const hadData = state.loadStatus === 'ready';
+  const controller = new AbortController();
+  const timeout = setTimeout(() => controller.abort(), CAMPAIGN_LOAD_TIMEOUT);
   if (els.refreshBtn) els.refreshBtn.disabled = true;
-  if (els.resultSummary) els.resultSummary.textContent = '正在加载活动…';
-  setLoadingState({ loading: true, error: false, empty: false });
-  if (els.grid) els.grid.innerHTML = '';
-  updateShortcuts([]);
+  if (els.loadNotice) els.loadNotice.textContent = hadData ? '正在更新活动…' : '正在加载活动…';
+  if (!hadData) {
+    state.loadStatus = 'loading';
+    if (els.resultSummary) els.resultSummary.textContent = '正在加载活动…';
+    setLoadingState({ loading: true });
+  }
 
   try {
-    const response = await fetch(`${API_BASE}/campaigns.php`, { credentials: 'omit' });
+    const response = await fetch(`${API_BASE}/campaigns.php?view=web-list`, {
+      credentials: 'omit',
+      signal: controller.signal
+    });
     if (!response.ok) throw new Error(`HTTP ${response.status}`);
 
     const payload = await response.json();
-    if (payload?.code !== 0 || !Array.isArray(payload.data)) {
-      throw new Error(payload?.message || '接口返回异常');
+    if (!payload || payload.code !== 0 || !Array.isArray(payload.data)) {
+      throw new Error((payload && payload.message) || '接口返回异常');
     }
 
-    state.campaigns = payload.data.map(normalizeCampaign).sort(compareCampaign);
+    state.campaigns = payload.data.filter(item => item && item.id != null)
+      .map(normalizeCampaign).sort(compareCampaign);
     state.loadStatus = 'ready';
     applyFilters();
+    if (els.loadNotice) {
+      els.loadNotice.textContent = `已加载 ${state.campaigns.length} 条活动`;
+    }
   } catch (err) {
-    state.loadStatus = 'error';
-    console.error('加载活动失败', err);
-    if (els.resultSummary) els.resultSummary.textContent = '暂未载入活动';
-    setLoadingState({ loading: false, error: true, empty: false });
+    const message = controller.signal.aborted ? '活动加载超时' : '活动加载失败';
+    if (els.loadNotice) {
+      els.loadNotice.textContent = hadData ? '更新失败，仍显示上次加载的活动' : `${message}，请重试`;
+    }
+    if (!hadData) {
+      state.loadStatus = 'error';
+      if (els.resultSummary) els.resultSummary.textContent = '暂未载入活动';
+      if (els.loadErrorMessage) els.loadErrorMessage.textContent = `${message}，请重试。`;
+      setLoadingState({ error: true });
+    }
+    console.error(message, err);
   } finally {
+    clearTimeout(timeout);
+    state.requestPending = false;
     if (els.refreshBtn) els.refreshBtn.disabled = false;
   }
 }
@@ -619,10 +646,10 @@ function matchesBankFilter(item, selected) {
       (String(item.star || '').match(/🌟/g) || []).length >= 3;
   }
   const bank = BANK_MATCHERS.find(([, pattern]) => pattern.test(bankName));
-  return (bank?.[0] || '其他银行') === selected;
+  return (bank ? bank[0] : '其他银行') === selected;
 }
 
-document.addEventListener('DOMContentLoaded', () => {
+function initializeCampaignPage() {
   if (!isListPage()) {
     return;
   }
@@ -639,4 +666,10 @@ document.addEventListener('DOMContentLoaded', () => {
   mountShortcuts();
   syncFilterControls();
   fetchCampaigns();
-});
+}
+
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', initializeCampaignPage, { once: true });
+} else {
+  initializeCampaignPage();
+}
