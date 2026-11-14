@@ -466,7 +466,6 @@ function buildCard(item) {
       </div>
     </div>
     <h3 class="card-title">${escapeHtml(item.title || '未命名活动')}</h3>
-    <p class="card-desc">${escapeHtml(item.desc || '暂无活动描述')}</p>
     <div class="card-meta">
       <span>有效期：${escapeHtml(item.validFrom || '--')} 至 ${escapeHtml(item.validTo || '--')}</span>
     </div>
