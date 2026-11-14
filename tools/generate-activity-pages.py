@@ -166,6 +166,7 @@ def document(title, summary, url, kind, body, lastmod=None, indexable=True):
         <a class="site-nav-link" href="/#listTitle">全部活动</a>
         <a class="site-nav-link" href="/activities/">精选活动</a>
         <a class="site-nav-link" href="/contact.html">联系方式</a>
+        <a class="site-nav-link" href="https://t.me/yangmaozhushou" target="_blank" rel="noopener noreferrer">Telegram 社群</a>
       </nav>
     </div>
   </header>
