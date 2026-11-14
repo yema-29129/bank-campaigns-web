@@ -1,5 +1,5 @@
-const STATIC_CACHE = 'hyw-static-v1';
-const RUNTIME_CACHE = 'hyw-runtime-v1';
+const STATIC_CACHE = 'yangmao-pro-static-v2';
+const RUNTIME_CACHE = 'yangmao-pro-runtime-v2';
 const STATIC_ASSETS = [
   '/',
   '/index.html',
@@ -13,8 +13,10 @@ const STATIC_ASSETS = [
   '/sitemap.xml',
   '/manifest.webmanifest',
   '/assets/styles.css',
-  '/assets/app.js',
-  '/assets/detail.js',
+  '/assets/theme.css?v=20261115-brand-pro',
+  '/assets/detail-v2.css?v=20261115-brand-pro',
+  '/assets/app.js?v=20261115-brand-pro',
+  '/assets/detail.js?v=20261115-brand-pro',
   '/assets/pwa.js',
   '/assets/favicon.svg'
 ];
