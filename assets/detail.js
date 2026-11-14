@@ -418,6 +418,7 @@ function renderDetail(activity) {
           <a href="#offer-details">获奖内容</a>
           <a href="#participation">活动路径</a>
           ${activity.pathUrl ? '<a href="#activity-link">活动链接</a>' : ''}
+          <a href="#telegram-reminder">Telegram 优惠提醒</a>
           <a href="#activity-image">活动图片</a>
         </nav>
         <div class="detail-layout-content">
@@ -460,6 +461,11 @@ function renderDetail(activity) {
               </section>
             ` : ''}
 
+            <aside class="telegram-subscribe detail-telegram-reminder" id="telegram-reminder" aria-label="订阅优惠更新">
+              <p>信用卡返现、微信立减金和港卡优惠更新。</p>
+              <a class="ghost-btn" href="https://t.me/yangmaozhushou">订阅 Telegram 优惠提醒</a>
+            </aside>
+
             <section class="detail-section detail-section-compact" id="activity-image">
               <div class="detail-section-head">
                 <h2>活动图片路径</h2>
@@ -499,7 +505,7 @@ function renderDetail(activity) {
 
   const sectionId = window.location.hash.slice(1);
   const section = document.getElementById(sectionId);
-  if (section?.matches('.detail-layout-content section')) section.scrollIntoView();
+  if (section?.matches('.detail-layout-content section, .detail-layout-content .detail-telegram-reminder')) section.scrollIntoView();
 
   const copyBtn = document.getElementById('copyPathBtn');
   if (copyBtn && activity.pathUrl) {

@@ -133,7 +133,7 @@ def document(title, summary, url, kind, body, lastmod=None, indexable=True):
     schema_text = json.dumps(schema, ensure_ascii=False).replace("<", "\\u003c")
     og_type = "article" if lastmod else "website"
     robots = INDEX_ROBOTS if indexable else ARCHIVE_ROBOTS
-    styles = "/assets/styles.css?v=20261115-stack" if kind == "WebPage" else "/assets/styles.css"
+    styles = "/assets/styles.css?v=20261115-telegram-detail" if kind == "WebPage" else "/assets/styles.css"
     return f"""<!doctype html>
 <html lang="zh-CN">
 <head>
@@ -254,6 +254,7 @@ def detail(entry):
             <a href="#offer-details">优惠内容</a>
             <a href="#participation">参与方式</a>
             <a href="#activity-notes">官方来源</a>
+            <a href="#telegram-reminder">Telegram 优惠提醒</a>
           </nav>
           <div class="detail-layout-content">
             <div class="detail-main">
@@ -275,6 +276,10 @@ def detail(entry):
                 <p class="detail-section-copy">本站整理更新于 {time_element(entry["lastmod"])}。活动资格、名额和领取入口以官方规则为准。</p>
                 <a class="detail-link" href="/detail.html?id={activity_id}">查看实时详情和活动图片</a>
               </section>
+              <aside class="telegram-subscribe detail-telegram-reminder" id="telegram-reminder" aria-label="订阅优惠更新">
+                <p>信用卡返现、微信立减金和港卡优惠更新。</p>
+                <a class="ghost-btn" href="https://t.me/yangmaozhushou">订阅 Telegram 优惠提醒</a>
+              </aside>
             </aside>
           </div>
         </div>

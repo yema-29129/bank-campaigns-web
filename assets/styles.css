@@ -1424,6 +1424,7 @@ input[type="search"] {
 .detail-layout:has(#participation:target) a[href="#participation"],
 .detail-layout:has(#activity-link:target) a[href="#activity-link"],
 .detail-layout:has(#activity-image:target) a[href="#activity-image"],
+.detail-layout:has(#telegram-reminder:target) a[href="#telegram-reminder"],
 .detail-layout:has(#activity-notes:target) a[href="#activity-notes"] {
   background: #e8f0ff;
   color: #1e4ed8;
@@ -1442,7 +1443,7 @@ input[type="search"] {
   min-width: 0;
 }
 
-.detail-layout-content section[id] {
+.detail-layout-content :is(section[id], .detail-telegram-reminder) {
   scroll-margin-top: 88px;
 }
 
@@ -1772,7 +1773,7 @@ input[type="search"] {
     flex-basis: 100%;
   }
 
-  .detail-layout-content section[id] {
+  .detail-layout-content :is(section[id], .detail-telegram-reminder) {
     scroll-margin-top: 10.5rem;
   }
 
