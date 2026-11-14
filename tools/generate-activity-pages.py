@@ -133,7 +133,7 @@ def document(title, summary, url, kind, body, lastmod=None, indexable=True):
     schema_text = json.dumps(schema, ensure_ascii=False).replace("<", "\\u003c")
     og_type = "article" if lastmod else "website"
     robots = INDEX_ROBOTS if indexable else ARCHIVE_ROBOTS
-    styles_url = "/assets/styles.css?v=20261115-editorial" if kind == "WebPage" else "/assets/styles.css"
+    styles_url = "/assets/styles.css?v=20261115-editorial2" if kind == "WebPage" else "/assets/styles.css"
     return f"""<!doctype html>
 <html lang="zh-CN">
 <head>
