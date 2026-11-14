@@ -13,6 +13,7 @@ URLs remain readable when a campaign ends or no longer has a valid feed entry.
 import argparse
 from datetime import date
 from html import escape
+import ipaddress
 import json
 from pathlib import Path
 import re
@@ -21,26 +22,14 @@ from urllib.parse import urlsplit
 import xml.etree.ElementTree as ET
 
 SITE = "https://bank.vooqqqm.com"
-SITE_NAME = "羊毛助手Pro"
+SITE_NAME = "好羊毛银行活动站"
 DIRECTORY = f"{SITE}/activities/"
 OUTPUT = Path(__file__).resolve().parents[1] / "activities"
-SOURCE_HOSTS = frozenset({
-    "www.icbcasia.com", "www.dbs.com.hk", "creditcard.ecitic.com", "ccb.cn",
-    "www.unionpayintl.com", "www.zyebank.com.cn", "www.abchina.com",
-    "www.hangseng.com", "www.bochk.com", "bank.za.group", "www.spdbccc.com.cn",
-    "www.psbc.com", "creditcard.cib.com.cn", "www.yantaibank.net",
-    "cschannel.alipay.com", "creditcard.cmbc.com.cn", "www.cqcbank.com",
-})
-# The banks use these hosts for public assets and supporting documents.
-# Keep them separate from the approved primary activity sources.
-SUPPORTING_DOCUMENT_HOSTS = frozenset({"v.icbc.com.cn", "cdn.zaticdn.com", "ccc.spdb.com.cn"})
-EMBEDDED_SOURCE_HOSTS = SOURCE_HOSTS | SUPPORTING_DOCUMENT_HOSTS
-MANUAL_REVIEW_IDS = frozenset({"354"})
 TEXT_FIELDS = (
     "title", "desc", "bankName", "awardDesc", "pathDesc",
     "region", "consumeChannel", "channel",
 )
-REQUIRED_FIELDS = ("title", "desc", "bankName", "awardDesc", "pathDesc")
+REQUIRED_FIELDS = ("title", "desc", "bankName")
 EMBEDDED_URL = re.compile(r'https?://[^\s<>"\u3000-\u303f\uff00-\uffef]+', re.IGNORECASE)
 INDEX_ROBOTS = "index,follow,max-image-preview:large"
 ARCHIVE_ROBOTS = "noindex,follow"
@@ -52,18 +41,24 @@ STATUS_MESSAGES = {
 STATUS_MARKER = "<!-- activity-status -->"
 
 
-def safe_source(url, hosts=SOURCE_HOSTS, require_path=True):
+def safe_source(url):
     try:
         parsed = urlsplit(url)
     except ValueError:
         return False
-    return (
-        parsed.scheme == "https"
-        and parsed.netloc.lower() in hosts
-        and (not require_path or bool(parsed.path and parsed.path != "/"))
-        and "\\" not in url
-        and not any(char.isspace() or ord(char) < 32 for char in url)
-    )
+    host = parsed.hostname
+    if (
+        parsed.scheme != "https" or not host or parsed.username or parsed.password
+        or "\\" in url or any(char.isspace() or ord(char) < 32 for char in url)
+        or host == "localhost" or host.endswith(".local")
+    ):
+        return False
+    try:
+        if not ipaddress.ip_address(host).is_global:
+            return False
+    except ValueError:
+        pass
+    return True
 
 
 def parse_entry(activity_id, row, as_of):
@@ -76,16 +71,16 @@ def parse_entry(activity_id, row, as_of):
     entry = {key: (row.get(key) or "").strip() for key in TEXT_FIELDS}
     if not all(entry[key] for key in REQUIRED_FIELDS):
         raise ValueError("Incomplete public activity information.")
+    if not entry["awardDesc"]:
+        entry["awardDesc"] = "当前记录未提供完整优惠说明，请打开实时详情并以所属机构最新公告为准。"
+    if not entry["pathDesc"]:
+        entry["pathDesc"] = "当前记录未提供完整参与路径，请打开实时详情并以所属机构最新公告为准。"
 
-    sources = tuple(dict.fromkeys((row.get("pathUrl") or "").split()))
-    if activity_id in MANUAL_REVIEW_IDS or not sources or not all(map(safe_source, sources)):
-        raise ValueError("Source requires manual review.")
-    for value in entry.values():
-        if any(
-            not safe_source(url.rstrip(").,;!?]"), EMBEDDED_SOURCE_HOSTS, require_path=False)
-            for url in EMBEDDED_URL.findall(value)
-        ):
-            raise ValueError("Embedded URL requires manual review.")
+    sources = tuple(dict.fromkeys(
+        url.rstrip(").,;!?]")
+        for url in EMBEDDED_URL.findall(row.get("pathUrl") or "")
+        if safe_source(url.rstrip(").,;!?]"))
+    ))
 
     status = "ended" if end < as_of else "upcoming" if start > as_of else "current"
     entry.update(
@@ -127,6 +122,7 @@ def document(title, summary, url, kind, body, lastmod=None, indexable=True):
         "url": url,
         "inLanguage": "zh-CN",
         "isPartOf": {"@type": "WebSite", "name": SITE_NAME, "url": f"{SITE}/"},
+        "publisher": {"@type": "Organization", "name": SITE_NAME, "url": f"{SITE}/"},
     }
     if lastmod:
         schema["dateModified"] = lastmod
@@ -219,10 +215,13 @@ def detail(entry):
     title = entry["title"]
     summary = entry["desc"]
     activity_id = entry["id"]
-    sources = "\n".join(
-        f'                <li><a class="detail-link" href="{escape(url)}">查看来源（{urlsplit(url).hostname}）</a></li>'
-        for url in entry["sources"]
-    )
+    if entry["sources"]:
+        sources = "\n".join(
+            f'                <li><a class="detail-link" href="{escape(url)}" rel="nofollow noopener">查看活动来源（{urlsplit(url).hostname}）</a></li>'
+            for url in entry["sources"]
+        )
+    else:
+        sources = "                <li>当前记录未提供可直接访问的公开来源链接，请以所属机构最新公告为准。</li>"
     facts = [fact("活动机构", escape(entry["bankName"])), fact("活动时间", period(entry))]
     for key, label in (("region", "适用地区"), ("consumeChannel", "消费场景"), ("channel", "支付渠道")):
         if entry[key]:
@@ -254,7 +253,7 @@ def detail(entry):
             <p class="detail-section-nav-title">本页内容</p>
             <a href="#offer-details">优惠内容</a>
             <a href="#participation">参与方式</a>
-            <a href="#activity-notes">官方来源</a>
+            <a href="#activity-notes">来源与核对</a>
             <a href="#telegram-reminder">Telegram 优惠提醒</a>
           </nav>
           <div class="detail-layout-content">
@@ -270,11 +269,11 @@ def detail(entry):
             </div>
             <aside class="detail-side">
               <section class="detail-side-panel" id="activity-notes">
-                <div class="detail-side-head"><h2>官方来源</h2></div>
+                <div class="detail-side-head"><h2>活动来源与核对</h2></div>
                 <ul class="activity-sources">
 {sources}
                 </ul>
-                <p class="detail-section-copy">本站整理更新于 {time_element(entry["lastmod"])}。活动资格、名额和领取入口以官方规则为准。</p>
+                <p class="detail-section-copy">本站按公开活动信息整理，更新于 {time_element(entry["lastmod"])}。活动资格、名额和领取入口以所属机构最新规则为准。</p>
                 <a class="detail-link" href="/detail.html?id={activity_id}">查看实时详情和活动图片</a>
               </section>
               <aside class="telegram-subscribe detail-telegram-reminder" id="telegram-reminder" aria-label="订阅优惠更新">
@@ -304,8 +303,8 @@ def preserve_detail(html, status):
 
 
 def directory(entries):
-    title = "精选银行活动"
-    summary = "浏览银行及支付机构公开发布的优惠活动，查看活动时间、参与方式和官方来源。"
+    title = "当前银行优惠活动目录"
+    summary = "浏览当前有效的银行及支付优惠活动，查看活动时间、优惠内容、参与方式和可用来源。"
     cards = "\n".join(f"""        <li class="detail-section">
           <h2><a href="/activities/{entry["id"]}.html">{escape(entry["title"])}</a></h2>
           <p>{escape(entry["desc"])}</p>
@@ -316,7 +315,7 @@ def directory(entries):
       <h1>{title}</h1>
       <p>{summary}</p>
       <p>共 {len(entries)} 项。活动名额、参与资格与有效期以官方公告为准。</p>
-      <p><a href="/#listTitle">浏览和筛选全部活动</a></p>
+      <p><a href="/#listTitle">返回首页筛选全部实时活动</a></p>
       <ul class="activity-directory">
 {cards}
       </ul>
@@ -337,6 +336,76 @@ def sitemap_xml(entries):
     return '<?xml version="1.0" encoding="UTF-8"?>\n' + ET.tostring(root, encoding="unicode") + "\n"
 
 
+def clean_line(value):
+    return " ".join((value or "").split())
+
+
+def ai_feed(entries, generated_on):
+    payload = {
+        "site": SITE_NAME,
+        "url": f"{SITE}/",
+        "generatedAt": generated_on.isoformat(),
+        "total": len(entries),
+        "activities": [{
+            "id": entry["id"],
+            "title": entry["title"],
+            "summary": entry["desc"],
+            "institution": entry["bankName"],
+            "validFrom": entry["validFrom"],
+            "validTo": entry["validTo"],
+            "offer": entry["awardDesc"],
+            "participation": entry["pathDesc"],
+            "url": f'{DIRECTORY}{entry["id"]}.html',
+            "sources": list(entry["sources"]),
+        } for entry in entries],
+    }
+    return json.dumps(payload, ensure_ascii=False, indent=2) + "\n"
+
+
+def llms_index(entries, generated_on):
+    return f"""# {SITE_NAME}
+
+> 整理银行、支付机构和日常消费场景的公开优惠。当前目录包含 {len(entries)} 条有效活动，更新于 {generated_on.isoformat()}。每篇详情提供活动时间、优惠内容、参与方式及可用来源；参与前请以所属机构最新规则为准。
+
+## 活动数据
+
+- [当前活动目录]({DIRECTORY}): 可直接读取的 HTML 活动目录，每项均链接到独立详情页。
+- [活动全文索引]({SITE}/llms-full.txt): 面向检索系统的当前活动全文摘要。
+- [结构化活动数据]({SITE}/activities/feed.json): 当前活动的 JSON 数据，包括标题、机构、有效期、优惠内容、参与方式和详情网址。
+- [全部活动与筛选]({SITE}/): 实时活动列表，可按银行、场景、卡种和时间筛选。
+- [站点地图]({SITE}/sitemap.xml): 提交给搜索引擎的当前公开页面网址。
+
+## 网站说明
+
+- [关于我们]({SITE}/about.html): 网站定位与整理方式。
+- [免责声明]({SITE}/disclaimer.html): 活动日期、参与资格和名额以所属机构公告为准。
+"""
+
+
+def llms_full(entries, generated_on):
+    lines = [
+        f"# {SITE_NAME}当前活动全文索引",
+        "",
+        f"> 更新于 {generated_on.isoformat()}，共 {len(entries)} 条当前有效活动。以下内容来自网站公开活动数据；资格、名额、时间和入口以所属机构最新规则为准。",
+        "",
+    ]
+    for entry in entries:
+        source_text = "、".join(entry["sources"]) if entry["sources"] else "当前记录未提供可直接访问的来源链接"
+        lines.extend([
+            f'## {clean_line(entry["title"])}',
+            "",
+            f'- 详情：{DIRECTORY}{entry["id"]}.html',
+            f'- 活动机构：{clean_line(entry["bankName"])}',
+            f'- 有效期：{entry["validFrom"]} 至 {entry["validTo"]}',
+            f'- 摘要：{clean_line(entry["desc"])}',
+            f'- 优惠内容：{clean_line(entry["awardDesc"])}',
+            f'- 参与方式：{clean_line(entry["pathDesc"])}',
+            f'- 活动来源：{source_text}',
+            "",
+        ])
+    return "\n".join(lines).rstrip() + "\n"
+
+
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("feed", type=Path)
@@ -351,22 +420,18 @@ def main():
 
     manifest_path = OUTPUT / "manifest.json"
     previous = json.loads(manifest_path.read_text(encoding="utf-8"))["activities"] if manifest_path.exists() else []
-    published = {entry["id"]: entry for entry in current}
-    pages = {entry["id"]: detail(entry) for entry in current}
+    published = dict(selected)
+    pages = {entry["id"]: detail(entry) for entry in selected.values()}
     for old in previous:
         activity_id = old["id"]
         if not re.fullmatch(r"[1-9][0-9]*", activity_id):
             raise ValueError("Invalid ID in the activity manifest.")
         if activity_id in published:
             continue
-        if activity_id in selected:
-            entry = selected[activity_id]
-            pages[activity_id] = detail(entry)
-        else:
-            html = (OUTPUT / f"{activity_id}.html").read_text(encoding="utf-8")
-            status = "ended" if date.fromisoformat(old["validTo"]) < args.as_of else "unavailable"
-            entry = {**old, "status": status}
-            pages[activity_id] = preserve_detail(html, status)
+        html = (OUTPUT / f"{activity_id}.html").read_text(encoding="utf-8")
+        status = "ended" if date.fromisoformat(old["validTo"]) < args.as_of else "unavailable"
+        entry = {**old, "status": status}
+        pages[activity_id] = preserve_detail(html, status)
         published[activity_id] = entry
 
     manifest = {"activities": [
@@ -375,14 +440,20 @@ def main():
     ]}
     directory_html = directory(current)
     sitemap = sitemap_xml(current)
+    feed_json = ai_feed(current, args.as_of)
+    llms_text = llms_index(current, args.as_of)
+    llms_full_text = llms_full(current, args.as_of)
     OUTPUT.mkdir(exist_ok=True)
     for activity_id, html in pages.items():
         (OUTPUT / f"{activity_id}.html").write_text(html, encoding="utf-8")
     (OUTPUT / "index.html").write_text(directory_html, encoding="utf-8")
+    (OUTPUT / "feed.json").write_text(feed_json, encoding="utf-8")
     (OUTPUT.parent / "sitemap.xml").write_text(sitemap, encoding="utf-8")
+    (OUTPUT.parent / "llms.txt").write_text(llms_text, encoding="utf-8")
+    (OUTPUT.parent / "llms-full.txt").write_text(llms_full_text, encoding="utf-8")
     manifest_path.write_text(json.dumps(manifest, indent=2) + "\n", encoding="utf-8")
-    print(f"Wrote {len(current)} current pages and {len(published) - len(current)} archived or unavailable pages, plus the directory and sitemap.")
-    print(f"Skipped {rejected} feed rows with incomplete information or sources requiring review.", file=sys.stderr)
+    print(f"Wrote {len(current)} current pages and {len(published) - len(current)} archived or unavailable pages, plus the directory, sitemap, JSON feed, and AI indexes.")
+    print(f"Skipped {rejected} feed rows with invalid dates or missing core information.", file=sys.stderr)
 
 
 if __name__ == "__main__":

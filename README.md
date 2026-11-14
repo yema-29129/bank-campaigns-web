@@ -22,14 +22,14 @@
 
 ## 更新公开活动详情与站点地图
 
-首页的筛选列表实时读取接口。`activities/` 下的公开活动目录和详情，以及 `sitemap.xml`，由同一份公开活动数据生成。发布新一批活动或活动到期后，在网站仓库根目录运行：
+首页的筛选列表实时读取接口。`activities/` 下的公开活动目录和详情、`sitemap.xml`、`llms.txt`、`llms-full.txt` 与 `activities/feed.json`，由同一份公开活动数据生成。当前有效活动进入目录和 sitemap；过期活动保留为 `noindex` 历史页。发布新一批活动或活动到期后，在网站仓库根目录运行：
 
 ```sh
 curl --fail --silent --show-error https://mini.vooqqqm.com/api/campaigns.php -o /tmp/bank-public-activities.json
 python3 tools/generate-activity-pages.py /tmp/bank-public-activities.json --as-of "$(TZ=Asia/Shanghai date +%F)"
 ```
 
-检查生成的活动规则、有效期和来源链接，提交到网站仓库的 `main` 分支，GitHub Pages 会部署。确认上线后，可通过 IndexNow 通知参与平台本次新增、更新或退出目录的网址。Google Search Console 已提交固定地址 `https://bank.vooqqqm.com/sitemap.xml`，后续更新沿用该地址。
+检查生成的活动规则、有效期和来源链接，提交到网站仓库的 `main` 分支，GitHub Pages 会部署。确认上线后，可通过 IndexNow 通知参与平台本次新增、更新或退出目录的网址。Google Search Console 使用固定地址 `https://bank.vooqqqm.com/sitemap.xml`，后续更新沿用该地址。搜索引擎和 AI 平台是否最终收录或引用由各平台决定。
 
 ## 广告说明
 
