@@ -212,178 +212,19 @@ function renderCompactParagraphs(text) {
     .filter(Boolean);
 
   const html = paragraphs.map(item => {
-    const inner = escapeHtml(item).replace(/\n/g, '<br>');
-    return `<div class="detail-text-paragraph">${inner}</div>`;
+    const lead = item.match(/^(【[^】\n]+】)(?=\n|$)/);
+    const inner = lead
+      ? `<strong class="detail-rule-label">${escapeHtml(lead[0])}</strong>${escapeHtml(item.slice(lead[0].length).trimStart()).replace(/\n/g, '<br>')}`
+      : escapeHtml(item).replace(/\n/g, '<br>');
+    return `<p class="detail-text-paragraph">${inner}</p>`;
   }).join('');
 
   return `<div class="detail-text-block">${html}</div>`;
 }
 
-function ensureRuntimeStyles() {
-  if (document.getElementById('detail-runtime-fix-styles')) return;
-
-  const style = document.createElement('style');
-  style.id = 'detail-runtime-fix-styles';
-  style.textContent = `
-    .detail-metric-grid {
-      display: grid;
-      gap: 14px;
-    }
-
-    .detail-metric-extend {
-      margin-top: 14px;
-      display: flex;
-      flex-wrap: wrap;
-      gap: 10px;
-    }
-
-    .detail-mini-pill {
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      padding: 8px 12px;
-      border-radius: 999px;
-      background: rgba(255,255,255,0.12);
-      border: 1px solid rgba(255,255,255,0.10);
-      color: rgba(255,255,255,0.92);
-      font-size: 13px;
-      line-height: 1.2;
-      font-weight: 700;
-      backdrop-filter: blur(8px);
-    }
-
-    .detail-mini-pill strong {
-      color: #ffffff;
-      font-weight: 800;
-    }
-
-    .detail-text-block {
-      margin: 0;
-      padding: 0;
-    }
-
-    .detail-text-paragraph {
-      margin: 0 0 14px 0;
-      line-height: 1.7;
-      font-size: 15px;
-      color: inherit;
-      font-weight: inherit;
-      word-break: break-word;
-    }
-
-    .detail-text-paragraph:last-child {
-      margin-bottom: 0;
-    }
-
-    .detail-link-box {
-      display: flex;
-      align-items: center;
-      width: 100%;
-      min-height: 70px;
-      padding: 16px 18px;
-      border-radius: 22px;
-      background: #f8fafc;
-      border: 1px solid #cbd5e1;
-      box-sizing: border-box;
-      overflow: hidden;
-    }
-
-    .detail-link-box .detail-link {
-      display: block;
-      width: 100%;
-
-      font-size: 14px;          /* 👈 原来15 → 再小一号 */
-      line-height: 1.6;
-      font-weight: 500;         /* 👈 更轻一点，更高级 */
-
-      color: #0f172a;
-      word-break: break-all;
-      overflow-wrap: anywhere;
-    }
-
-    .detail-link-actions {
-      margin-top: 14px;
-      display: flex;
-      flex-wrap: wrap;
-      gap: 10px;
-    }
-
-    .detail-inline-card.column-card {
-      display: block;
-    }
-
-    .detail-inline-card.column-card .detail-poster-name {
-      display: block;
-    }
-
-    .detail-group-btn-row {
-      margin-top: 14px;
-      display: flex;
-      justify-content: flex-start;
-    }
-
-    .detail-link-actions .secondary-btn {
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-    
-      min-width: 110px;         /* 👈 原来120 */
-      height: 40px;             /* 👈 原来42 → 更精致 */
-      padding: 0 16px;          /* 👈 原来18 */
-    
-      border-radius: 999px;
-    
-      background: linear-gradient(135deg, #2563eb, #3b82f6);
-      color: #ffffff !important;
-      border: none;
-      text-decoration: none;
-    
-      font-size: 14px;          /* 👈 原来14（保持） */
-      font-weight: 600;         /* 👈 原来700 → 降一点更舒服 */
-    
-      box-shadow: 0 6px 14px rgba(37, 99, 235, 0.15); /* 👈 阴影也柔一点 */
-    
-      cursor: pointer;
-      transition: all 0.2s ease;
-    }
-    
-    .detail-link-actions .secondary-btn:hover {
-      opacity: 0.95;
-      transform: translateY(-1px);
-    }
-
-    .detail-link-actions .secondary-btn:hover {
-      opacity: 0.96;
-      transform: translateY(-1px);
-    }
-
-    @media (max-width: 768px) {
-      .detail-mini-pill {
-        font-size: 12px;
-      }
-
-      .detail-link-actions {
-        flex-direction: column;
-      }
-
-      .detail-link-actions .secondary-btn {
-        width: 100%;
-      }
-
-      .detail-text-paragraph {
-        margin-bottom: 12px;
-        line-height: 1.65;
-        font-size: 15px;
-      }
-    }
-  `;
-  document.head.appendChild(style);
-}
-
 function renderDetail(activity) {
   currentActivity = activity;
   updateDetailMeta(activity);
-  ensureRuntimeStyles();
 
   const posterUrl = resolvePosterUrl(activity);
   const isPathUrlLink = /^https?:\/\//i.test(activity.pathUrl || '');
@@ -396,15 +237,11 @@ function renderDetail(activity) {
   ];
 
   const sideItems = [
-    ['适用地区', activity.region || '--'],
-    ['消费渠道', activity.channel || '--'],
-    ['最低门槛金额', (activity.minAmount || activity.minAmount === 0) ? `${activity.minAmount} 元` : '--'],
-    ['立减金额', buildDiscountText(activity)],
-    ['返现比例', activity.cashbackRate || '--'],
-    ['活动时间', (activity.validFrom || activity.validTo) ? `${activity.validFrom || '--'} 至 ${activity.validTo || '--'}` : '--'],
-    ['重复规则', activity.recurringText || '--'],
-    ['最近更新', activity.updatedDate || activity.updatedAt || activity.createdAt || '--']
-  ];
+    ['消费渠道', activity.channel],
+    ['返现比例', activity.cashbackRate],
+    ['重复规则', activity.recurringText],
+    ['最近更新', activity.updatedDate || activity.updatedAt || activity.createdAt]
+  ].filter(([, value]) => Boolean(value));
 
   const sideGrid = sideItems.map(([label, value]) => `
     <section class="detail-stat">
@@ -415,110 +252,72 @@ function renderDetail(activity) {
 
   const metricGrid = metrics.map(([label, value]) => `
     <div class="detail-metric">
-      <span class="detail-metric-label">${escapeHtml(label)}</span>
-      <strong class="detail-metric-value">${escapeHtml(value)}</strong>
+      <dt class="detail-metric-label">${escapeHtml(label)}</dt>
+      <dd class="detail-metric-value">${escapeHtml(value)}</dd>
     </div>
   `).join('');
 
   const tags = (activity.tags || []).map((tag) => `<span class="badge tag">${escapeHtml(tag)}</span>`).join('');
-  const summaryPills = [
-    activity.bankName || '银行活动',
-    activity.channel || '',
-    activity.recurringText || '',
-    activity.validTo ? `到期 ${activity.validTo}` : ''
-  ].filter(Boolean).map((text) => `<span class="detail-summary-pill">${escapeHtml(text)}</span>`).join('');
-
-  const heroExtraPills = [
-    activity.validFrom ? `<span class="detail-mini-pill"><span>开始</span><strong>${escapeHtml(activity.validFrom)}</strong></span>` : '',
-    activity.validTo ? `<span class="detail-mini-pill"><span>截止</span><strong>${escapeHtml(activity.validTo)}</strong></span>` : ''
-  ].filter(Boolean).join('');
-
   const html = `
     <article class="detail-card">
-      <section class="detail-hero">
+      <header class="detail-hero">
         <div class="detail-hero-copy">
-          <div class="detail-hero-top">
-            <div class="detail-hero-tags">
-              <span class="detail-bank-pill">${escapeHtml(activity.bankName || '银行活动')}</span>
-              ${tags ? `<div class="detail-tag-row">${tags}</div>` : ''}
-            </div>
-            <span class="detail-kicker">活动详情</span>
+          <div class="detail-hero-tags">
+            <span class="detail-bank-pill">${escapeHtml(activity.bankName || '银行活动')}</span>
+            ${tags}
           </div>
-
           <h1>${escapeHtml(activity.title || '活动详情')}</h1>
-          <p class="detail-desc">${escapeHtml(activity.desc || '暂无活动描述')}</p>
-          <div class="detail-summary-row">${summaryPills}</div>
-
-          ${heroExtraPills ? `<div class="detail-metric-extend">${heroExtraPills}</div>` : ''}
+          ${activity.desc ? `<p class="detail-desc detail-overview">${escapeHtml(activity.desc)}</p>` : ''}
         </div>
+        <dl class="detail-metric-grid">${metricGrid}</dl>
+      </header>
 
-        <div class="detail-metric-grid">${metricGrid}</div>
-      </section>
+      <nav class="detail-jump" aria-label="页内导航">
+        <a href="#offer-details">优惠规则</a>
+        <a href="#participation">参与方式</a>
+        ${sideItems.length ? '<a href="#activity-notes">活动信息</a>' : ''}
+      </nav>
 
       <div class="detail-layout">
-        <section class="detail-main">
-          <section class="detail-section detail-section-emphasis">
-            <div class="detail-section-head">
-              <h2>获奖内容</h2>
-            </div>
-            ${renderCompactParagraphs(activity.awardDesc || '--')}
+        <div class="detail-main">
+          <section id="offer-details" class="detail-section detail-section-emphasis">
+            <div class="detail-section-head"><h2>优惠规则</h2></div>
+            ${renderCompactParagraphs(activity.awardDesc || '暂无规则说明，请以官方页面为准。')}
           </section>
+        </div>
 
-          <section class="detail-section">
-            <div class="detail-section-head">
-              <h2>活动路径</h2>
-            </div>
-            ${renderCompactParagraphs(activity.pathDesc || '--')}
-          </section>
+        <aside class="detail-side" aria-label="参与方式与补充信息">
+          <section id="participation" class="detail-section detail-participation">
+            <div class="detail-section-head"><h2>参与方式</h2></div>
+            ${renderCompactParagraphs(activity.pathDesc || '暂无参与步骤，请以官方页面为准。')}
 
-          ${activity.pathUrl ? `
-            <section class="detail-section detail-section-compact">
-              <div class="detail-section-head">
-                <h2>活动链接</h2>
-              </div>
-
+            ${activity.pathUrl ? `
               <div class="detail-link-box">
                 <span class="detail-link">${escapeHtml(activity.pathUrl)}</span>
               </div>
 
               <div class="detail-link-actions">
-                ${isPathUrlLink ? `<a class="secondary-btn" href="${escapeAttribute(activity.pathUrl)}" target="_blank" rel="noopener noreferrer">打开链接</a>` : ''}
+                ${isPathUrlLink ? `<a class="primary-btn" href="${escapeAttribute(activity.pathUrl)}" target="_blank" rel="noopener noreferrer">打开活动链接 <span aria-hidden="true">↗</span></a>` : ''}
                 <button class="secondary-btn" type="button" id="copyPathBtn">复制链接</button>
               </div>
+            ` : ''}
+
+            ${posterUrl ? `<div class="detail-poster-action">
+              <button class="secondary-btn" type="button" id="viewPosterBtn">查看活动图片 / 二维码</button>
+            </div>` : ''}
+          </section>
+
+          ${sideItems.length ? `
+            <section id="activity-notes" class="detail-side-panel">
+              <div class="detail-side-head"><h2>活动信息</h2></div>
+              <div class="detail-stat-grid">${sideGrid}</div>
             </section>
           ` : ''}
 
-          <section class="detail-section detail-section-compact">
-            <div class="detail-section-head">
-              <h2>活动图片路径</h2>
-            </div>
-            <div class="detail-inline-card column-card">
-              <span class="detail-poster-name">活动路径/二维码</span>
-              <div class="detail-group-btn-row">
-                <button class="primary-btn" type="button" id="viewPosterBtn"${posterUrl ? '' : ' disabled'}>${posterUrl ? '查看图片' : '暂无图片'}</button>
-              </div>
-            </div>
-          </section>
-        </section>
-
-        <aside class="detail-side">
-          <section class="detail-side-panel">
-            <div class="detail-side-head">
-              <h2>快速查看</h2>
-            </div>
-            <div class="detail-stat-grid">${sideGrid}</div>
-          </section>
-
-          <section class="detail-side-note">
-            <span class="detail-section-kicker">提示</span>
-            <p>活动规则、名额、页面入口都可能变化，实际请以银行官方页面为准。</p>
-          </section>
-
           <section class="detail-side-note detail-side-promo">
-            <span class="detail-section-kicker">社群福利</span>
-            <h2>加入「薅羊毛微信群·每月最少薅500元」</h2>
-            <p>点击下方按钮即可查看固定微信群二维码，后续扫码进群即可获取更多羊毛线报。</p>
-            <button class="primary-btn detail-promo-btn" type="button" id="viewGroupQrBtn">查看群二维码</button>
+            <h2>微信群</h2>
+            <p>扫码加入微信群，交流活动和优惠线索。</p>
+            <button class="secondary-btn detail-promo-btn" type="button" id="viewGroupQrBtn">查看群二维码</button>
           </section>
         </aside>
       </div>

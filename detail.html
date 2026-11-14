@@ -21,7 +21,7 @@
   <link rel="icon" type="image/svg+xml" href="./assets/favicon.svg">
   <link rel="shortcut icon" href="./assets/favicon.svg">
   <link rel="preconnect" href="https://mini.vooqqqm.com" crossorigin>
-  <link rel="stylesheet" href="./assets/styles.css?v=20261115-contact">
+  <link rel="stylesheet" href="./assets/styles.css?v=20261115-detail">
   <script id="detailStructuredData" type="application/ld+json"></script>
   <script>
   var _hmt = _hmt || [];
@@ -62,7 +62,12 @@
   <div class="detail-shell">
     <header class="detail-topbar">
       <a class="ghost-btn" href="./index.html">返回列表</a>
-      <span class="detail-topbar-title">活动详情</span>
+      <div id="shareDock" class="share-dock hidden" aria-label="分享活动">
+        <button id="shareDockBtn" class="share-dock-btn" type="button" aria-haspopup="dialog" aria-expanded="false">
+          <span class="share-dock-icon" aria-hidden="true">↗</span>
+          <span class="share-dock-text">分享</span>
+        </button>
+      </div>
     </header>
 
     <aside class="telegram-subscribe" aria-label="订阅优惠更新">
@@ -77,13 +82,6 @@
         <button id="detailRetryBtn" class="ghost-btn" type="button">重新加载</button>
       </div>
     </main>
-  </div>
-
-  <div id="shareDock" class="share-dock hidden" aria-label="分享活动">
-    <button id="shareDockBtn" class="share-dock-btn" type="button" aria-haspopup="dialog" aria-expanded="false">
-      <span class="share-dock-icon" aria-hidden="true">↗</span>
-      <span class="share-dock-text">分享</span>
-    </button>
   </div>
 
   <div id="shareSheet" class="share-sheet hidden" aria-hidden="true">
@@ -148,6 +146,6 @@
     </div>
   </footer>
 
-  <script async src="./assets/detail.js?v=20261113-directory"></script>
+  <script async src="./assets/detail.js?v=20261115-detail"></script>
 </body>
 </html>

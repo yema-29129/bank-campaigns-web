@@ -133,6 +133,7 @@ def document(title, summary, url, kind, body, lastmod=None, indexable=True):
     schema_text = json.dumps(schema, ensure_ascii=False).replace("<", "\\u003c")
     og_type = "article" if lastmod else "website"
     robots = INDEX_ROBOTS if indexable else ARCHIVE_ROBOTS
+    styles_url = "/assets/styles.css?v=20261115-detail" if kind == "WebPage" else "/assets/styles.css"
     return f"""<!doctype html>
 <html lang="zh-CN">
 <head>
@@ -149,7 +150,7 @@ def document(title, summary, url, kind, body, lastmod=None, indexable=True):
   <meta property="og:description" content="{escape(summary)}">
   <meta property="og:url" content="{url}">
   <link rel="icon" href="/assets/favicon.svg" type="image/svg+xml">
-  <link rel="stylesheet" href="/assets/styles.css">
+  <link rel="stylesheet" href="{styles_url}">
   <link rel="stylesheet" href="/activities/styles.css">
   <script type="application/ld+json">{schema_text}</script>
 </head>
@@ -193,12 +194,17 @@ def period(entry):
     return f'{time_element(entry["validFrom"])} 至 {time_element(entry["validTo"])}'
 
 
-def prose(value):
+def prose(value, label_rules=False):
     paragraphs = re.split(r"\n\s*\n", value.replace("\r\n", "\n").replace("\r", "\n"))
-    return "\n".join(
-        f'              <p class="detail-section-copy activity-copy">{escape(paragraph)}</p>'
-        for paragraph in paragraphs
-    )
+    rendered = []
+    for paragraph in paragraphs:
+        label, separator, remainder = paragraph.partition("\n")
+        if label_rules and re.fullmatch(r"[^\S\n]*【[^】\n]+】[^\S\n]*", label):
+            content = f'<strong class="detail-rule-label">{escape(label)}{separator}</strong>{escape(remainder)}'
+        else:
+            content = escape(paragraph)
+        rendered.append(f'              <p class="detail-section-copy activity-copy">{content}</p>')
+    return "\n".join(rendered)
 
 
 def status_notice(status):
@@ -240,25 +246,29 @@ def detail(entry):
         <header class="detail-hero">
           <div class="detail-hero-copy">
             <h1>{escape(title)}</h1>
-            <p class="detail-desc">{escape(summary)}</p>
+            <p class="detail-desc detail-overview">{escape(summary)}</p>
           </div>
           <dl class="detail-metric-grid">
 {facts_markup}
           </dl>
         </header>
+        <nav class="detail-jump" aria-label="页内导航">
+          <a href="#offer-details">优惠内容</a>
+          <a href="#participation">参与方式</a>
+        </nav>
         {STATUS_MARKER}{status_notice(status)}
         <div class="detail-layout">
           <div class="detail-main">
-            <section class="detail-section detail-section-emphasis">
+            <section class="detail-section detail-section-emphasis" id="offer-details">
               <div class="detail-section-head"><h2>优惠内容与条件</h2></div>
-{prose(entry["awardDesc"])}
-            </section>
-            <section class="detail-section">
-              <div class="detail-section-head"><h2>参与方式</h2></div>
-{prose(entry["pathDesc"])}
+{prose(entry["awardDesc"], label_rules=True)}
             </section>
           </div>
           <aside class="detail-side">
+            <section class="detail-side-panel" id="participation">
+              <div class="detail-side-head"><h2>参与方式</h2></div>
+{prose(entry["pathDesc"])}
+            </section>
             <section class="detail-side-panel">
               <div class="detail-side-head"><h2>官方来源</h2></div>
               <ul class="activity-sources">
