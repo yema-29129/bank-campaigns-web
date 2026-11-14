@@ -5,9 +5,9 @@ From the site checkout:
   curl --fail --silent --show-error https://mini.vooqqqm.com/api/campaigns.php -o /tmp/bank-seo-feed.json
   python3 tools/generate-activity-pages.py /tmp/bank-seo-feed.json --as-of YYYY-MM-DD
 
-Review the generated changes before publishing. Only complete, current rows
-with approved sources enter the directory and sitemap. Previously published
-URLs remain readable when a campaign ends or no longer has a valid feed entry.
+Review the generated changes before publishing. Complete public rows enter the
+current or historical directory, sitemap, and AI feeds. Previously published
+URLs remain readable but noindex when they no longer have a valid feed entry.
 """
 
 import argparse
@@ -290,7 +290,10 @@ def detail(entry):
       </article>
     </main>
   </div>"""
-    return document(title, summary, f"{DIRECTORY}{activity_id}.html", "WebPage", body, entry["lastmod"], indexable=status == "current")
+    # Feed-backed pages remain indexable after an activity ends so the site's
+    # complete public archive can be found. The page itself carries a prominent
+    # ended notice; only feed-missing preserved pages are noindex.
+    return document(title, summary, f"{DIRECTORY}{activity_id}.html", "WebPage", body, entry["lastmod"], indexable=True)
 
 
 def preserve_detail(html, status):
@@ -320,6 +323,7 @@ def directory(entries):
       <p>{summary}</p>
       <p>共 {len(entries)} 项。活动名额、参与资格与有效期以官方公告为准。</p>
       <p><a href="/#listTitle">返回首页筛选全部实时活动</a></p>
+      <p><a href="/activities/archive.html">查看已结束的历史活动资料</a></p>
       <ul class="activity-directory">
 {cards}
       </ul>
@@ -328,9 +332,32 @@ def directory(entries):
     return document(title, summary, DIRECTORY, "CollectionPage", body)
 
 
+def archive_directory(entries):
+    title = "已结束活动历史资料"
+    summary = "浏览已结束的银行及支付优惠历史资料；所有条目均已失效，仅供查询和研究。"
+    cards = "\n".join(f"""        <li class="detail-section">
+          <p><strong>已结束</strong></p>
+          <h2><a href="/activities/{entry["id"]}.html">{escape(entry["title"])}</a></h2>
+          <p>{escape(entry["desc"])}</p>
+          <p>{escape(entry["bankName"])} · {period(entry)}</p>
+        </li>""" for entry in entries)
+    body = f"""  <main class="info-shell">
+    <section class="info-card">
+      <h1>{title}</h1>
+      <p>{summary}</p>
+      <p><strong>以下 {len(entries)} 项活动均已结束，不代表当前仍可参与。</strong> 活动内容仅作历史资料，实际优惠请查看当前活动目录。</p>
+      <p><a href="/activities/">返回当前活动目录</a></p>
+      <ul class="activity-directory">
+{cards}
+      </ul>
+    </section>
+  </main>"""
+    return document(title, summary, f"{DIRECTORY}archive.html", "CollectionPage", body)
+
+
 def sitemap_xml(entries):
     root = ET.Element("urlset", xmlns="http://www.sitemaps.org/schemas/sitemap/0.9")
-    for path in ("/", "/about.html", "/terms.html", "/privacy.html", "/disclaimer.html", "/contact.html", "/activities/"):
+    for path in ("/", "/about.html", "/terms.html", "/privacy.html", "/disclaimer.html", "/contact.html", "/activities/", "/activities/archive.html"):
         ET.SubElement(ET.SubElement(root, "url"), "loc").text = f"{SITE}{path}"
     for entry in entries:
         url = ET.SubElement(root, "url")
@@ -357,6 +384,7 @@ def ai_feed(entries, generated_on):
             "institution": entry["bankName"],
             "validFrom": entry["validFrom"],
             "validTo": entry["validTo"],
+            "status": entry["status"],
             "offer": entry["awardDesc"],
             "participation": entry["pathDesc"],
             "url": f'{DIRECTORY}{entry["id"]}.html',
@@ -366,16 +394,17 @@ def ai_feed(entries, generated_on):
     return json.dumps(payload, ensure_ascii=False, indent=2) + "\n"
 
 
-def llms_index(entries, generated_on):
+def llms_index(current, ended, generated_on):
     return f"""# {SITE_NAME}
 
-> 整理银行、支付机构和日常消费场景的公开优惠。当前目录包含 {len(entries)} 条有效活动，更新于 {generated_on.isoformat()}。每篇详情提供活动时间、优惠内容、参与方式及可用来源；参与前请以所属机构最新规则为准。
+> 整理银行、支付机构和日常消费场景的公开优惠。当前目录包含 {len(current)} 条有效活动，历史目录包含 {len(ended)} 条已结束活动，更新于 {generated_on.isoformat()}。每篇详情提供活动状态、活动时间、优惠内容、参与方式及可用来源；参与前请以所属机构最新规则为准。
 
 ## 活动数据
 
 - [当前活动目录]({DIRECTORY}): 可直接读取的 HTML 活动目录，每项均链接到独立详情页。
-- [活动全文索引]({SITE}/llms-full.txt): 面向检索系统的当前活动全文摘要。
-- [结构化活动数据]({SITE}/activities/feed.json): 当前活动的 JSON 数据，包括标题、机构、有效期、优惠内容、参与方式和详情网址。
+- [已结束活动历史资料]({DIRECTORY}archive.html): 已明确标注失效状态的历史活动目录。
+- [活动全文索引]({SITE}/llms-full.txt): 面向检索系统的当前及历史活动全文摘要。
+- [结构化活动数据]({SITE}/activities/feed.json): 全部公开活动的 JSON 数据，包括状态、标题、机构、有效期、优惠内容、参与方式和详情网址。
 - [全部活动与筛选]({SITE}/): 实时活动列表，可按银行、场景、卡种和时间筛选。
 - [站点地图]({SITE}/sitemap.xml): 提交给搜索引擎的当前公开页面网址。
 
@@ -388,9 +417,9 @@ def llms_index(entries, generated_on):
 
 def llms_full(entries, generated_on):
     lines = [
-        f"# {SITE_NAME}当前活动全文索引",
+        f"# {SITE_NAME}活动全文索引",
         "",
-        f"> 更新于 {generated_on.isoformat()}，共 {len(entries)} 条当前有效活动。以下内容来自网站公开活动数据；资格、名额、时间和入口以所属机构最新规则为准。",
+        f"> 更新于 {generated_on.isoformat()}，共 {len(entries)} 条公开活动，包含当前有效和已结束的历史资料。以下内容来自网站公开活动数据；资格、名额、时间和入口以所属机构最新规则为准。",
         "",
     ]
     for entry in entries:
@@ -399,6 +428,7 @@ def llms_full(entries, generated_on):
             f'## {clean_line(entry["title"])}',
             "",
             f'- 详情：{DIRECTORY}{entry["id"]}.html',
+            f'- 状态：{"当前有效" if entry["status"] == "current" else "尚未开始" if entry["status"] == "upcoming" else "已结束"}',
             f'- 活动机构：{clean_line(entry["bankName"])}',
             f'- 有效期：{entry["validFrom"]} 至 {entry["validTo"]}',
             f'- 摘要：{clean_line(entry["desc"])}',
@@ -417,9 +447,12 @@ def main():
     args = parser.parse_args()
     feed = json.loads(args.feed.read_text(encoding="utf-8"))
     selected, rejected = select_activities(feed, args.as_of)
-    current = [entry for entry in selected.values() if entry["status"] == "current"]
-    current.sort(key=lambda entry: (entry["lastmod"], int(entry["id"])), reverse=True)
-    if not current:
+    active = [entry for entry in selected.values() if entry["status"] in ("current", "upcoming")]
+    ended = [entry for entry in selected.values() if entry["status"] == "ended"]
+    active.sort(key=lambda entry: (entry["lastmod"], int(entry["id"])), reverse=True)
+    ended.sort(key=lambda entry: (entry["validTo"], int(entry["id"])), reverse=True)
+    public_entries = active + ended
+    if not active:
         raise ValueError("No current, complete activities with approved sources; published files are untouched.")
 
     manifest_path = OUTPUT / "manifest.json"
@@ -442,21 +475,23 @@ def main():
         {key: entry[key] for key in ("id", "lastmod", "validTo", "status")}
         for entry in published.values()
     ]}
-    directory_html = directory(current)
-    sitemap = sitemap_xml(current)
-    feed_json = ai_feed(current, args.as_of)
-    llms_text = llms_index(current, args.as_of)
-    llms_full_text = llms_full(current, args.as_of)
+    directory_html = directory(active)
+    archive_html = archive_directory(ended)
+    sitemap = sitemap_xml(public_entries)
+    feed_json = ai_feed(public_entries, args.as_of)
+    llms_text = llms_index(active, ended, args.as_of)
+    llms_full_text = llms_full(public_entries, args.as_of)
     OUTPUT.mkdir(exist_ok=True)
     for activity_id, html in pages.items():
         (OUTPUT / f"{activity_id}.html").write_text(html, encoding="utf-8")
     (OUTPUT / "index.html").write_text(directory_html, encoding="utf-8")
+    (OUTPUT / "archive.html").write_text(archive_html, encoding="utf-8")
     (OUTPUT / "feed.json").write_text(feed_json, encoding="utf-8")
     (OUTPUT.parent / "sitemap.xml").write_text(sitemap, encoding="utf-8")
     (OUTPUT.parent / "llms.txt").write_text(llms_text, encoding="utf-8")
     (OUTPUT.parent / "llms-full.txt").write_text(llms_full_text, encoding="utf-8")
     manifest_path.write_text(json.dumps(manifest, indent=2) + "\n", encoding="utf-8")
-    print(f"Wrote {len(current)} current pages and {len(published) - len(current)} archived or unavailable pages, plus the directory, sitemap, JSON feed, and AI indexes.")
+    print(f"Wrote {len(active)} current or upcoming pages, {len(ended)} public historical pages, and {len(published) - len(selected)} unavailable preserved pages, plus both directories, sitemap, JSON feed, and AI indexes.")
     print(f"Skipped {rejected} feed rows with invalid dates or missing core information.", file=sys.stderr)
 
 
