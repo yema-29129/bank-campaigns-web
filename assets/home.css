@@ -73,11 +73,12 @@
 .home-page .directory-intro h1 {
   margin: 0;
   color: #fff;
-  font-size: clamp(30px, 4vw, 48px);
+  font-size: clamp(24px, 3.2vw, 36px);
   font-weight: 900;
-  letter-spacing: -.045em;
-  line-height: 1.16;
-  text-wrap: balance;
+  letter-spacing: -.035em;
+  line-height: 1.22;
+  text-wrap: nowrap;
+  white-space: nowrap;
 }
 
 .home-page .directory-intro p {
@@ -610,6 +611,10 @@
   .home-page .directory-intro {
     grid-template-columns: minmax(0, 1fr);
     gap: 12px;
+  }
+
+  .home-page .directory-intro h1 {
+    font-size: clamp(16px, 4.5vw, 18px);
   }
 
   .home-page .filters-grid {
