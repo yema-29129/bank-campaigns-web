@@ -37,6 +37,11 @@ const SHORTCUTS = [
   { key: 'expiring', label: '快到期', description: '20 天内到期', expiring: true }
 ];
 
+const SHORTCUT_ICONS = {
+  all: '🗂️', food: '🍜', shopping: '🛍️', travel: '🚄',
+  overseas: '✈️', life: '💡', today: '🆕', expiring: '⏰'
+};
+
 // 与小程序 pages/utils/campaign_scene.js 使用同一组场景分类规则。
 // Explicit scenario metadata wins. Legacy records use concrete merchants/services only.
 const SCENE_OPTIONS = ['全部', '吃喝', '购物', '出行', '境外游', '生活', '会员权益', '通用优惠'];
@@ -139,8 +144,8 @@ function setMeta(selector, value) {
 function setHomeMeta() {
   const isCredit = state.view === 'credit';
   const title = isCredit
-    ? '信用卡活动专区 | 信用卡返现 | 羊毛助手Pro'
-    : '银行立减金活动网站 | 微信立减金 | 信用卡返现 | 羊毛助手Pro';
+    ? '信用卡活动专区 | 信用卡返现 | 好羊毛银行活动站'
+    : '银行立减金活动网站 | 微信立减金 | 信用卡返现 | 好羊毛银行活动站';
   const description = isCredit
     ? '查看信用卡返现、刷卡优惠、现金红包和信用卡活动，支持按银行、标签和时间快速筛选。'
     : '薅羊毛·银行/微信立减金/信用卡返现网站，实时更新微信立减金、返现、信用卡返现、信用卡活动、现金红包等信息。';
@@ -361,6 +366,7 @@ function mountShortcuts() {
     button.className = 'shortcut-card';
     button.dataset.shortcut = shortcut.key;
     button.innerHTML = `
+      <span class="shortcut-icon" aria-hidden="true">${SHORTCUT_ICONS[shortcut.key] || '✨'}</span>
       <strong>${shortcut.label}</strong>
       <span class="shortcut-count"><b>—</b><span>条</span></span>
       <small>${shortcut.description}</small>
@@ -371,8 +377,8 @@ function mountShortcuts() {
       if (shortcut.scene) state.scene = state.scene === shortcut.scene ? '全部' : shortcut.scene;
       if (shortcut.time) state.time = state.time === shortcut.time ? '全部时间' : shortcut.time;
       if (shortcut.expiring) state.expiring = !state.expiring;
+      // 保持当前位置，不再自动滚动，方便连续切换筛选
       applyFilters();
-      scrollToResults();
     });
 
     els.quickTimeFilters.appendChild(button);
@@ -452,25 +458,43 @@ function buildCard(item) {
     badges.push('<span class="badge credit">信用卡</span>');
   }
 
+  const bankName = item.bankName || '银行活动';
+  const bankMark = bankName.replace(/^中国/, '').charAt(0) || '银';
+  const sub = [item.region, item.channel || item.consumeChannel]
+    .filter(Boolean)
+    .filter((v, i, arr) => arr.indexOf(v) === i)
+    .join(' · ');
+
+  let stateHtml = '';
   if (item.isExpired) {
-    badges.push('<span class="badge expired">已过期</span>');
+    stateHtml = '<span class="card-state is-expired">已过期</span>';
+  } else if (item.isTodayAdded) {
+    stateHtml = '<span class="card-state is-new">今日新增</span>';
   } else if (item.isSoon) {
-    badges.push('<span class="badge soon">快到期</span>');
+    const end = parseDate(item.validTo);
+    const days = end ? Math.max(0, Math.ceil((end.getTime() - Date.now()) / 86400000)) : null;
+    stateHtml = `<span class="card-state is-soon">${days === null ? '快到期' : days === 0 ? '今天截止' : `剩 ${days} 天`}</span>`;
   }
 
+  const shortDate = (value) => String(value || '--').replace(/^\d{4}-/, '');
+  const dateText = (item.validFrom || item.validTo)
+    ? `${shortDate(item.validFrom)} 至 ${shortDate(item.validTo)}`
+    : '长期有效';
+
   card.innerHTML = `
-    <div class="card-head">
-      <div class="badge-row">
-        <div class="card-bank">${escapeHtml(item.bankName || '银行活动')}</div>
-        ${badges.join('')}
+    <div class="card-top">
+      <span class="card-logo" aria-hidden="true">${escapeHtml(bankMark)}</span>
+      <div class="card-bank-wrap">
+        <div class="card-bank">${escapeHtml(bankName)}</div>
+        ${sub ? `<span class="card-sub">${escapeHtml(sub)}</span>` : ''}
       </div>
+      ${stateHtml}
     </div>
     <h3 class="card-title">${escapeHtml(item.title || '未命名活动')}</h3>
-    <div class="card-meta">
-      <span>有效期：${escapeHtml(item.validFrom || '--')} 至 ${escapeHtml(item.validTo || '--')}</span>
-    </div>
-    <div class="card-actions">
-      <span class="primary-btn card-entry">查看详情</span>
+    ${badges.length ? `<div class="badge-row">${badges.join('')}</div>` : ''}
+    <div class="card-foot">
+      <span class="card-meta" title="有效期：${escapeHtml(item.validFrom || '--')} 至 ${escapeHtml(item.validTo || '--')}">📅 ${escapeHtml(dateText)}</span>
+      <span class="card-entry">查看详情 →</span>
     </div>
   `;
 

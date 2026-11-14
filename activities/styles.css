@@ -1,3 +1,5 @@
+@import url("/assets/theme.css?v=20261115-r5");
+
 .activity-copy + .activity-copy {
   margin-top: 0.75em;
 }
