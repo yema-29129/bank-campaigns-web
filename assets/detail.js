@@ -175,11 +175,17 @@ function normalizeTags(tags) {
 }
 
 function buildDiscountText(activity) {
-  if (activity.discountMin || activity.discountMin === 0) {
-    return `${activity.discountMin} ~ ${activity.discountMax} 元`;
+  const unit = activity.amountUnit || '元';
+  const min = activity.discountMin;
+  const max = activity.discountMax;
+  if (min || min === 0) {
+    const amount = max || max === 0
+      ? `${formatOfferNumber(min)}–${formatOfferNumber(max)}`
+      : formatOfferNumber(min);
+    return `${amount} ${unit}`;
   }
   if (activity.discountAmount || activity.discountAmount === 0) {
-    return `${activity.discountAmount} 元`;
+    return `${formatOfferNumber(activity.discountAmount)} ${unit}`;
   }
   return '--';
 }
@@ -222,6 +228,50 @@ function renderCompactParagraphs(text) {
   return `<div class="detail-text-block">${html}</div>`;
 }
 
+function formatOfferNumber(amount) {
+  const number = Number(amount);
+  return Number.isFinite(number)
+    ? number.toLocaleString('zh-CN', { maximumFractionDigits: 2 })
+    : String(amount);
+}
+
+function renderSpendTiers(ruleText) {
+  const normalize = String(ruleText || '').replace(/\r\n?/g, '\n');
+  const paragraphs = normalize.split(/\n\s*\n+/);
+  const lead = paragraphs.findIndex(part => /单笔折合人民币金额达档位即享立减：\s*$/.test(part));
+  const tierText = paragraphs[lead + 1]?.trim();
+  if (lead < 0 || !tierText?.endsWith('。')) return '';
+
+  const clauses = tierText.slice(0, -1).split(/[；;]/).map(part => part.trim());
+  if (clauses.length < 2 || clauses.length > 6) return '';
+
+  const rows = clauses.map((clause, index) => {
+    const range = clause.match(/^满([0-9]+)元至([0-9]+)元，立减([0-9]+)元$/);
+    const open = index === clauses.length - 1 && clause.match(/^满([0-9]+)元及以上，立减([0-9]+)元$/);
+    if (range) return { from: Number(range[1]), to: Number(range[2]), discount: Number(range[3]) };
+    if (open) return { from: Number(open[1]), to: Infinity, discount: Number(open[2]) };
+    return null;
+  });
+  if (rows.some((row, index) => !row || !Number.isSafeInteger(row.from)
+    || (Number.isFinite(row.to) && !Number.isSafeInteger(row.to))
+    || !Number.isSafeInteger(row.discount)
+    || row.from <= 0 || row.to < row.from || row.discount <= 0
+    || (index > 0 && row.from <= rows[index - 1]?.to))) return '';
+
+  const cells = rows.map(({ from, to, discount }) => {
+    const spend = Number.isFinite(to)
+      ? `${formatOfferNumber(from)}–${formatOfferNumber(to)} 元`
+      : `${formatOfferNumber(from)} 元及以上`;
+    return `<tr><td>${spend}</td><td>${formatOfferNumber(discount)} 元</td></tr>`;
+  }).join('');
+  return `<div class="detail-tier-frame">
+    <table class="detail-tier-table" aria-label="单笔消费立减档位">
+      <thead><tr><th scope="col">单笔消费</th><th scope="col">立减金额</th></tr></thead>
+      <tbody>${cells}</tbody>
+    </table>
+  </div>`;
+}
+
 function renderDetail(activity) {
   currentActivity = activity;
   updateDetailMeta(activity);
@@ -239,10 +289,10 @@ function renderDetail(activity) {
         : '见活动规则';
 
   const metrics = [
-    ['优惠金额', buildDiscountText(activity)],
-    ['最低门槛', (activity.minAmount || activity.minAmount === 0) ? `${activity.minAmount} 元` : '--'],
     ['活动时间', null, dateRange],
-    ['适用地区', activity.region || '--']
+    ['适用地区', activity.region || '--'],
+    ['最低门槛', (activity.minAmount || activity.minAmount === 0) ? `${formatOfferNumber(activity.minAmount)} ${activity.amountUnit || '元'}` : '--'],
+    ['优惠金额', buildDiscountText(activity)]
   ];
 
   const sideItems = [
@@ -266,32 +316,37 @@ function renderDetail(activity) {
     </div>
   `).join('');
 
-  const tags = (activity.tags || []).map((tag) => `<span class="badge tag">${escapeHtml(tag)}</span>`).join('');
+  const categoryTags = (activity.tags || []).filter(tag => !activity.bankName?.includes(tag));
+  const cardType = (activity.title || '').match(/信用卡|储蓄卡|借记卡/)?.[0];
+  if (cardType && !categoryTags.includes(cardType)) categoryTags.unshift(cardType);
+  const tags = categoryTags.map((tag) => `<span class="badge tag">${escapeHtml(tag)}</span>`).join('');
   const html = `
     <article class="detail-card">
       <header class="detail-hero">
         <div class="detail-hero-copy">
-          <p class="detail-eyebrow">银行优惠指南</p>
           <div class="detail-hero-tags">
             <span class="detail-bank-pill">${escapeHtml(activity.bankName || '银行活动')}</span>
             ${tags}
           </div>
           <h1>${escapeHtml(activity.title || '活动详情')}</h1>
-          ${activity.desc ? `<p class="detail-desc detail-overview">${escapeHtml(activity.desc)}</p>` : ''}
         </div>
         <dl class="detail-metric-grid">${metricGrid}</dl>
+        <a href="#participation" class="primary-btn detail-focus-link">查看参与方式</a>
       </header>
-
       <nav class="detail-jump" aria-label="页内导航">
+        <span class="detail-jump-label">本页内容</span>
         <a href="#offer-details">优惠规则</a>
         <a href="#participation">参与方式</a>
         ${sideItems.length ? '<a href="#activity-notes">活动信息</a>' : ''}
       </nav>
 
+
       <div class="detail-layout">
         <div class="detail-main">
+          ${activity.desc ? `<p class="detail-desc detail-overview">${escapeHtml(activity.desc)}</p>` : ''}
           <section id="offer-details" class="detail-section detail-section-emphasis">
             <div class="detail-section-head"><h2>优惠规则</h2></div>
+            ${renderSpendTiers(activity.awardDesc)}
             ${renderCompactParagraphs(activity.awardDesc || '暂无规则说明，请以官方页面为准。')}
           </section>
         </div>
@@ -340,6 +395,8 @@ function renderDetail(activity) {
   `;
 
   els.root.innerHTML = html;
+  const initialSection = ['#offer-details', '#participation', '#activity-notes'].includes(window.location.hash);
+  if (initialSection) document.getElementById(window.location.hash.slice(1))?.scrollIntoView({ behavior: 'instant' });
 
   const copyBtn = document.getElementById('copyPathBtn');
   if (copyBtn && activity.pathUrl) {
