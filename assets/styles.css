@@ -1340,6 +1340,12 @@ input[type="search"] {
   gap: 8px;
 }
 
+@media (min-width: 900px) {
+  #detailRoot .detail-metric-grid {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+}
+
 #detailRoot .detail-metric {
   min-width: 0;
   padding: 8px 12px;
