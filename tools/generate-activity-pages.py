@@ -133,7 +133,7 @@ def document(title, summary, url, kind, body, lastmod=None, indexable=True):
     schema_text = json.dumps(schema, ensure_ascii=False).replace("<", "\\u003c")
     og_type = "article" if lastmod else "website"
     robots = INDEX_ROBOTS if indexable else ARCHIVE_ROBOTS
-    styles_url = "/assets/styles.css?v=20261115-detail" if kind == "WebPage" else "/assets/styles.css"
+    styles_url = "/assets/styles.css?v=20261115-editorial" if kind == "WebPage" else "/assets/styles.css"
     return f"""<!doctype html>
 <html lang="zh-CN">
 <head>
@@ -237,7 +237,7 @@ def detail(entry):
     <header class="detail-topbar">
       <a class="ghost-btn" href="/activities/">返回精选活动</a>
     </header>
-    <aside class="telegram-subscribe">
+    <aside class="telegram-subscribe" aria-label="订阅优惠更新">
       <p>信用卡返现、微信立减金和港卡优惠更新。</p>
       <a class="ghost-btn" href="https://t.me/yangmaozhushou">订阅 Telegram 优惠提醒</a>
     </aside>
@@ -245,6 +245,7 @@ def detail(entry):
       <article class="detail-card">
         <header class="detail-hero">
           <div class="detail-hero-copy">
+            <p class="detail-eyebrow">银行优惠指南</p>
             <h1>{escape(title)}</h1>
             <p class="detail-desc detail-overview">{escape(summary)}</p>
           </div>
@@ -268,12 +269,13 @@ def detail(entry):
             <section class="detail-side-panel" id="participation">
               <div class="detail-side-head"><h2>参与方式</h2></div>
 {prose(entry["pathDesc"])}
-            </section>
-            <section class="detail-side-panel">
-              <div class="detail-side-head"><h2>官方来源</h2></div>
+              <h3>官方来源</h3>
               <ul class="activity-sources">
 {sources}
               </ul>
+            </section>
+            <section class="detail-side-panel">
+              <div class="detail-side-head"><h2>补充信息</h2></div>
               <p class="detail-section-copy">本站整理更新于 {time_element(entry["lastmod"])}。活动资格、名额和领取入口以官方规则为准。</p>
               <a class="detail-link" href="/detail.html?id={activity_id}">查看实时详情和活动图片</a>
             </section>

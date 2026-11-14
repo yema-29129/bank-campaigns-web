@@ -229,10 +229,19 @@ function renderDetail(activity) {
   const posterUrl = resolvePosterUrl(activity);
   const isPathUrlLink = /^https?:\/\//i.test(activity.pathUrl || '');
 
+  const renderDate = date => `<span class="detail-date">${escapeHtml(date)}</span>`;
+  const dateRange = activity.validFrom && activity.validTo
+    ? `${renderDate(activity.validFrom)} 至 ${renderDate(activity.validTo)}`
+    : activity.validFrom
+      ? `自 ${renderDate(activity.validFrom)} 起`
+      : activity.validTo
+        ? `截至 ${renderDate(activity.validTo)}`
+        : '见活动规则';
+
   const metrics = [
-    ['立减金额', buildDiscountText(activity)],
+    ['优惠金额', buildDiscountText(activity)],
     ['最低门槛', (activity.minAmount || activity.minAmount === 0) ? `${activity.minAmount} 元` : '--'],
-    ['活动时间', (activity.validFrom || activity.validTo) ? `${activity.validFrom || '--'} 至 ${activity.validTo || '--'}` : '--'],
+    ['活动时间', null, dateRange],
     ['适用地区', activity.region || '--']
   ];
 
@@ -250,10 +259,10 @@ function renderDetail(activity) {
     </section>
   `).join('');
 
-  const metricGrid = metrics.map(([label, value]) => `
+  const metricGrid = metrics.map(([label, value, dates]) => `
     <div class="detail-metric">
       <dt class="detail-metric-label">${escapeHtml(label)}</dt>
-      <dd class="detail-metric-value">${escapeHtml(value)}</dd>
+      <dd class="detail-metric-value">${dates ?? escapeHtml(value === '--' ? '见活动规则' : value)}</dd>
     </div>
   `).join('');
 
@@ -262,6 +271,7 @@ function renderDetail(activity) {
     <article class="detail-card">
       <header class="detail-hero">
         <div class="detail-hero-copy">
+          <p class="detail-eyebrow">银行优惠指南</p>
           <div class="detail-hero-tags">
             <span class="detail-bank-pill">${escapeHtml(activity.bankName || '银行活动')}</span>
             ${tags}
@@ -292,14 +302,15 @@ function renderDetail(activity) {
             ${renderCompactParagraphs(activity.pathDesc || '暂无参与步骤，请以官方页面为准。')}
 
             ${activity.pathUrl ? `
-              <div class="detail-link-box">
-                <span class="detail-link">${escapeHtml(activity.pathUrl)}</span>
-              </div>
-
+              ${isPathUrlLink ? '' : `<p class="detail-link-box detail-link">${escapeHtml(activity.pathUrl)}</p>`}
               <div class="detail-link-actions">
                 ${isPathUrlLink ? `<a class="primary-btn" href="${escapeAttribute(activity.pathUrl)}" target="_blank" rel="noopener noreferrer">打开活动链接 <span aria-hidden="true">↗</span></a>` : ''}
                 <button class="secondary-btn" type="button" id="copyPathBtn">复制链接</button>
               </div>
+              ${isPathUrlLink ? `<details class="detail-link-reveal">
+                <summary>查看链接地址</summary>
+                <p class="detail-link-box detail-link">${escapeHtml(activity.pathUrl)}</p>
+              </details>` : ''}
             ` : ''}
 
             ${posterUrl ? `<div class="detail-poster-action">
