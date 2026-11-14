@@ -225,38 +225,6 @@ function ensureRuntimeStyles() {
   const style = document.createElement('style');
   style.id = 'detail-runtime-fix-styles';
   style.textContent = `
-    .detail-metric-grid {
-      display: grid;
-      gap: 14px;
-    }
-
-    .detail-metric-extend {
-      margin-top: 14px;
-      display: flex;
-      flex-wrap: wrap;
-      gap: 10px;
-    }
-
-    .detail-mini-pill {
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      padding: 8px 12px;
-      border-radius: 999px;
-      background: rgba(255,255,255,0.12);
-      border: 1px solid rgba(255,255,255,0.10);
-      color: rgba(255,255,255,0.92);
-      font-size: 13px;
-      line-height: 1.2;
-      font-weight: 700;
-      backdrop-filter: blur(8px);
-    }
-
-    .detail-mini-pill strong {
-      color: #ffffff;
-      font-weight: 800;
-    }
-
     .detail-text-block {
       margin: 0;
       padding: 0;
@@ -358,10 +326,6 @@ function ensureRuntimeStyles() {
     }
 
     @media (max-width: 768px) {
-      .detail-mini-pill {
-        font-size: 12px;
-      }
-
       .detail-link-actions {
         flex-direction: column;
       }
@@ -424,14 +388,8 @@ function renderDetail(activity) {
   const summaryPills = [
     activity.bankName || '银行活动',
     activity.channel || '',
-    activity.recurringText || '',
-    activity.validTo ? `到期 ${activity.validTo}` : ''
+    activity.recurringText || ''
   ].filter(Boolean).map((text) => `<span class="detail-summary-pill">${escapeHtml(text)}</span>`).join('');
-
-  const heroExtraPills = [
-    activity.validFrom ? `<span class="detail-mini-pill"><span>开始</span><strong>${escapeHtml(activity.validFrom)}</strong></span>` : '',
-    activity.validTo ? `<span class="detail-mini-pill"><span>截止</span><strong>${escapeHtml(activity.validTo)}</strong></span>` : ''
-  ].filter(Boolean).join('');
 
   const html = `
     <article class="detail-card">
@@ -448,8 +406,6 @@ function renderDetail(activity) {
           <h1>${escapeHtml(activity.title || '活动详情')}</h1>
           <p class="detail-desc">${escapeHtml(activity.desc || '暂无活动描述')}</p>
           <div class="detail-summary-row">${summaryPills}</div>
-
-          ${heroExtraPills ? `<div class="detail-metric-extend">${heroExtraPills}</div>` : ''}
         </div>
 
         <div class="detail-metric-grid">${metricGrid}</div>
@@ -458,13 +414,20 @@ function renderDetail(activity) {
       <div class="detail-layout">
         <nav class="detail-section-nav" aria-label="活动详情目录">
           <p class="detail-section-nav-title">本页内容</p>
+          <a href="#activity-notes">快速查看</a>
           <a href="#offer-details">获奖内容</a>
           <a href="#participation">活动路径</a>
           ${activity.pathUrl ? '<a href="#activity-link">活动链接</a>' : ''}
           <a href="#activity-image">活动图片</a>
-          <a href="#activity-notes">快速查看</a>
         </nav>
         <div class="detail-layout-content">
+          <section class="detail-side-panel" id="activity-notes">
+            <div class="detail-side-head">
+              <h2>快速查看</h2>
+            </div>
+            <div class="detail-stat-grid">${sideGrid}</div>
+          </section>
+
           <section class="detail-main">
             <section class="detail-section detail-section-emphasis" id="offer-details">
               <div class="detail-section-head">
@@ -511,13 +474,6 @@ function renderDetail(activity) {
           </section>
 
           <aside class="detail-side">
-            <section class="detail-side-panel" id="activity-notes">
-              <div class="detail-side-head">
-                <h2>快速查看</h2>
-              </div>
-              <div class="detail-stat-grid">${sideGrid}</div>
-            </section>
-
             <section class="detail-side-note">
               <span class="detail-section-kicker">提示</span>
               <p>活动规则、名额、页面入口都可能变化，实际请以银行官方页面为准。</p>

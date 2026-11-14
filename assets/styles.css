@@ -1335,6 +1335,21 @@ input[type="search"] {
   align-content: start;
 }
 
+#detailRoot .detail-metric-grid {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+}
+
+#detailRoot .detail-metric {
+  min-width: 0;
+  padding: 8px 12px;
+  overflow-wrap: anywhere;
+}
+
+#detailRoot .detail-metric-label {
+  margin-bottom: 4px;
+}
+
 .detail-metric {
   padding: 16px;
   border-radius: 18px;
@@ -1484,6 +1499,17 @@ input[type="search"] {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 10px;
+}
+
+#activity-notes .detail-stat-grid {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 8px;
+}
+
+@media (max-width: 900px) {
+  #activity-notes .detail-stat-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
 }
 
 .detail-stat {
