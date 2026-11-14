@@ -252,120 +252,136 @@ input {
 
 .contact-grid {
   display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 18px;
-  margin-top: 22px;
+  grid-template-columns: minmax(0, .95fr) minmax(0, 1.05fr);
+  gap: 16px;
 }
 
 .contact-page {
   display: grid;
-  gap: 22px;
+  width: min(1060px, calc(100% - 32px));
+  gap: 18px;
+  margin: clamp(24px, 5vw, 58px) auto 36px;
 }
 
 .contact-hero {
-  display: grid;
-  grid-template-columns: minmax(0, 1.2fr) minmax(320px, 0.72fr);
-  gap: 18px;
-  align-items: stretch;
+  padding: 0 2px 4px;
 }
 
-.contact-hero-copy,
-.contact-telegram-card {
-  padding: 22px;
-  border-radius: 22px;
-  background: linear-gradient(180deg, rgba(248, 251, 255, 0.98), rgba(242, 247, 254, 0.98));
-  border: 1px solid #e2eaf4;
-}
-
-.contact-hero-copy,
-.contact-telegram-card {
-  display: grid;
-  gap: 12px;
-}
-
-.contact-telegram-card {
-  align-content: start;
-}
-
-.contact-telegram-card h2,
-.contact-telegram-card p {
-  margin: 0;
-}
-
-.contact-highlights {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 10px;
-}
-
-.contact-chip {
-  display: inline-flex;
-  align-items: center;
-  padding: 8px 12px;
-  border-radius: 999px;
-  background: rgba(31, 94, 255, 0.08);
-  color: var(--brand);
-  font-size: 12px;
-  font-weight: 700;
+.contact-hero h1 {
+  margin: 0 0 8px;
+  font-size: clamp(30px, 4vw, 48px);
+  line-height: 1.2;
+  letter-spacing: -.025em;
 }
 
 .contact-panel {
   display: grid;
+  min-width: 0;
+  padding: clamp(18px, 3vw, 30px);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-lg);
+  background: #fff;
+  box-shadow: 0 12px 28px rgba(22, 42, 77, .07);
+}
+
+.contact-telegram-card {
+  align-content: center;
+  justify-items: start;
   gap: 10px;
-  padding: 20px;
-  border-radius: 22px;
-  background: linear-gradient(180deg, rgba(248, 251, 255, 0.98), rgba(242, 247, 254, 0.98));
-  border: 1px solid #e2eaf4;
+  background: linear-gradient(145deg, #173b83, #194aa4);
+  border-color: transparent;
+  color: #fff;
+}
+
+.contact-wechat-card {
+  grid-template-columns: minmax(0, 1fr) minmax(120px, 38%);
+  align-items: center;
+  gap: 18px;
 }
 
 .contact-kicker {
-  font-size: 11px;
-  font-weight: 800;
-  color: #73859e;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
+  display: block;
+  color: #356b4e;
+  font-size: 13px;
+  font-weight: 750;
+}
+
+.contact-telegram-card .contact-kicker {
+  color: #d3e6ff;
+}
+
+.contact-page p {
+  margin: 0;
+  color: #51627b;
+  font-size: 15px;
+  line-height: 1.65;
+}
+
+.contact-telegram-card p {
+  color: #e4efff;
 }
 
 .contact-panel h2 {
   margin: 0;
-  font-size: 24px;
+  font-size: clamp(21px, 2.6vw, 28px);
   line-height: 1.3;
 }
 
-.contact-copy {
-  display: grid;
-  gap: 12px;
+.contact-wechat-copy h2 {
+  margin: 8px 0;
 }
 
-.contact-panel p {
-  margin: 0;
+.contact-wechat-copy .contact-qr-hint {
+  margin-top: 8px;
+  font-size: 13px;
 }
 
-.contact-action {
-  justify-self: start;
-  margin-top: 2px;
+.contact-panel .contact-action {
+  gap: 9px;
+  min-height: 44px;
+  margin-top: 8px;
+  background: #fff;
+  color: #173b83;
+  box-shadow: none;
 }
 
-.contact-panel-qr {
-  align-content: start;
+.contact-panel .contact-action:hover {
+  background: #e7f1ff;
 }
 
-.contact-qr-frame {
-  display: grid;
-  place-items: center;
-  width: 100%;
-  padding: 16px;
-  border-radius: 28px;
-  background: linear-gradient(180deg, rgba(247, 250, 255, 0.98), rgba(239, 245, 252, 0.98));
-  border: 1px solid #e3ebf5;
-  min-height: 560px;
+.contact-qr-link {
+  display: block;
+  justify-self: end;
+  width: min(100%, 174px);
+  border-radius: 12px;
 }
 
 .contact-qr-image {
   display: block;
-  width: min(100%, 320px);
-  border-radius: 24px;
-  box-shadow: 0 18px 40px rgba(18, 32, 51, 0.12);
+  width: 100%;
+  height: auto;
+  border-radius: inherit;
+}
+
+.contact-page a:focus-visible {
+  outline: 2px solid var(--brand);
+  outline-offset: 4px;
+}
+
+.contact-page .contact-action:focus-visible {
+  outline-color: #fff;
+}
+
+.contact-feedback {
+  padding: 16px 20px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-md);
+  background: #f5f8fd;
+}
+
+.contact-feedback h2 {
+  margin: 0 0 5px;
+  font-size: 16px;
 }
 
 .hero {
@@ -1068,7 +1084,7 @@ input[type="search"] {
 }
 
 .detail-shell > .telegram-subscribe {
-  margin-top: 16px;
+  margin-bottom: 16px;
 }
 
 .telegram-subscribe p {
@@ -1624,7 +1640,10 @@ input[type="search"] {
     width: 100%;
   }
 
-  .contact-hero,
+  .contact-page {
+    margin-top: 22px;
+  }
+
   .contact-grid {
     grid-template-columns: 1fr;
   }

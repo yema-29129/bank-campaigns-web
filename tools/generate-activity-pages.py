@@ -231,6 +231,10 @@ def detail(entry):
     <header class="detail-topbar">
       <a class="ghost-btn" href="/activities/">返回精选活动</a>
     </header>
+    <aside class="telegram-subscribe">
+      <p>信用卡返现、微信立减金和港卡优惠更新。</p>
+      <a class="ghost-btn" href="https://t.me/yangmaozhushou">订阅 Telegram 优惠提醒</a>
+    </aside>
     <main class="detail-root">
       <article class="detail-card">
         <header class="detail-hero">
@@ -266,10 +270,6 @@ def detail(entry):
           </aside>
         </div>
       </article>
-      <aside class="telegram-subscribe">
-        <p>信用卡返现、微信立减金和港卡优惠更新。</p>
-        <a class="ghost-btn" href="https://t.me/yangmaozhushou">订阅 Telegram 优惠提醒</a>
-      </aside>
     </main>
   </div>"""
     return document(title, summary, f"{DIRECTORY}{activity_id}.html", "WebPage", body, entry["lastmod"], indexable=status == "current")

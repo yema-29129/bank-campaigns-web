@@ -20,10 +20,7 @@
   <meta name="twitter:description" content="通过微信群反馈活动和网站问题，或订阅羊毛助手Pro Telegram 频道接收优惠更新。">
   <link rel="icon" type="image/svg+xml" href="./assets/favicon.svg">
   <link rel="shortcut icon" href="./assets/favicon.svg">
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;700;800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="./assets/styles.css?v=20261115-telegram">
+  <link rel="stylesheet" href="./assets/styles.css?v=20261115-contact">
   <script type="application/ld+json">
   {
     "@context": "https://schema.org",
@@ -51,49 +48,38 @@
   </script>
 </head>
 <body>
-  <header class="site-header"><div class="site-header-inner"><a class="site-brand" href="./index.html"><span class="site-brand-mark">薅</span><span class="site-brand-copy"><strong>好羊毛银行活动站</strong><small>微信立减金 / 信用卡返现 / 现金红包</small></span></a><nav class="site-nav" aria-label="主导航"><a class="site-nav-link" href="./index.html">首页</a><a class="site-nav-link" href="./index.html#listTitle">发现活动</a><a class="site-nav-link is-active" href="./contact.html">联系方式</a></nav></div></header>
-  <main class="info-shell">
-    <article class="info-card contact-page">
-      <div class="contact-hero">
-        <div class="contact-hero-copy">
-          <span class="contact-kicker">Contact</span>
-          <h1>联系方式</h1>
-          <p>使用好羊毛银行活动站或微信小程序「好羊毛助手Pro」时，如果发现活动失效、链接异常或页面显示错误，欢迎通过下方微信群反馈，也可以分享新的银行优惠线索。</p>
-          <div class="contact-highlights">
-            <span class="contact-chip">活动纠错</span>
-            <span class="contact-chip">内容合作</span>
-            <span class="contact-chip">页面建议</span>
-            <span class="contact-chip">微信群交流</span>
-          </div>
-        </div>
+  <header class="site-header"><div class="site-header-inner"><a class="site-brand" href="./index.html"><span class="site-brand-mark">薅</span><span class="site-brand-copy"><strong>好羊毛银行活动站</strong><small>微信立减金 / 信用卡返现 / 现金红包</small></span></a><nav class="site-nav" aria-label="主导航"><a class="site-nav-link" href="./index.html">首页</a><a class="site-nav-link" href="./index.html#listTitle">发现活动</a><a class="site-nav-link is-active" href="./contact.html" aria-current="page">联系方式</a></nav></div></header>
+  <main class="info-shell contact-page">
+    <header class="contact-hero">
+      <h1>联系方式</h1>
+      <p>订阅银行优惠更新，或进微信群交流、反馈活动问题。</p>
+    </header>
 
-        <section class="contact-telegram-card">
-          <span class="contact-kicker">Telegram 频道</span>
-          <h2>羊毛助手Pro</h2>
-          <p>接收信用卡返现、微信立减金和港卡优惠更新。每条消息附活动详情链接。</p>
-          <a class="primary-btn contact-action" href="https://t.me/yangmaozhushou">订阅 Telegram 优惠提醒</a>
-        </section>
-      </div>
-
-      <section class="contact-grid">
-        <div class="contact-panel">
-          <h2>反馈说明</h2>
-          <div class="contact-copy">
-            <p>反馈时请附上活动名称、所属银行和问题页面，如有截图也可以一并发到微信群，方便核对。内容补充和合作建议也可以在群内交流。</p>
-            <p>请注意，本站仅作银行活动信息整理与展示，并非银行官方客服，无法代替银行处理账户、支付、资格审核、领奖、退款或风控限制等业务问题。这类问题仍应联系对应银行或活动主办方官方渠道。</p>
-          </div>
-        </div>
-
-        <div class="contact-panel contact-panel-qr">
-          <span class="contact-kicker">微信群入口</span>
-          <h2>加入「薅羊毛微信群·每月最少薅500元」</h2>
-          <p>扫码加入固定微信群，获取更多银行立减金、返现、信用卡返现和红包线报。</p>
-          <div class="contact-qr-frame">
-            <img class="contact-qr-image" src="./assets/group-wechat-qr.png?v=20260321" alt="薅羊毛微信群二维码">
-          </div>
-        </div>
+    <div class="contact-grid">
+      <section class="contact-panel contact-telegram-card" aria-labelledby="telegram-title">
+        <span class="contact-kicker">Telegram 频道</span>
+        <h2 id="telegram-title">订阅优惠提醒</h2>
+        <p>关注「羊毛助手Pro」，接收信用卡返现、微信立减金和港卡优惠更新。每条消息都附活动详情链接。</p>
+        <a class="primary-btn contact-action" href="https://t.me/yangmaozhushou">订阅 Telegram 优惠提醒 <span aria-hidden="true">↗</span></a>
       </section>
-    </article>
+
+      <section class="contact-panel contact-wechat-card" aria-labelledby="wechat-title">
+        <div class="contact-wechat-copy">
+          <span class="contact-kicker">微信群</span>
+          <h2 id="wechat-title">进群交流与反馈</h2>
+          <p>分享优惠线索、反馈活动失效或提出网站建议。</p>
+          <p class="contact-qr-hint">用微信扫码。手机上可长按二维码识别。</p>
+        </div>
+        <a class="contact-qr-link" href="./assets/group-wechat-qr.png?v=20260321" aria-label="打开微信群二维码大图">
+          <img class="contact-qr-image" src="./assets/group-wechat-qr.png?v=20260321" width="2470" height="3293" alt="微信群二维码">
+        </a>
+      </section>
+    </div>
+
+    <section class="contact-feedback" aria-labelledby="feedback-title">
+      <h2 id="feedback-title">怎么反馈</h2>
+      <p>在微信群里发活动名称、问题链接和截图。账户、支付、资格、领奖或退款问题，请联系对应银行或活动主办方。</p>
+    </section>
   </main>
   <footer class="site-footer"><div class="site-footer-inner"><div class="site-footer-brand"><div class="site-footer-logo">薅</div><div><h3>好羊毛银行活动站</h3><p>整理微信立减金、返现、信用卡返现、信用卡活动、现金红包等信息，帮助用户更快找到值得参与的活动。</p></div></div><div class="site-footer-group"><h4>网站信息</h4><a href="./about.html">关于我们</a><a href="./terms.html">使用条款</a><a href="./privacy.html">隐私政策</a><a href="./disclaimer.html">免责声明</a><a href="./contact.html">联系方式</a></div><div class="site-footer-group"><h4>友情链接</h4><a href="https://tmhzz.com/" target="_blank" rel="noopener noreferrer">「天马黑珍珠」社群</a><a href="https://www.vooqqqm.com/" target="_blank" rel="noopener noreferrer">「HAIMA」投资理财社群</a><a href="https://calcwisehub.com/" target="_blank" rel="noopener noreferrer">CalcwiseHub</a><a href="https://fitcalcify.com/" target="_blank" rel="noopener noreferrer">Health Toolkit Lab</a></div></div><div class="site-footer-bottom"><span>© 2026 好羊毛银行活动站。</span></div></footer>
 </body>
