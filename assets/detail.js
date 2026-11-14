@@ -456,71 +456,81 @@ function renderDetail(activity) {
       </section>
 
       <div class="detail-layout">
-        <section class="detail-main">
-          <section class="detail-section detail-section-emphasis">
-            <div class="detail-section-head">
-              <h2>获奖内容</h2>
-            </div>
-            ${renderCompactParagraphs(activity.awardDesc || '--')}
-          </section>
-
-          <section class="detail-section">
-            <div class="detail-section-head">
-              <h2>活动路径</h2>
-            </div>
-            ${renderCompactParagraphs(activity.pathDesc || '--')}
-          </section>
-
-          ${activity.pathUrl ? `
-            <section class="detail-section detail-section-compact">
+        <nav class="detail-section-nav" aria-label="活动详情目录">
+          <p class="detail-section-nav-title">本页内容</p>
+          <a href="#offer-details">获奖内容</a>
+          <a href="#participation">活动路径</a>
+          ${activity.pathUrl ? '<a href="#activity-link">活动链接</a>' : ''}
+          <a href="#activity-image">活动图片</a>
+          <a href="#activity-notes">快速查看</a>
+        </nav>
+        <div class="detail-layout-content">
+          <section class="detail-main">
+            <section class="detail-section detail-section-emphasis" id="offer-details">
               <div class="detail-section-head">
-                <h2>活动链接</h2>
+                <h2>获奖内容</h2>
               </div>
+              ${renderCompactParagraphs(activity.awardDesc || '--')}
+            </section>
 
-              <div class="detail-link-box">
-                <span class="detail-link">${escapeHtml(activity.pathUrl)}</span>
+            <section class="detail-section" id="participation">
+              <div class="detail-section-head">
+                <h2>活动路径</h2>
               </div>
+              ${renderCompactParagraphs(activity.pathDesc || '--')}
+            </section>
 
-              <div class="detail-link-actions">
-                ${isPathUrlLink ? `<a class="secondary-btn" href="${escapeAttribute(activity.pathUrl)}" target="_blank" rel="noopener noreferrer">打开链接</a>` : ''}
-                <button class="secondary-btn" type="button" id="copyPathBtn">复制链接</button>
+            ${activity.pathUrl ? `
+              <section class="detail-section detail-section-compact" id="activity-link">
+                <div class="detail-section-head">
+                  <h2>活动链接</h2>
+                </div>
+
+                <div class="detail-link-box">
+                  <span class="detail-link">${escapeHtml(activity.pathUrl)}</span>
+                </div>
+
+                <div class="detail-link-actions">
+                  ${isPathUrlLink ? `<a class="secondary-btn" href="${escapeAttribute(activity.pathUrl)}" target="_blank" rel="noopener noreferrer">打开链接</a>` : ''}
+                  <button class="secondary-btn" type="button" id="copyPathBtn">复制链接</button>
+                </div>
+              </section>
+            ` : ''}
+
+            <section class="detail-section detail-section-compact" id="activity-image">
+              <div class="detail-section-head">
+                <h2>活动图片路径</h2>
+              </div>
+              <div class="detail-inline-card column-card">
+                <span class="detail-poster-name">活动路径/二维码</span>
+                <div class="detail-group-btn-row">
+                  <button class="primary-btn" type="button" id="viewPosterBtn"${posterUrl ? '' : ' disabled'}>${posterUrl ? '查看图片' : '暂无图片'}</button>
+                </div>
               </div>
             </section>
-          ` : ''}
+          </section>
 
-          <section class="detail-section detail-section-compact">
-            <div class="detail-section-head">
-              <h2>活动图片路径</h2>
-            </div>
-            <div class="detail-inline-card column-card">
-              <span class="detail-poster-name">活动路径/二维码</span>
-              <div class="detail-group-btn-row">
-                <button class="primary-btn" type="button" id="viewPosterBtn"${posterUrl ? '' : ' disabled'}>${posterUrl ? '查看图片' : '暂无图片'}</button>
+          <aside class="detail-side">
+            <section class="detail-side-panel" id="activity-notes">
+              <div class="detail-side-head">
+                <h2>快速查看</h2>
               </div>
-            </div>
-          </section>
-        </section>
+              <div class="detail-stat-grid">${sideGrid}</div>
+            </section>
 
-        <aside class="detail-side">
-          <section class="detail-side-panel">
-            <div class="detail-side-head">
-              <h2>快速查看</h2>
-            </div>
-            <div class="detail-stat-grid">${sideGrid}</div>
-          </section>
+            <section class="detail-side-note">
+              <span class="detail-section-kicker">提示</span>
+              <p>活动规则、名额、页面入口都可能变化，实际请以银行官方页面为准。</p>
+            </section>
 
-          <section class="detail-side-note">
-            <span class="detail-section-kicker">提示</span>
-            <p>活动规则、名额、页面入口都可能变化，实际请以银行官方页面为准。</p>
-          </section>
-
-          <section class="detail-side-note detail-side-promo">
-            <span class="detail-section-kicker">社群福利</span>
-            <h2>加入「薅羊毛微信群·每月最少薅500元」</h2>
-            <p>点击下方按钮即可查看固定微信群二维码，后续扫码进群即可获取更多羊毛线报。</p>
-            <button class="primary-btn detail-promo-btn" type="button" id="viewGroupQrBtn">查看群二维码</button>
-          </section>
-        </aside>
+            <section class="detail-side-note detail-side-promo">
+              <span class="detail-section-kicker">社群福利</span>
+              <h2>加入「薅羊毛微信群·每月最少薅500元」</h2>
+              <p>点击下方按钮即可查看固定微信群二维码，后续扫码进群即可获取更多羊毛线报。</p>
+              <button class="primary-btn detail-promo-btn" type="button" id="viewGroupQrBtn">查看群二维码</button>
+            </section>
+          </aside>
+        </div>
       </div>
 
       <div class="detail-footer">
@@ -530,6 +540,10 @@ function renderDetail(activity) {
   `;
 
   els.root.innerHTML = html;
+
+  const sectionId = window.location.hash.slice(1);
+  const section = document.getElementById(sectionId);
+  if (section?.matches('.detail-layout-content section')) section.scrollIntoView();
 
   const copyBtn = document.getElementById('copyPathBtn');
   if (copyBtn && activity.pathUrl) {

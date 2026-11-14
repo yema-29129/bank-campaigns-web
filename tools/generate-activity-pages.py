@@ -133,7 +133,7 @@ def document(title, summary, url, kind, body, lastmod=None, indexable=True):
     schema_text = json.dumps(schema, ensure_ascii=False).replace("<", "\\u003c")
     og_type = "article" if lastmod else "website"
     robots = INDEX_ROBOTS if indexable else ARCHIVE_ROBOTS
-    styles = "/assets/styles.css?v=20261115-restore" if kind == "WebPage" else "/assets/styles.css"
+    styles = "/assets/styles.css?v=20261115-stack" if kind == "WebPage" else "/assets/styles.css"
     return f"""<!doctype html>
 <html lang="zh-CN">
 <head>
@@ -197,7 +197,7 @@ def period(entry):
 def prose(value):
     paragraphs = re.split(r"\n\s*\n", value.replace("\r\n", "\n").replace("\r", "\n"))
     return "\n".join(
-        f'              <p class="detail-section-copy activity-copy">{escape(paragraph)}</p>'
+        f'                <p class="detail-section-copy activity-copy">{escape(paragraph)}</p>'
         for paragraph in paragraphs
     )
 
@@ -219,7 +219,7 @@ def detail(entry):
     summary = entry["desc"]
     activity_id = entry["id"]
     sources = "\n".join(
-        f'              <li><a class="detail-link" href="{escape(url)}">查看来源（{urlsplit(url).hostname}）</a></li>'
+        f'                <li><a class="detail-link" href="{escape(url)}">查看来源（{urlsplit(url).hostname}）</a></li>'
         for url in entry["sources"]
     )
     facts = [fact("活动机构", escape(entry["bankName"])), fact("活动时间", period(entry))]
@@ -249,26 +249,34 @@ def detail(entry):
         </header>
         {STATUS_MARKER}{status_notice(status)}
         <div class="detail-layout">
-          <div class="detail-main">
-            <section class="detail-section detail-section-emphasis">
-              <div class="detail-section-head"><h2>优惠内容与条件</h2></div>
+          <nav class="detail-section-nav" aria-label="活动详情目录">
+            <p class="detail-section-nav-title">本页内容</p>
+            <a href="#offer-details">优惠内容</a>
+            <a href="#participation">参与方式</a>
+            <a href="#activity-notes">官方来源</a>
+          </nav>
+          <div class="detail-layout-content">
+            <div class="detail-main">
+              <section class="detail-section detail-section-emphasis" id="offer-details">
+                <div class="detail-section-head"><h2>优惠内容与条件</h2></div>
 {prose(entry["awardDesc"])}
-            </section>
-            <section class="detail-section">
-              <div class="detail-section-head"><h2>参与方式</h2></div>
+              </section>
+              <section class="detail-section" id="participation">
+                <div class="detail-section-head"><h2>参与方式</h2></div>
 {prose(entry["pathDesc"])}
-            </section>
-          </div>
-          <aside class="detail-side">
-            <section class="detail-side-panel">
-              <div class="detail-side-head"><h2>官方来源</h2></div>
-              <ul class="activity-sources">
+              </section>
+            </div>
+            <aside class="detail-side">
+              <section class="detail-side-panel" id="activity-notes">
+                <div class="detail-side-head"><h2>官方来源</h2></div>
+                <ul class="activity-sources">
 {sources}
-              </ul>
-              <p class="detail-section-copy">本站整理更新于 {time_element(entry["lastmod"])}。活动资格、名额和领取入口以官方规则为准。</p>
-              <a class="detail-link" href="/detail.html?id={activity_id}">查看实时详情和活动图片</a>
-            </section>
-          </aside>
+                </ul>
+                <p class="detail-section-copy">本站整理更新于 {time_element(entry["lastmod"])}。活动资格、名额和领取入口以官方规则为准。</p>
+                <a class="detail-link" href="/detail.html?id={activity_id}">查看实时详情和活动图片</a>
+              </section>
+            </aside>
+          </div>
         </div>
       </article>
     </main>
