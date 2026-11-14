@@ -91,13 +91,13 @@ function updateStructuredData(data, url, description) {
   const payload = {
     '@context': 'https://schema.org',
     '@type': 'WebPage',
-    name: `${data.title || '活动详情'} | 好羊毛银行活动站`,
+    name: `${data.title || '活动详情'} | 羊毛助手Pro`,
     url,
     description,
     inLanguage: 'zh-CN',
     isPartOf: {
       '@type': 'WebSite',
-      name: '好羊毛银行活动站',
+      name: '羊毛助手Pro',
       url: 'https://bank.vooqqqm.com/'
     }
   };
@@ -106,7 +106,7 @@ function updateStructuredData(data, url, description) {
 }
 
 function updateDetailMeta(activity) {
-  const title = `${activity.title || '活动详情'} | ${activity.bankName || '银行活动'} | 好羊毛银行活动站`;
+  const title = `${activity.title || '活动详情'} | ${activity.bankName || '银行活动'} | 羊毛助手Pro`;
   const description = [
     activity.desc || '',
     activity.channel ? `渠道：${activity.channel}` : '',

@@ -1,5 +1,5 @@
 /* =========================================================
-   好羊毛银行活动站 · 全站新主题 theme.css
+   羊毛助手Pro · 全站新主题 theme.css
    加载顺序：styles.css → theme.css（最后加载，覆盖旧样式）
    ========================================================= */
 
@@ -237,10 +237,11 @@ body {
 .intro-copy { position: relative; z-index: 1; }
 .intro-copy h1 {
   margin: 0 0 12px;
-  font-size: clamp(30px, 4vw, 44px);
+  font-size: clamp(28px, 2.4vw, 32px);
   line-height: 1.15;
   font-weight: 800;
-  letter-spacing: -.02em;
+  letter-spacing: -.03em;
+  white-space: nowrap;
   color: #fff;
 }
 .intro-copy > p {
@@ -1214,7 +1215,7 @@ details:not([open]) .filter-collapse { display: none; }
   body { font-size: 14px; }
   .site-shell, .info-shell { margin-top: 14px; }
   .directory-intro { padding: 26px 20px; border-radius: 22px; }
-  .intro-copy h1 { font-size: 28px; }
+  .intro-copy h1 { font-size: clamp(16px, 4.4vw, 22px); }
   .intro-copy > p { font-size: 14px; margin-bottom: 16px; }
   .intro-results-link { min-height: 34px; padding: 0 12px; font-size: 12px; }
   .directory-intro .field-search { padding: 14px; }

@@ -22,7 +22,7 @@ from urllib.parse import urlsplit
 import xml.etree.ElementTree as ET
 
 SITE = "https://bank.vooqqqm.com"
-SITE_NAME = "好羊毛银行活动站"
+SITE_NAME = "羊毛助手Pro"
 DIRECTORY = f"{SITE}/activities/"
 OUTPUT = Path(__file__).resolve().parents[1] / "activities"
 TEXT_FIELDS = (
@@ -39,6 +39,10 @@ STATUS_MESSAGES = {
     "unavailable": "当前活动资料暂时无法核实。下方为此前发布的历史资料。",
 }
 STATUS_MARKER = "<!-- activity-status -->"
+
+
+def normalize_brand(value):
+    return value.replace("好羊毛银行活动站", SITE_NAME).replace("好羊毛助手Pro", SITE_NAME)
 
 
 def safe_source(url):
@@ -68,7 +72,7 @@ def parse_entry(activity_id, row, as_of):
     if start > end or lastmod > as_of:
         raise ValueError("Inconsistent activity dates.")
 
-    entry = {key: (row.get(key) or "").strip() for key in TEXT_FIELDS}
+    entry = {key: normalize_brand((row.get(key) or "").strip()) for key in TEXT_FIELDS}
     if not all(entry[key] for key in REQUIRED_FIELDS):
         raise ValueError("Incomplete public activity information.")
     if not entry["awardDesc"]:
