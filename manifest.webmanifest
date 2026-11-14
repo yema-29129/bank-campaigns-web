@@ -1,7 +1,7 @@
 {
   "id": "/",
-  "name": "好羊毛银行活动站",
-  "short_name": "好羊毛",
+  "name": "羊毛助手Pro",
+  "short_name": "羊毛助手Pro",
   "description": "实时查看微信立减金、银行优惠、信用卡返现与现金红包活动。",
   "start_url": "/?source=pwa",
   "scope": "/",

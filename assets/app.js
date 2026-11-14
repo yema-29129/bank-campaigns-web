@@ -139,8 +139,8 @@ function setMeta(selector, value) {
 function setHomeMeta() {
   const isCredit = state.view === 'credit';
   const title = isCredit
-    ? '信用卡活动专区 | 信用卡返现 | 好羊毛银行活动站'
-    : '银行立减金活动网站 | 微信立减金 | 信用卡返现 | 好羊毛银行活动站';
+    ? '信用卡活动专区 | 信用卡返现 | 羊毛助手Pro'
+    : '银行立减金活动网站 | 微信立减金 | 信用卡返现 | 羊毛助手Pro';
   const description = isCredit
     ? '查看信用卡返现、刷卡优惠、现金红包和信用卡活动，支持按银行、标签和时间快速筛选。'
     : '薅羊毛·银行/微信立减金/信用卡返现网站，实时更新微信立减金、返现、信用卡返现、信用卡活动、现金红包等信息。';

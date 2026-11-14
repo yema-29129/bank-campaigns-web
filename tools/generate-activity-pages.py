@@ -21,7 +21,7 @@ from urllib.parse import urlsplit
 import xml.etree.ElementTree as ET
 
 SITE = "https://bank.vooqqqm.com"
-SITE_NAME = "好羊毛银行活动站"
+SITE_NAME = "羊毛助手Pro"
 DIRECTORY = f"{SITE}/activities/"
 OUTPUT = Path(__file__).resolve().parents[1] / "activities"
 SOURCE_HOSTS = frozenset({

@@ -63,35 +63,45 @@
   grid-template-columns: minmax(0, 1fr) minmax(240px, .64fr);
   align-items: center;
   gap: 17px 30px;
-  padding: clamp(14px, 2vw, 22px) clamp(16px, 3vw, 30px);
-  background: linear-gradient(110deg, #e7efff, #f8fbff 82%);
-  border: 1px solid #d7e4fb;
+  padding: clamp(20px, 3.4vw, 38px) clamp(18px, 3.8vw, 44px);
+  background: linear-gradient(110deg, #2f67f4 0%, #4052ea 100%);
+  border: 1px solid rgba(255, 255, 255, .14);
   border-radius: 20px;
+  box-shadow: 0 14px 34px rgba(36, 74, 207, .22);
 }
 
 .home-page .directory-intro h1 {
   margin: 0;
-  font-size: clamp(24px, 3.2vw, 36px);
-  font-weight: 800;
-  letter-spacing: -.035em;
-  line-height: 1.22;
+  color: #fff;
+  font-size: clamp(30px, 4vw, 48px);
+  font-weight: 900;
+  letter-spacing: -.045em;
+  line-height: 1.16;
   text-wrap: balance;
 }
 
 .home-page .directory-intro p {
-  margin: 9px 0 0;
-  color: var(--directory-muted);
-  font-size: clamp(13px, 1.5vw, 15px);
-  line-height: 1.65;
+  margin: 12px 0 0;
+  color: rgba(255, 255, 255, .92);
+  font-size: clamp(15px, 1.8vw, 21px);
+  font-weight: 600;
+  line-height: 1.5;
 }
 
 .home-page .intro-results-link {
   display: inline-block;
-  margin-top: 8px;
-  color: var(--directory-blue);
+  margin-top: 11px;
+  padding: 5px 9px;
+  border-radius: 8px;
+  color: #fff;
+  background: rgba(255, 255, 255, .12);
   font-size: 13px;
   font-weight: 700;
   text-underline-offset: 3px;
+}
+
+.home-page .intro-results-link:hover {
+  background: rgba(255, 255, 255, .2);
 }
 
 .home-page .intro-activity-links {
@@ -102,7 +112,7 @@
 
 .home-page .intro-load-notice {
   margin-inline-start: 10px;
-  color: var(--directory-muted);
+  color: rgba(255, 255, 255, .78);
   font-size: 12px;
 }
 
@@ -236,7 +246,12 @@
 
 .home-page .directory-intro .field-search input {
   background: #fff;
-  border-color: #bdcfee;
+  border-color: rgba(255, 255, 255, .72);
+  box-shadow: 0 8px 22px rgba(20, 47, 145, .18);
+}
+
+.home-page .directory-intro .field-search > span {
+  color: #fff;
 }
 
 .home-page .field-search input::placeholder {
