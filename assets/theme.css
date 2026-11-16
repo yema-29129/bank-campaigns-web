@@ -1,5 +1,5 @@
 /* =========================================================
-   羊毛助手Pro · 全站新主题 theme.css
+   好羊毛银行活动站 · 全站新主题 theme.css
    加载顺序：styles.css → theme.css（最后加载，覆盖旧样式）
    ========================================================= */
 
@@ -237,11 +237,10 @@ body {
 .intro-copy { position: relative; z-index: 1; }
 .intro-copy h1 {
   margin: 0 0 12px;
-  font-size: clamp(28px, 2.4vw, 32px);
+  font-size: clamp(30px, 4vw, 44px);
   line-height: 1.15;
   font-weight: 800;
-  letter-spacing: -.03em;
-  white-space: nowrap;
+  letter-spacing: -.02em;
   color: #fff;
 }
 .intro-copy > p {
@@ -1215,7 +1214,7 @@ details:not([open]) .filter-collapse { display: none; }
   body { font-size: 14px; }
   .site-shell, .info-shell { margin-top: 14px; }
   .directory-intro { padding: 26px 20px; border-radius: 22px; }
-  .intro-copy h1 { font-size: clamp(16px, 4.4vw, 22px); }
+  .intro-copy h1 { font-size: 28px; }
   .intro-copy > p { font-size: 14px; margin-bottom: 16px; }
   .intro-results-link { min-height: 34px; padding: 0 12px; font-size: 12px; }
   .directory-intro .field-search { padding: 14px; }
@@ -1391,3 +1390,128 @@ html, body { overflow-x: clip; }
 /* 去掉卡片顶部彩色细线 */
 .campaign-card::before,
 .detail-card > .detail-hero::before { content: none; display: none; }
+
+/* =========================================================
+   顶部导航栏：微信小程序悬停二维码弹窗
+   ========================================================= */
+.site-header {
+  z-index: 110;
+  overflow: visible;
+}
+
+.site-nav-qr {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  flex: none;
+}
+
+.site-nav-qr-btn {
+  border: 0;
+  background: transparent;
+  cursor: pointer;
+  font-family: inherit;
+}
+
+.site-nav-qr:hover .site-nav-qr-btn,
+.site-nav-qr.is-open .site-nav-qr-btn {
+  background: var(--t-soft);
+  color: var(--t-brand);
+}
+
+.site-nav-qr-pop img {
+  display: block;
+  width: 100%;
+  height: auto;
+  border-radius: 10px;
+}
+
+.site-nav-qr-pop span {
+  display: block;
+  margin-top: 8px;
+  font-size: 12px;
+  font-weight: 600;
+  color: #475569;
+  line-height: 1.4;
+}
+
+@media (min-width: 761px) {
+  .site-nav-qr-pop {
+    position: absolute;
+    top: calc(100% + 10px);
+    left: 50%;
+    width: 212px;
+    padding: 12px 12px 10px;
+    border-radius: 16px;
+    background: #ffffff;
+    border: 1px solid #e2e8f0;
+    box-shadow: 0 18px 44px rgba(15, 27, 45, 0.18);
+    text-align: center;
+    z-index: 300;
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+    transform: translateX(-50%) translateY(6px);
+    transition: opacity 0.16s ease, transform 0.16s ease, visibility 0.16s;
+  }
+
+  /* 悬停桥接，避免鼠标移向卡片时闪烁关闭 */
+  .site-nav-qr-pop::before {
+    content: "";
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: -12px;
+    height: 12px;
+  }
+
+  .site-nav-qr-pop::after {
+    content: "";
+    position: absolute;
+    top: -6px;
+    left: 50%;
+    width: 10px;
+    height: 10px;
+    background: #ffffff;
+    border-left: 1px solid #e2e8f0;
+    border-top: 1px solid #e2e8f0;
+    transform: translateX(-50%) rotate(45deg);
+  }
+
+  .site-nav-qr:hover .site-nav-qr-pop,
+  .site-nav-qr:focus-within .site-nav-qr-pop,
+  .site-nav-qr.is-open .site-nav-qr-pop {
+    opacity: 1;
+    visibility: visible;
+    pointer-events: auto;
+    transform: translateX(-50%) translateY(0);
+  }
+}
+
+@media (max-width: 760px) {
+  .site-nav-qr-pop {
+    display: none;
+    position: fixed;
+    top: 94px;
+    left: 50%;
+    width: 224px;
+    padding: 12px;
+    border-radius: 16px;
+    background: #ffffff;
+    border: 1px solid #e2e8f0;
+    box-shadow: 0 20px 50px rgba(15, 27, 45, 0.25);
+    text-align: center;
+    z-index: 300;
+    transform: translateX(-50%);
+  }
+
+  .site-nav-qr.is-open .site-nav-qr-pop {
+    display: block;
+  }
+}
+
+@media (max-width: 420px) {
+  .site-nav-link { padding: 0 6px; font-size: 12.5px; }
+  .site-nav-link[href*="t.me"] { padding: 0 9px; }
+  .site-nav-link[href*="t.me"]::before { font-size: 12.5px; }
+}

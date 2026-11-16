@@ -1,0 +1,1606 @@
+/* =========================================================
+   好羊毛银行活动站 · 极简雷达列表页 + 分组侧栏 + 右侧详情抽屉
+   仅作用于 body.radar-page（首页），不影响详情页与其它页面
+   ========================================================= */
+
+body.radar-page {
+  margin: 0;
+  background: #f6f8fb;
+  color: #0f1b2d;
+  font-size: 14px;
+  overflow-x: clip;
+}
+
+.radar-page .sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+.radar-page .site-header-inner {
+  width: min(1380px, calc(100% - 32px));
+}
+
+.radar-page .share-sheet,
+.radar-page .lightbox {
+  z-index: 220;
+}
+
+/* ---------- 整体两栏工作台 ---------- */
+.radar-shell {
+  width: min(1380px, 100%);
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: 248px minmax(0, 1fr);
+  min-height: calc(100vh - 65px);
+  background: #ffffff;
+  border-left: 1px solid #ebeff5;
+  border-right: 1px solid #ebeff5;
+}
+
+/* ---------- 左侧栏：搜索 -> 快捷视图 -> 筛选区 -> 社群入口 ---------- */
+.radar-sidebar-backdrop,
+.radar-sidebar-mobile-head {
+  display: none;
+}
+
+.radar-sidebar {
+  position: sticky;
+  top: 65px;
+  height: calc(100vh - 65px);
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  padding: 14px 12px 16px;
+  background: #fbfcfe;
+  border-right: 1px solid #ebeff5;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  scrollbar-width: thin;
+  scrollbar-color: #cbd5e1 transparent;
+}
+
+.radar-sidebar::-webkit-scrollbar {
+  width: 5px;
+}
+.radar-sidebar::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 999px;
+}
+
+/* 搜索框 */
+.radar-search {
+  position: relative;
+  display: flex;
+  align-items: center;
+  width: 100%;
+  flex: none;
+}
+
+.radar-search-icon {
+  position: absolute;
+  left: 10px;
+  width: 15px;
+  height: 15px;
+  color: #94a3b8;
+  pointer-events: none;
+}
+
+.radar-search input[type="search"] {
+  width: 100%;
+  height: 36px;
+  padding: 0 30px 0 32px;
+  border-radius: 10px;
+  border: 1px solid #e2e8f0;
+  background: #ffffff;
+  font-size: 13px;
+  color: #0f1b2d;
+  box-shadow: none;
+  outline: none;
+  transition: border-color 0.15s, box-shadow 0.15s;
+}
+
+.radar-search input[type="search"]::placeholder {
+  color: #94a3b8;
+}
+
+.radar-search input[type="search"]:focus {
+  border-color: #1f5eff;
+  box-shadow: 0 0 0 3px rgba(31, 94, 255, 0.12);
+}
+
+.radar-kbd {
+  position: absolute;
+  right: 9px;
+  display: inline-grid;
+  place-items: center;
+  min-width: 18px;
+  height: 18px;
+  padding: 0 4px;
+  border-radius: 5px;
+  border: 1px solid #e2e8f0;
+  background: #f8fafc;
+  color: #94a3b8;
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 11px;
+  pointer-events: none;
+}
+
+/* 快捷视图 */
+.radar-nav-group {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.radar-group-label {
+  padding: 0 8px 4px;
+  font-size: 11px;
+  font-weight: 700;
+  color: #94a3b8;
+  letter-spacing: 0.03em;
+}
+
+.radar-nav-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  width: 100%;
+  height: 34px;
+  padding: 0 9px;
+  border: 0;
+  border-radius: 9px;
+  background: transparent;
+  color: #334155;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  text-align: left;
+  transition: background 0.15s, color 0.15s;
+}
+
+.radar-nav-item:hover {
+  background: #f1f5f9;
+  color: #0f1b2d;
+}
+
+.radar-nav-item.is-active {
+  background: #eaf1ff;
+  color: #1f5eff;
+  font-weight: 700;
+}
+
+.radar-nav-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+}
+
+.radar-dot {
+  display: inline-block;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  flex: none;
+}
+.radar-dot.is-all { background: #1f5eff; }
+.radar-dot.is-today { background: #10b981; }
+.radar-dot.is-soon { background: #f97316; }
+.radar-dot.is-recurring { background: #8b5cf6; }
+
+.radar-nav-count {
+  padding: 1px 6px;
+  border-radius: 999px;
+  background: #eef2f7;
+  color: #64748b;
+  font-size: 11px;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+
+.radar-nav-item.is-active .radar-nav-count {
+  background: #dbeafe;
+  color: #1f5eff;
+}
+
+/* ---------- 左侧分类筛选区（一级蓝底 / 二级灰底 / 选项白底） ---------- */
+.radar-filter-zone {
+  padding-top: 12px;
+  border-top: 1px solid #eef1f6;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.radar-zone-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 4px 2px;
+  font-size: 11px;
+  font-weight: 700;
+  color: #94a3b8;
+  letter-spacing: 0.03em;
+}
+
+.radar-text-reset {
+  border: 0;
+  background: none;
+  padding: 0;
+  font-size: 11.5px;
+  font-weight: 600;
+  color: #1f5eff;
+  cursor: pointer;
+}
+
+.radar-text-reset:hover {
+  text-decoration: underline;
+}
+
+/* 一级目录：银行分类 / 消费场景 / 支付方式 / 卡组织 / 银行卡种 / 适用地区 */
+.radar-l1 {
+  border: 1px solid #d8e3f5;
+  border-radius: 10px;
+  background: #ffffff;
+  overflow: hidden;
+}
+
+.radar-l1 > summary {
+  list-style: none;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 36px;
+  padding: 0 10px;
+  background: #eef3fc;
+  border-left: 3px solid #1f5eff;
+  color: #163a70;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  user-select: none;
+  transition: background 0.15s ease;
+}
+
+.radar-l1 > summary::-webkit-details-marker {
+  display: none;
+}
+
+.radar-l1 > summary::after {
+  content: "›";
+  margin-left: auto;
+  font-size: 15px;
+  color: #5b7bb2;
+  transition: transform 0.15s ease;
+}
+
+.radar-l1[open] > summary {
+  background: #e3ecfb;
+  border-bottom: 1px solid #d8e3f5;
+  color: #0f2d5c;
+}
+
+.radar-l1[open] > summary::after {
+  transform: rotate(90deg);
+}
+
+.radar-l1-title {
+  min-width: 0;
+}
+
+.radar-l1-badge {
+  padding: 1px 7px;
+  border-radius: 999px;
+  background: #1f5eff;
+  color: #ffffff;
+  font-size: 10.5px;
+  font-weight: 700;
+  max-width: 96px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.radar-l1-badge:empty {
+  display: none;
+}
+
+.radar-l1-body {
+  padding: 8px;
+  background: #ffffff;
+}
+
+/* 3 分段卡种开关 */
+.radar-seg3 {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 3px;
+  padding: 3px;
+  border-radius: 9px;
+  background: #eef2f7;
+}
+
+.radar-seg3 button {
+  height: 28px;
+  border: 0;
+  border-radius: 7px;
+  background: transparent;
+  color: #475569;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s, box-shadow 0.15s;
+}
+
+.radar-seg3 button:hover {
+  color: #0f1b2d;
+}
+
+.radar-seg3 button.is-active {
+  background: #ffffff;
+  color: #1f5eff;
+  font-weight: 700;
+  box-shadow: 0 1px 2px rgba(15, 27, 45, 0.1);
+}
+
+/* 二级目录（银行分类下：国有大行 / 股份制银行 / 地方银行 / 其他银行） */
+.radar-bank-groups {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.radar-l2 {
+  margin-left: 4px;
+  border: 1px solid #e5e7eb;
+  border-left: 2px solid #94a3b8;
+  border-radius: 8px;
+  background: #fafbfc;
+  overflow: hidden;
+}
+
+.radar-l2 > summary {
+  list-style: none;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 31px;
+  padding: 0 9px;
+  background: #f3f4f7;
+  color: #374151;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  user-select: none;
+  transition: background 0.15s ease;
+}
+
+.radar-l2 > summary::-webkit-details-marker {
+  display: none;
+}
+
+.radar-l2 > summary::after {
+  content: "›";
+  margin-left: auto;
+  font-size: 13px;
+  color: #94a3b8;
+  transition: transform 0.15s ease;
+}
+
+.radar-l2[open] > summary {
+  background: #eaedf2;
+  border-bottom: 1px solid #e5e7eb;
+  color: #111827;
+}
+
+.radar-l2[open] > summary::after {
+  transform: rotate(90deg);
+}
+
+.radar-cat-count {
+  font-size: 11px;
+  font-weight: 600;
+  color: #94a3b8;
+  font-variant-numeric: tabular-nums;
+}
+
+.radar-l2 .radar-mini-chips {
+  padding: 7px 6px;
+  background: #ffffff;
+}
+
+.radar-mini-chips {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 5px;
+}
+
+.radar-mini-chip {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 4px;
+  min-width: 0;
+  height: 28px;
+  padding: 0 8px;
+  border: 1px solid #e6ebf2;
+  border-radius: 7px;
+  background: #fbfcfe;
+  color: #334155;
+  font-size: 11.5px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.12s, border-color 0.12s, color 0.12s;
+}
+
+.radar-mini-chip span {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.radar-mini-chip b {
+  flex: none;
+  font-size: 10.5px;
+  font-weight: 600;
+  color: #94a3b8;
+  font-variant-numeric: tabular-nums;
+}
+
+.radar-mini-chip:hover {
+  border-color: #cbd5e1;
+  background: #f1f5f9;
+  color: #0f1b2d;
+}
+
+.radar-mini-chip.is-active {
+  border-color: #1f5eff;
+  background: #eaf1ff;
+  color: #1f5eff;
+  font-weight: 700;
+}
+
+.radar-mini-chip.is-active b {
+  color: #1f5eff;
+}
+
+.radar-mini-chip.is-empty {
+  opacity: 0.45;
+}
+
+.radar-mini-chip.is-group-all {
+  grid-column: 1 / -1;
+  background: #f8fafc;
+}
+
+.radar-bank-all {
+  width: 100%;
+  height: 30px;
+  background: #ffffff;
+}
+
+/* 底部社群入口（已往下挪） */
+.radar-community-group {
+  margin-top: auto;
+  padding-top: 12px;
+  border-top: 1px solid #eef1f6;
+}
+
+.radar-nav-link {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  height: 34px;
+  padding: 0 9px;
+  border-radius: 9px;
+  font-size: 12.5px;
+  font-weight: 600;
+  color: #475569;
+  text-decoration: none;
+  transition: background 0.15s, color 0.15s;
+}
+
+.radar-nav-link:hover {
+  background: #f1f5f9;
+  color: #0f1b2d;
+}
+
+.radar-nav-link.is-tg {
+  background: #f0f8ff;
+  color: #0284c7;
+  margin-bottom: 2px;
+}
+
+.radar-nav-link.is-tg:hover {
+  background: #e0f2fe;
+  color: #0369a1;
+}
+
+/* ---------- 右侧主列 & 顶部场景分类条 ---------- */
+.radar-main {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  background: #ffffff;
+}
+
+.radar-mobile-bar {
+  display: none;
+}
+
+.radar-topstrip {
+  position: sticky;
+  top: 65px;
+  z-index: 25;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px 12px;
+  padding: 10px 20px;
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border-bottom: 1px solid #eef1f6;
+  scroll-margin-top: 72px;
+}
+
+.radar-cat-tabs {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px;
+  min-width: 0;
+}
+
+.radar-cat-tab {
+  height: 31px;
+  padding: 0 12px;
+  border: 1px solid transparent;
+  border-radius: 8px;
+  background: transparent;
+  color: #475569;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: background 0.12s, color 0.12s, border-color 0.12s;
+}
+
+.radar-cat-tab:hover {
+  background: #f1f5f9;
+  color: #0f1b2d;
+}
+
+.radar-cat-tab.is-active {
+  background: #0f1b2d;
+  color: #ffffff;
+}
+
+.radar-strip-meta {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-left: auto;
+  font-size: 12.5px;
+  color: #64748b;
+  font-variant-numeric: tabular-nums;
+}
+
+.radar-filter-summary {
+  color: #1f5eff;
+  font-weight: 600;
+  max-width: 240px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.radar-filter-summary:empty {
+  display: none;
+}
+
+.radar-reset-btn {
+  display: inline-flex;
+  align-items: center;
+  height: 28px;
+  padding: 0 10px;
+  border-radius: 7px;
+  border: 1px solid #fecaca;
+  background: #fff5f5;
+  color: #dc2626;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.radar-reset-btn:hover {
+  background: #fee2e2;
+}
+
+.radar-result-count {
+  white-space: nowrap;
+}
+
+.radar-icon-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  padding: 0;
+  border-radius: 7px;
+  border: 1px solid #e2e8f0;
+  background: #ffffff;
+  color: #334155;
+  font-size: 14px;
+  cursor: pointer;
+}
+
+.radar-icon-btn:hover {
+  background: #f8fafc;
+  border-color: #cbd5e1;
+}
+
+.radar-icon-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* ---------- 列表容器与序号行 ---------- */
+.radar-feed-wrap {
+  flex: 1;
+  min-width: 0;
+}
+
+.radar-feed-wrap > .state-card {
+  margin: 24px;
+}
+
+.radar-list {
+  display: flex;
+  flex-direction: column;
+}
+
+.radar-row {
+  display: grid;
+  grid-template-columns: 54px minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 12px;
+  padding: 13px 22px;
+  border-bottom: 1px solid #f1f4f9;
+  border-left: 3px solid transparent;
+  text-decoration: none;
+  color: inherit;
+  transition: background 0.12s ease, border-color 0.12s ease;
+}
+
+.radar-row:hover {
+  background: #f8faff;
+}
+
+.radar-row:hover .radar-row-title {
+  color: #1f5eff;
+}
+
+.radar-row.is-selected {
+  background: #eff6ff;
+  border-left-color: #1f5eff;
+}
+
+.radar-row.is-selected .radar-row-title {
+  color: #1d4ed8;
+}
+
+.radar-row.is-expired {
+  opacity: 0.62;
+}
+
+.radar-rank {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-variant-numeric: tabular-nums;
+  min-width: 0;
+}
+
+.radar-status-dot {
+  flex: none;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #10b981;
+}
+.radar-status-dot.is-today { background: #2563eb; }
+.radar-status-dot.is-soon { background: #f97316; }
+.radar-status-dot.is-expired { background: #cbd5e1; }
+
+.radar-num {
+  font-size: 13.5px;
+  font-weight: 700;
+  color: #059669;
+  line-height: 1;
+}
+.radar-row.is-soon .radar-num { color: #ea580c; }
+.radar-row.is-expired .radar-num { color: #94a3b8; }
+
+.radar-row-body {
+  min-width: 0;
+}
+
+.radar-row-line1 {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 6px;
+  line-height: 1.45;
+}
+
+.radar-row-title {
+  font-size: 14.5px;
+  font-weight: 600;
+  color: #0f1b2d;
+  transition: color 0.12s ease;
+  word-break: break-word;
+}
+
+.radar-tag {
+  display: inline-flex;
+  align-items: center;
+  padding: 1px 6px;
+  border-radius: 4px;
+  font-size: 11px;
+  font-weight: 600;
+  line-height: 1.5;
+  white-space: nowrap;
+}
+.radar-tag.is-new { background: #e0f2fe; color: #0369a1; }
+.radar-tag.is-soon { background: #ffedd5; color: #c2410c; }
+.radar-tag.is-credit { background: #ede9fe; color: #6d28d9; }
+.radar-tag.is-recurring { background: #dcfce7; color: #15803d; }
+.radar-tag.is-expired { background: #f1f5f9; color: #64748b; }
+
+.radar-row-meta {
+  margin-top: 3px;
+  font-size: 12px;
+  color: #64748b;
+  line-height: 1.4;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.radar-row-side {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 12px;
+  color: #94a3b8;
+  white-space: nowrap;
+  font-variant-numeric: tabular-nums;
+}
+
+.radar-row-jump {
+  font-size: 13px;
+  color: #94a3b8;
+  transition: color 0.12s, transform 0.12s;
+}
+
+.radar-row:hover .radar-row-jump {
+  color: #1f5eff;
+  transform: translate(1px, -1px);
+}
+
+/* 已过期折叠区块 */
+.radar-feed-wrap .expired-panel {
+  margin: 16px 22px;
+  border-radius: 14px;
+  border: 1px solid #eef1f6;
+  background: #fbfcfe;
+  overflow: hidden;
+  gap: 0;
+}
+
+.radar-feed-wrap .expired-toggle {
+  min-height: 44px;
+  padding: 0 16px;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  font-size: 13px;
+  color: #475569;
+}
+
+.radar-feed-wrap .expired-grid {
+  display: flex;
+  flex-direction: column;
+  border-top: 1px solid #eef1f6;
+  background: #ffffff;
+}
+
+/* ---------- 极简页脚 ---------- */
+.radar-footer {
+  padding: 18px 22px 24px;
+  border-top: 1px solid #eef1f6;
+  background: #fbfcfe;
+  font-size: 12px;
+  line-height: 1.8;
+  color: #7a879a;
+}
+
+.radar-footer-links {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px 12px;
+}
+
+.radar-footer-links a {
+  color: #475569;
+  text-decoration: none;
+}
+
+.radar-footer-links a:hover {
+  color: #1f5eff;
+  text-decoration: underline;
+}
+
+.radar-footer-sep {
+  color: #cbd5e1;
+}
+
+.radar-footer-copy {
+  margin-top: 4px;
+  color: #94a3b8;
+}
+
+/* =========================================================
+   右侧极简详情抽屉
+   ========================================================= */
+.radar-drawer-backdrop {
+  display: none;
+}
+
+.radar-drawer {
+  position: fixed;
+  top: 65px;
+  right: 0;
+  bottom: 0;
+  width: min(520px, 44vw);
+  min-width: 400px;
+  z-index: 80;
+  background: #ffffff;
+  border-left: 1px solid #e2e8f0;
+  box-shadow: -12px 0 36px rgba(15, 27, 45, 0.10);
+  display: flex;
+  flex-direction: column;
+  transform: translateX(100%);
+  transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.radar-drawer.is-open {
+  transform: translateX(0);
+}
+
+.radar-drawer-head {
+  flex: none;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  min-height: 52px;
+  padding: 0 18px;
+  border-bottom: 1px solid #eef1f6;
+  background: #fbfcfe;
+}
+
+.radar-drawer-meta {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+}
+
+.radar-drawer-tools {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex: none;
+}
+
+.radar-tool-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  height: 30px;
+  padding: 0 10px;
+  border-radius: 7px;
+  border: 1px solid #e2e8f0;
+  background: #ffffff;
+  color: #334155;
+  font-size: 12.5px;
+  font-weight: 600;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.radar-tool-btn:hover {
+  border-color: #cbd5e1;
+  background: #f8fafc;
+  color: #0f1b2d;
+}
+
+.radar-tool-btn.is-close {
+  width: 30px;
+  padding: 0;
+}
+
+.radar-drawer-body {
+  flex: 1;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  padding: 22px 24px 32px;
+}
+
+/* 极简详情正文 */
+.clean-bank-name {
+  font-size: 13px;
+  font-weight: 700;
+  color: #0f1b2d;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.clean-status {
+  flex: none;
+  padding: 2px 8px;
+  border-radius: 999px;
+  font-size: 11px;
+  font-weight: 700;
+}
+.clean-status.is-live { background: #e8f7ef; color: #0f9d58; }
+.clean-status.is-soon { background: #fff3ec; color: #ea580c; }
+.clean-status.is-ended { background: #f1f5f9; color: #64748b; }
+
+.clean-top-links {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  margin: 0 0 12px;
+}
+
+.clean-top-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  height: 28px;
+  padding: 0 11px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 600;
+  line-height: 1;
+  text-decoration: none !important;
+  cursor: pointer;
+  transition: background 0.15s ease, border-color 0.15s ease, color 0.15s ease;
+}
+
+.clean-top-pill.is-tg {
+  background: #f0f7ff;
+  border: 1px solid #dbeafe;
+  color: #1d4ed8;
+}
+
+.clean-top-pill.is-tg:hover {
+  background: #e0effe;
+  border-color: #bfdbfe;
+}
+
+.clean-top-pill.is-wx {
+  background: #ecfdf5;
+  border: 1px solid #d1fae5;
+  color: #047857;
+}
+
+.clean-top-pill.is-wx:hover {
+  background: #d1fae5;
+  border-color: #a7f3d0;
+}
+
+.clean-top-pill:focus:not(:focus-visible) {
+  outline: none;
+}
+
+.clean-title {
+  margin: 0 0 8px;
+  font-size: 19px;
+  line-height: 1.4;
+  font-weight: 800;
+  color: #0f1b2d;
+}
+
+.clean-desc {
+  margin: 0 0 16px;
+  font-size: 14px;
+  line-height: 1.7;
+  color: #475569;
+}
+
+.clean-kv-grid {
+  margin: 0 0 16px;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.clean-kv-grid > div {
+  padding: 9px 11px;
+  border-radius: 10px;
+  background: #f8fafc;
+  border: 1px solid #f1f5f9;
+  min-width: 0;
+}
+
+.clean-kv-grid dt {
+  font-size: 11.5px;
+  color: #64748b;
+  margin-bottom: 2px;
+}
+
+.clean-kv-grid dd {
+  margin: 0;
+  font-size: 13px;
+  font-weight: 700;
+  color: #0f1b2d;
+  word-break: break-word;
+}
+
+.clean-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 4px;
+}
+
+.clean-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  height: 36px;
+  padding: 0 15px;
+  border-radius: 9px;
+  border: 1px solid #e2e8f0;
+  background: #ffffff;
+  color: #0f1b2d;
+  font-size: 13px;
+  font-weight: 600;
+  text-decoration: none;
+  cursor: pointer;
+  transition: background 0.12s, border-color 0.12s;
+}
+
+.clean-btn:hover {
+  border-color: #cbd5e1;
+  background: #f8fafc;
+}
+
+.clean-btn.is-primary {
+  border-color: #1f5eff;
+  background: #1f5eff;
+  color: #ffffff;
+}
+
+.clean-btn.is-primary:hover {
+  background: #174ed9;
+}
+
+.clean-path-box {
+  margin-top: 10px;
+  padding: 9px 11px;
+  border-radius: 8px;
+  background: #f8fafc;
+  border: 1px dashed #cbd5e1;
+  font-size: 12.5px;
+  color: #334155;
+  word-break: break-all;
+}
+
+.clean-section {
+  margin-top: 20px;
+  padding-top: 18px;
+  border-top: 1px solid #eef1f6;
+}
+
+.clean-section h3 {
+  margin: 0 0 12px;
+  font-size: 15px;
+  font-weight: 800;
+  color: #0f1b2d;
+  letter-spacing: 0.01em;
+}
+
+.clean-rules-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.clean-rule-group {
+  padding: 12px 14px;
+  border-radius: 10px;
+  background: #f8fafc;
+  border: 1px solid #edf2f7;
+}
+
+.clean-rule-group h4 {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  margin: 0 0 9px;
+  padding-bottom: 7px;
+  border-bottom: 1px solid #e9eef5;
+  font-size: 13px;
+  font-weight: 700;
+  color: #0f1b2d;
+  line-height: 1.4;
+}
+
+.clean-rule-group h4::before {
+  content: "";
+  width: 3px;
+  height: 12px;
+  border-radius: 2px;
+  background: #1f5eff;
+  flex: none;
+}
+
+.clean-rule-items {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+}
+
+.clean-p {
+  margin: 0;
+  font-size: 13.5px;
+  line-height: 1.78;
+  color: #334155;
+  word-break: break-word;
+}
+
+.clean-p.is-bullet {
+  position: relative;
+  padding-left: 13px;
+}
+
+.clean-p.is-bullet::before {
+  content: "";
+  position: absolute;
+  left: 1px;
+  top: 0.74em;
+  width: 4.5px;
+  height: 4.5px;
+  border-radius: 50%;
+  background: #94a3b8;
+}
+
+.clean-p.is-url {
+  margin-top: 2px;
+  line-height: 1.55;
+}
+
+.clean-rule-key {
+  color: #0f1b2d;
+  font-weight: 700;
+}
+
+.clean-num {
+  color: #dc2626;
+  font-weight: 600;
+  padding: 0 1px;
+}
+
+.clean-inline-link {
+  color: #1f5eff;
+  font-size: 12.5px;
+  font-weight: 500;
+  word-break: break-all;
+  text-decoration: none;
+  border-bottom: 1px dashed rgba(31, 94, 255, 0.38);
+}
+
+.clean-inline-link:hover {
+  border-bottom-style: solid;
+  color: #174ed9;
+}
+
+.clean-steps {
+  margin: 0;
+  padding: 11px 14px 11px 30px;
+  border-radius: 10px;
+  background: #f8fafc;
+  border: 1px solid #edf2f7;
+  display: grid;
+  gap: 6px;
+}
+
+.clean-steps li {
+  font-size: 13.5px;
+  line-height: 1.65;
+  color: #334155;
+}
+
+.clean-loading,
+.clean-error {
+  margin-top: 16px;
+  padding: 14px;
+  border-radius: 10px;
+  background: #f8fafc;
+  color: #64748b;
+  font-size: 13px;
+}
+
+.clean-error {
+  background: #fff5f5;
+  color: #b91c1c;
+}
+
+.clean-foot {
+  margin-top: 20px;
+  padding-top: 14px;
+  border-top: 1px solid #eef1f6;
+}
+
+.clean-foot p {
+  margin: 0;
+  font-size: 12px;
+  color: #94a3b8;
+  line-height: 1.6;
+}
+
+/* =========================================================
+   中等屏幕 & 手机端适配
+   ========================================================= */
+@media (max-width: 960px) {
+  body.drawer-open {
+    overflow: hidden;
+  }
+
+  .radar-drawer-backdrop {
+    display: block;
+    position: fixed;
+    inset: 0;
+    z-index: 125;
+    background: rgba(15, 27, 45, 0.45);
+    backdrop-filter: blur(2px);
+  }
+
+  .radar-drawer {
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    width: 100%;
+    height: 100dvh;
+    min-width: 0;
+    z-index: 130;
+    border-left: 0;
+  }
+
+  .radar-drawer-head {
+    padding: env(safe-area-inset-top, 0px) 14px 0;
+    min-height: calc(52px + env(safe-area-inset-top, 0px));
+  }
+
+  .radar-drawer-body {
+    padding: 16px 15px calc(28px + env(safe-area-inset-bottom, 0px));
+    -webkit-overflow-scrolling: touch;
+  }
+}
+
+@media (max-width: 860px) {
+  body.sidebar-open {
+    overflow: hidden;
+  }
+
+  .radar-page .site-header-inner {
+    width: calc(100% - 24px);
+  }
+
+  .radar-shell {
+    grid-template-columns: 1fr;
+    border-left: 0;
+    border-right: 0;
+    min-height: 0;
+  }
+
+  .radar-sidebar-backdrop {
+    display: block;
+    position: fixed;
+    inset: 0;
+    z-index: 115;
+    background: rgba(15, 27, 45, 0.4);
+    backdrop-filter: blur(2px);
+  }
+
+  .radar-sidebar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    width: min(310px, 86vw);
+    height: 100dvh;
+    z-index: 120;
+    background: #ffffff;
+    box-shadow: 16px 0 40px rgba(15, 27, 45, 0.18);
+    transform: translateX(-105%);
+    transition: transform 0.2s ease;
+    padding: 14px 14px calc(20px + env(safe-area-inset-bottom, 0px));
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .radar-sidebar.is-mobile-open {
+    transform: translateX(0);
+  }
+
+  .radar-sidebar-mobile-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding-bottom: 10px;
+    border-bottom: 1px solid #eef1f6;
+  }
+
+  .radar-sidebar-mobile-head strong {
+    font-size: 15px;
+    font-weight: 800;
+  }
+
+  .radar-close-btn {
+    height: 30px;
+    padding: 0 12px;
+    border-radius: 8px;
+    border: 0;
+    background: #1f5eff;
+    color: #ffffff;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+  }
+
+  .radar-sidebar .radar-kbd {
+    display: none;
+  }
+
+  .radar-sidebar .radar-search input[type="search"] {
+    font-size: 16px;
+  }
+
+  /* 手机端搜索 + 筛选按钮 + 快捷标签 */
+  .radar-mobile-bar {
+    display: grid;
+    gap: 8px;
+    padding: 10px 14px;
+    background: #fbfcfe;
+    border-bottom: 1px solid #eef1f6;
+  }
+
+  .radar-mobile-search-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    min-width: 0;
+  }
+
+  .radar-mobile-search {
+    flex: 1;
+    min-width: 0;
+  }
+
+  .radar-mobile-search input[type="search"] {
+    height: 38px;
+    padding-right: 12px;
+    font-size: 16px;
+  }
+
+  .radar-mobile-filter-btn {
+    flex: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    height: 38px;
+    padding: 0 13px;
+    border: 1px solid #e2e8f0;
+    border-radius: 10px;
+    background: #ffffff;
+    color: #0f1b2d;
+    font-size: 13px;
+    font-weight: 700;
+    cursor: pointer;
+    white-space: nowrap;
+  }
+
+  .radar-filter-badge {
+    display: inline-grid;
+    place-items: center;
+    min-width: 18px;
+    height: 18px;
+    padding: 0 5px;
+    border-radius: 999px;
+    background: #1f5eff;
+    color: #ffffff;
+    font-size: 11px;
+    font-weight: 700;
+  }
+
+  .radar-mobile-quick {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 6px;
+  }
+
+  .radar-mq-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 3px;
+    min-width: 0;
+    height: 32px;
+    padding: 0 4px;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    background: #ffffff;
+    color: #475569;
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    white-space: nowrap;
+  }
+
+  .radar-mq-btn.is-active {
+    border-color: #bfdbfe;
+    background: #eaf1ff;
+    color: #1f5eff;
+    font-weight: 700;
+  }
+
+  .radar-mq-count {
+    font-size: 10.5px;
+    color: #94a3b8;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .radar-mq-btn.is-active .radar-mq-count {
+    color: #1f5eff;
+  }
+
+  /* 手机端顶部场景条：横向平滑滑动 */
+  .radar-topstrip {
+    position: static;
+    padding: 8px 14px;
+    gap: 6px;
+  }
+
+  .radar-cat-tabs {
+    width: 100%;
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    scrollbar-width: none;
+    -webkit-overflow-scrolling: touch;
+    padding-bottom: 2px;
+  }
+
+  .radar-cat-tabs::-webkit-scrollbar {
+    display: none;
+  }
+
+  .radar-strip-meta {
+    width: 100%;
+    margin-left: 0;
+  }
+
+  .radar-result-count {
+    margin-left: auto;
+  }
+
+  .radar-row {
+    grid-template-columns: 42px minmax(0, 1fr) 16px;
+    gap: 8px;
+    padding: 12px 14px;
+    align-items: flex-start;
+  }
+
+  .radar-rank {
+    padding-top: 3px;
+    gap: 6px;
+  }
+
+  .radar-num {
+    font-size: 13px;
+  }
+
+  .radar-row-side {
+    padding-top: 3px;
+  }
+
+  .radar-feed-wrap > .state-card,
+  .radar-feed-wrap .expired-panel {
+    margin: 14px;
+  }
+
+  .radar-footer {
+    padding: 16px 14px 22px;
+  }
+}
+
+@media (max-width: 640px) {
+  .radar-row-time {
+    display: none;
+  }
+
+  .radar-drawer-head {
+    gap: 6px;
+    padding-left: 12px;
+    padding-right: 12px;
+  }
+
+  .radar-tool-btn {
+    height: 32px;
+    padding: 0 9px;
+    font-size: 12px;
+  }
+
+  .radar-tool-btn.is-close {
+    width: 32px;
+    padding: 0;
+  }
+
+  .clean-top-links {
+    gap: 6px;
+    margin-bottom: 10px;
+  }
+
+  .clean-top-pill {
+    height: 30px;
+    padding: 0 10px;
+    font-size: 12px;
+  }
+
+  .clean-title {
+    font-size: 17.5px;
+    line-height: 1.42;
+  }
+
+  .clean-desc {
+    font-size: 13.5px;
+    margin-bottom: 14px;
+  }
+
+  .clean-actions {
+    gap: 8px;
+  }
+
+  .clean-actions .clean-btn {
+    height: 38px;
+    flex: 1 1 auto;
+  }
+
+  .clean-rule-group {
+    padding: 11px 12px;
+  }
+
+  .clean-steps {
+    padding: 10px 12px 10px 28px;
+  }
+}

@@ -91,13 +91,13 @@ function updateStructuredData(data, url, description) {
   const payload = {
     '@context': 'https://schema.org',
     '@type': 'WebPage',
-    name: `${data.title || '活动详情'} | 羊毛助手Pro`,
+    name: `${data.title || '活动详情'} | 好羊毛银行活动站`,
     url,
     description,
     inLanguage: 'zh-CN',
     isPartOf: {
       '@type': 'WebSite',
-      name: '羊毛助手Pro',
+      name: '好羊毛银行活动站',
       url: 'https://bank.vooqqqm.com/'
     }
   };
@@ -106,7 +106,7 @@ function updateStructuredData(data, url, description) {
 }
 
 function updateDetailMeta(activity) {
-  const title = `${activity.title || '活动详情'} | ${activity.bankName || '银行活动'} | 羊毛助手Pro`;
+  const title = `${activity.title || '活动详情'} | ${activity.bankName || '银行活动'} | 好羊毛银行活动站`;
   const description = [
     activity.desc || '',
     activity.channel ? `渠道：${activity.channel}` : '',
@@ -383,18 +383,51 @@ function dxGetStatus(activity) {
   return { cls: 'is-live', text: '进行中', countdownLabel: '', countdown: '' };
 }
 
-function dxFormatInline(line) {
-  let html = escapeHtml(line);
-  // 前缀标签加粗，例如“活动对象：”“活动1（大额消费达标）：”
-  html = html.replace(/^([^：:，。,]{2,18}?)([：:])/, '<b>$1</b>$2');
-  // 金额高亮
-  html = html.replace(/(\d+(?:\.\d+)?\s*(?:万元|元|万))/g, '<span class="dx-num">$1</span>');
+const DX_PURE_URL_RE = /^https?:\/\/\S+$/i;
+const DX_INLINE_URL_RE = /https?:\/\/[^\s<>"'）)】]+/gi;
+const DX_HAS_PREFIX_MARKER_RE = /^(?:[\d①②③④⑤⑥⑦⑧⑨⑩]+[.、)）]|[-•·*]|[（(]\d+[)）])/;
+
+function dxFormatTextSegment(text, isStartOfLine) {
+  let html = escapeHtml(text);
+  if (isStartOfLine) {
+    html = html.replace(/^([^：:，。,；;|（(\s]{2,14}?)([：:])/, '<span class="dx-rule-key">$1$2</span>');
+  }
+  html = html.replace(/(\d+(?:\.\d+)?\s*(?:万元|元|万|港元|港币|折))/g, '<span class="dx-num">$1</span>');
   return html;
+}
+
+function dxFormatInline(line) {
+  const raw = String(line || '');
+  const urlRe = new RegExp(DX_INLINE_URL_RE.source, 'gi');
+  let out = '';
+  let lastIndex = 0;
+  let match;
+
+  while ((match = urlRe.exec(raw)) !== null) {
+    if (match.index > lastIndex) {
+      out += dxFormatTextSegment(raw.slice(lastIndex, match.index), lastIndex === 0);
+    }
+    const rawUrl = match[0];
+    const url = rawUrl.replace(/[。，；、,.!?;:)]+$/, '');
+    const trailing = rawUrl.slice(url.length);
+    if (url) {
+      out += `<a class="dx-inline-link" href="${escapeAttribute(url)}" target="_blank" rel="noopener noreferrer">${escapeHtml(url)} ↗</a>`;
+    }
+    if (trailing) {
+      out += escapeHtml(trailing);
+    }
+    lastIndex = match.index + rawUrl.length;
+  }
+
+  if (lastIndex < raw.length) {
+    out += dxFormatTextSegment(raw.slice(lastIndex), lastIndex === 0);
+  }
+  return out;
 }
 
 function dxRenderRules(text) {
   const raw = String(text || '').replace(/\r\n?/g, '\n').trim();
-  if (!raw || raw === '--') return '<p class="dx-rule-item">暂无内容</p>';
+  if (!raw || raw === '--') return '<p class="dx-clean-p">暂无详细规则</p>';
 
   const groups = [];
   let current = null;
@@ -413,46 +446,39 @@ function dxRenderRules(text) {
     current.items.push(line);
   });
 
-  return `<div class="dx-rules">${groups.map((g) => `
-    <div class="dx-rule-group">
-      ${g.title ? `<h3>${escapeHtml(g.title)}</h3>` : ''}
-      <div class="dx-rule-items">
-        ${g.items.map((item) => `<p class="dx-rule-item${/^活动\s*[0-9一二三四五]/.test(item) ? ' is-boxed' : ''}">${dxFormatInline(item)}</p>`).join('')}
+  return `<div class="dx-clean-rules-list">${groups.map((g) => {
+    const nonUrlCount = g.items.filter((it) => !DX_PURE_URL_RE.test(it)).length;
+    return `
+      <div class="dx-clean-rule-group">
+        ${g.title ? `<h3>${escapeHtml(g.title)}</h3>` : ''}
+        <div class="dx-clean-rule-items">
+          ${g.items.map((item) => {
+            if (DX_PURE_URL_RE.test(item)) {
+              return `<p class="dx-clean-p is-url">${dxFormatInline(item)}</p>`;
+            }
+            if (nonUrlCount > 1 && !DX_HAS_PREFIX_MARKER_RE.test(item)) {
+              return `<p class="dx-clean-p is-bullet">${dxFormatInline(item)}</p>`;
+            }
+            return `<p class="dx-clean-p">${dxFormatInline(item)}</p>`;
+          }).join('')}
+        </div>
       </div>
-    </div>`).join('')}</div>`;
+    `;
+  }).join('')}</div>`;
 }
 
 function dxRenderSteps(text) {
   const raw = String(text || '').replace(/\r\n?/g, '\n').trim();
-  if (!raw || raw === '--') return '<p class="dx-rule-item">暂无内容</p>';
-  if (!/→|->|➜|⇒/.test(raw)) return dxRenderRules(raw);
+  if (!raw || raw === '--') return '';
+  if (!/→|->|➜|⇒/.test(raw)) {
+    return raw.split('\n').map((l) => l.trim()).filter(Boolean)
+      .map((l) => `<p class="dx-clean-p">${dxFormatInline(l)}</p>`).join('');
+  }
   const steps = raw
     .split(/\s*(?:→|->|➜|⇒|\n)\s*/)
     .map((s) => s.replace(/[。；;]+$/, '').trim())
     .filter(Boolean);
-  return `<ol class="dx-steps">${steps.map((s) => `<li class="dx-step"><div class="dx-step-text">${escapeHtml(s)}</div></li>`).join('')}</ol>`;
-}
-
-function dxBindTabs() {
-  const tabs = Array.from(document.querySelectorAll('.dx-tabs a'));
-  if (!tabs.length || !('IntersectionObserver' in window)) return;
-  const map = new Map();
-  tabs.forEach((a) => {
-    const target = document.getElementById(a.getAttribute('href').slice(1));
-    if (target) map.set(target, a);
-  });
-  const observer = new IntersectionObserver((entries) => {
-    entries.forEach((entry) => {
-      if (!entry.isIntersecting) return;
-      tabs.forEach((t) => t.classList.remove('is-active'));
-      const tab = map.get(entry.target);
-      if (tab) {
-        tab.classList.add('is-active');
-        tab.scrollIntoView({ block: 'nearest', inline: 'nearest' });
-      }
-    });
-  }, { rootMargin: '-90px 0px -60% 0px' });
-  map.forEach((_, el) => observer.observe(el));
+  return `<ol class="dx-clean-steps">${steps.map((s) => `<li>${escapeHtml(s)}</li>`).join('')}</ol>`;
 }
 
 function renderDetail(activity) {
@@ -460,199 +486,109 @@ function renderDetail(activity) {
   updateDetailMeta(activity);
 
   const posterUrl = resolvePosterUrl(activity);
-  const isPathUrlLink = /^https?:\/\//i.test(activity.pathUrl || '');
+  const pathUrl = String(activity.pathUrl || '').trim();
+  const isPathUrlLink = /^https?:\/\//i.test(pathUrl);
   const status = dxGetStatus(activity);
 
-  const timeText = (activity.validFrom || activity.validTo) ? `${activity.validFrom || '--'} 至 ${activity.validTo || '--'}` : '--';
-  const minText = (activity.minAmount || activity.minAmount === 0) ? `${activity.minAmount} 元` : '--';
-
-  // 大金额
-  const dMin = dxNum(activity.discountMin);
-  const dMax = dxNum(activity.discountMax);
-  const dOne = dxNum(activity.discountAmount);
-  const bigAmount = dMax !== null ? dMax : (dOne !== null ? dOne : dMin);
-  const isRange = dMin !== null && dMax !== null && dMin !== dMax;
-  const prizeLabel = isRange ? '最高可得立减金' : '立减金额';
-  const prizeSub = [
-    isRange ? `${dxFmtMoney(dMin)} ~ ${dxFmtMoney(dMax)} 元` : '',
-    activity.minAmount || activity.minAmount === 0 ? `满 ${activity.minAmount} 元可用` : ''
-  ].filter(Boolean).join(' · ') || '以官方活动规则为准';
-
-  const bigAmountHtml = bigAmount !== null
-    ? `<small>¥</small><strong>${escapeHtml(dxFmtMoney(bigAmount))}</strong>`
-    : `<strong style="font-size:40px">${escapeHtml(activity.cashbackRate || '见规则')}</strong>`;
-
-  // 关键信息
-  const facts = [
-    ['💳', '最低门槛', minText],
-    ['📅', '活动时间', timeText],
-    ['📍', '适用地区', activity.region || '--'],
-    ['🛒', '消费渠道', activity.channel || '--'],
-    ['🔁', '重复规则', activity.recurringText || ''],
-    ['💰', '返现比例', activity.cashbackRate || '']
-  ].filter(([, , v]) => v && v !== '--' || false);
-  const factsHtml = facts.slice(0, 6).map(([icon, label, value]) => `
-    <div class="dx-fact">
-      <span class="dx-fact-icon" aria-hidden="true">${icon}</span>
-      <div>
-        <span class="dx-fact-label">${escapeHtml(label)}</span>
-        <span class="dx-fact-value">${escapeHtml(value)}</span>
-      </div>
-    </div>`).join('');
+  const discount = buildDiscountText(activity);
+  const amountVal = discount !== '--' ? discount : (activity.cashbackRate || '');
+  const minVal = (activity.minAmount || activity.minAmount === 0) ? `${activity.minAmount} 元` : '';
+  const timeVal = (activity.validFrom || activity.validTo) ? `${activity.validFrom || '--'} 至 ${activity.validTo || '--'}` : '';
+  const channelVal = activity.channel || activity.consumeChannel || '';
+  const regionVal = activity.region || '';
+  const recurringVal = activity.recurringText || '';
 
   const kvItems = [
-    ['银行', activity.bankName || '--'],
-    ['立减金额', buildDiscountText(activity)],
-    ['最低门槛', minText],
-    ['消费渠道', activity.channel || '--'],
-    ['返现比例', activity.cashbackRate || '--'],
-    ['重复规则', activity.recurringText || '--'],
-    ['适用地区', activity.region || '--'],
-    ['最近更新', activity.updatedDate || activity.updatedAt || activity.createdAt || '--']
-  ].filter(([, v]) => v !== '--');
-  const kvHtml = kvItems.map(([k, v]) => `<div class="dx-kv-row"><dt>${escapeHtml(k)}</dt><dd>${escapeHtml(v)}</dd></div>`).join('');
+    ['优惠额度', amountVal],
+    ['最低门槛', minVal],
+    ['活动时间', timeVal],
+    ['消费渠道', channelVal],
+    ['卡组织', activity.cardOrg || ''],
+    ['适用地区', regionVal],
+    ['重复规则', recurringVal]
+  ].filter(([, v]) => Boolean(v));
 
   const bankName = activity.bankName || '银行活动';
-  const bankMark = bankName.replace(/^中国/, '').charAt(0) || '银';
   const tags = (activity.tags || [])
     .filter((t) => t && t !== bankName)
-    .map((tag) => `<span class="dx-tag">${escapeHtml(tag)}</span>`).join('');
-
-  const primaryAction = isPathUrlLink
-    ? `<a class="dx-btn dx-btn-white" href="${escapeAttribute(activity.pathUrl)}" target="_blank" rel="noopener noreferrer">立即参与 →</a>`
-    : `<a class="dx-btn dx-btn-white" href="#participation">查看参与方式 ↓</a>`;
+    .map((tag) => `<span class="dx-clean-tag">${escapeHtml(tag)}</span>`).join('');
+  const stepsHtml = dxRenderSteps(activity.pathDesc);
 
   const html = `
-    <article class="dx">
-      <nav class="dx-crumb" aria-label="面包屑">
-        <a href="./index.html">首页</a><span>/</span>
-        <a href="./index.html#listTitle">活动列表</a><span>/</span>
-        <span>${escapeHtml(activity.title || '活动详情')}</span>
-      </nav>
-
-      <section class="dx-card dx-hero">
-        <div class="dx-hero-main">
-          <div class="dx-hero-head">
-            <span class="dx-bank"><span class="dx-bank-logo">${escapeHtml(bankMark)}</span>${escapeHtml(bankName)}</span>
-            <span class="dx-status ${status.cls}">${status.text}</span>
-            ${tags}
-          </div>
-          <h1 class="dx-title">${escapeHtml(activity.title || '活动详情')}</h1>
-          <p class="dx-desc">${escapeHtml(activity.desc || '暂无活动描述')}</p>
-          <div class="dx-facts">${factsHtml}</div>
-        </div>
-
-        <aside class="dx-prize">
-          <span class="dx-prize-label">${prizeLabel}</span>
-          <div class="dx-prize-amount">${bigAmountHtml}</div>
-          <div class="dx-prize-sub">${escapeHtml(prizeSub)}</div>
-          ${status.countdown ? `<div class="dx-prize-countdown"><span>${status.countdownLabel}</span><b>${status.countdown}</b></div>` : ''}
-          <div class="dx-prize-actions">
-            ${primaryAction}
-            <button class="dx-btn dx-btn-glass" type="button" data-dx-share>分享给好友</button>
-          </div>
-        </aside>
-      </section>
-
-      <a class="dx-card dx-tg-join" href="https://t.me/yangmaozhushou" target="_blank" rel="noopener noreferrer">
-        <span class="dx-tg-icon" aria-hidden="true">✈</span>
-        <span class="dx-tg-join-copy"><strong>加入 Telegram 羊毛社群</strong><span>第一时间收到银行立减金、信用卡返现提醒</span></span>
-        <span class="dx-tg-join-btn">立即加入</span>
-      </a>
-
-      <nav class="dx-card dx-tabs" aria-label="活动详情目录">
-        <a href="#offer-details" class="is-active">活动规则</a>
-        <a href="#participation">参与步骤</a>
-        ${activity.pathUrl ? '<a href="#activity-link">活动链接</a>' : ''}
-        <a href="#activity-image">活动图片</a>
-        <a href="#activity-notes">信息汇总</a>
-        <a href="#telegram-reminder">优惠提醒</a>
-      </nav>
-
-      <div class="dx-body">
-        <div class="dx-main">
-          <section class="dx-card dx-section" id="offer-details">
-            <div class="dx-section-head"><span class="dx-section-icon">🎁</span><h2>活动规则</h2></div>
-            ${dxRenderRules(activity.awardDesc)}
-          </section>
-
-          <section class="dx-card dx-section" id="participation">
-            <div class="dx-section-head"><span class="dx-section-icon">🧭</span><h2>参与步骤</h2></div>
-            ${dxRenderSteps(activity.pathDesc)}
-          </section>
-
-          ${activity.pathUrl ? `
-          <section class="dx-card dx-section" id="activity-link">
-            <div class="dx-section-head"><span class="dx-section-icon">🔗</span><h2>活动链接</h2></div>
-            <div class="dx-link">${escapeHtml(activity.pathUrl)}</div>
-            <div class="dx-link-actions">
-              ${isPathUrlLink ? `<a class="dx-btn dx-btn-primary" href="${escapeAttribute(activity.pathUrl)}" target="_blank" rel="noopener noreferrer">打开链接</a>` : ''}
-              <button class="dx-btn dx-btn-line" type="button" id="copyPathBtn">复制链接</button>
-            </div>
-          </section>` : ''}
-
-          <section class="dx-card dx-section" id="activity-image">
-            <div class="dx-section-head"><span class="dx-section-icon">🖼️</span><h2>活动图片</h2></div>
-            <div class="dx-poster">
-              <span class="dx-poster-thumb" aria-hidden="true">${posterUrl ? '📷' : '🗂️'}</span>
-              <div class="dx-poster-copy">
-                <strong>活动路径 / 二维码</strong>
-                <span>${posterUrl ? '点击查看大图，建议截图保存' : '本活动暂未提供图片'}</span>
-              </div>
-              <button class="dx-btn dx-btn-primary" type="button" id="viewPosterBtn"${posterUrl ? '' : ' disabled'}>${posterUrl ? '查看图片' : '暂无图片'}</button>
-            </div>
-          </section>
-        </div>
-
-        <aside class="dx-aside">
-          <section class="dx-card dx-side-card" id="activity-notes">
-            <h3 class="dx-side-title">信息汇总</h3>
-            <dl class="dx-kv">${kvHtml}</dl>
-          </section>
-
-          <section class="dx-card dx-promo">
-            <span class="dx-promo-kicker">社群福利</span>
-            <h3>加入「薅羊毛微信群」<br>每月最少薅 500 元</h3>
-            <p>扫码进群，第一时间获取银行立减金、返现等羊毛线报。</p>
-            <button class="dx-btn dx-btn-block" type="button" id="viewGroupQrBtn">查看群二维码</button>
-          </section>
-
-          <a class="dx-card dx-tg" id="telegram-reminder" href="https://t.me/yangmaozhushou" target="_blank" rel="noopener noreferrer">
-            <span class="dx-tg-icon" aria-hidden="true">✈</span>
-            <span class="dx-tg-copy"><strong>订阅 Telegram 优惠提醒</strong><span>信用卡返现、微信立减金和港卡优惠更新</span></span>
-            <span class="dx-tg-arrow" aria-hidden="true">›</span>
-          </a>
-
-          <div class="dx-note"><span aria-hidden="true">⚠️</span><span>活动规则、名额、页面入口都可能变化，实际请以银行官方页面为准。</span></div>
-        </aside>
+    <div class="dx-clean-wrap">
+      <div class="dx-clean-topbar">
+        <a class="dx-clean-back" href="./index.html">← 返回活动列表</a>
+        <button class="dx-clean-share-btn" type="button" data-dx-share>分享</button>
       </div>
 
-      <div class="dx-footer">活动内容归所属机构所有，活动奖品随时间推移可能变化，一切活动请以机构官方规则为准。网站端展示仅作信息整理，不构成保证。</div>
+      <article class="dx-clean-card">
+        <div class="dx-clean-meta-row">
+          <span class="dx-clean-bank">${escapeHtml(bankName)}</span>
+          <span class="dx-clean-status ${status.cls}">${escapeHtml(status.text === '即将开始' ? `${status.countdown}后开始` : (status.countdown || status.text))}</span>
+          ${tags}
+        </div>
 
-      <div class="dx-mobile-bar">
-        <button class="dx-btn dx-btn-line" type="button" data-dx-share>分享</button>
+        <div class="dx-clean-top-links">
+          <a class="dx-clean-top-pill is-tg" href="https://t.me/yangmaozhushou" target="_blank" rel="noopener noreferrer">✈ 加入 Telegram 优惠群</a>
+          <button type="button" class="dx-clean-top-pill is-wx" id="viewGroupQrBtn">💬 微信群二维码</button>
+        </div>
+
+        <h1 class="dx-clean-title">${escapeHtml(activity.title || '活动详情')}</h1>
+        ${activity.desc ? `<p class="dx-clean-desc">${escapeHtml(activity.desc)}</p>` : ''}
+
+        ${kvItems.length ? `
+          <dl class="dx-clean-kv">
+            ${kvItems.map(([k, v]) => `<div><dt>${escapeHtml(k)}</dt><dd>${escapeHtml(v)}</dd></div>`).join('')}
+          </dl>
+        ` : ''}
+
+        ${(pathUrl || posterUrl) ? `
+          <div class="dx-clean-actions">
+            ${isPathUrlLink ? `<a class="dx-clean-btn is-primary" href="${escapeAttribute(pathUrl)}" target="_blank" rel="noopener noreferrer">直达活动入口 ↗</a>` : ''}
+            ${pathUrl ? `<button class="dx-clean-btn" type="button" id="copyPathBtn">复制${isPathUrlLink ? '链接' : '路径'}</button>` : ''}
+            ${posterUrl ? `<button class="dx-clean-btn" type="button" id="viewPosterBtn">查看活动图片 / 二维码</button>` : ''}
+          </div>
+          ${(!isPathUrlLink && pathUrl) ? `<div class="dx-clean-path-box">${escapeHtml(pathUrl)}</div>` : ''}
+        ` : ''}
+
+        ${stepsHtml ? `
+          <section class="dx-clean-section" id="participation">
+            <h2>参与路径</h2>
+            ${stepsHtml}
+          </section>
+        ` : ''}
+
+        <section class="dx-clean-section" id="offer-details">
+          <h2>活动规则</h2>
+          ${dxRenderRules(activity.awardDesc)}
+        </section>
+
+        <footer class="dx-clean-foot">
+          <p class="dx-clean-disclaimer">活动内容归所属机构所有，规则与名额可能变动，实际请以银行官方页面为准。</p>
+        </footer>
+      </article>
+
+      <div class="dx-clean-mobile-bar">
+        <button class="dx-clean-btn" type="button" data-dx-share>分享</button>
         ${isPathUrlLink
-          ? `<a class="dx-btn dx-btn-hot" href="${escapeAttribute(activity.pathUrl)}" target="_blank" rel="noopener noreferrer">立即参与</a>`
-          : `<a class="dx-btn dx-btn-hot" href="#participation">查看参与方式</a>`}
+          ? `<a class="dx-clean-btn is-primary" href="${escapeAttribute(pathUrl)}" target="_blank" rel="noopener noreferrer">直达活动入口 ↗</a>`
+          : `<a class="dx-clean-btn is-primary" href="./index.html">返回列表</a>`}
       </div>
-    </article>
+    </div>
   `;
 
   els.root.innerHTML = html;
-  document.body.classList.add('dx-has-bar');
-
-  const sectionId = window.location.hash.slice(1);
-  const section = sectionId ? document.getElementById(sectionId) : null;
-  if (section && els.root.contains(section)) section.scrollIntoView();
+  document.body.classList.add('dx-clean-page');
 
   const copyBtn = document.getElementById('copyPathBtn');
   if (copyBtn && activity.pathUrl) {
     copyBtn.addEventListener('click', async () => {
       try {
         await navigator.clipboard.writeText(activity.pathUrl);
+        const idle = isPathUrlLink ? '复制链接' : '复制路径';
         copyBtn.textContent = '已复制 ✓';
         window.setTimeout(() => {
-          copyBtn.textContent = '复制链接';
+          copyBtn.textContent = idle;
         }, 1600);
       } catch (err) {
         console.error('复制链接失败', err);
@@ -675,7 +611,6 @@ function renderDetail(activity) {
     btn.addEventListener('click', () => openShareSheet());
   });
 
-  dxBindTabs();
   bindShareActions(activity);
 }
 
@@ -896,8 +831,29 @@ if (els.shareSheet) {
   });
 }
 
+document.addEventListener('click', (event) => {
+  const qrBox = event.target.closest('.site-nav-qr');
+  document.querySelectorAll('.site-nav-qr.is-open').forEach((el) => {
+    if (el !== qrBox) {
+      el.classList.remove('is-open');
+      const b = el.querySelector('.site-nav-qr-btn');
+      if (b) b.setAttribute('aria-expanded', 'false');
+    }
+  });
+  if (qrBox && event.target.closest('.site-nav-qr-btn')) {
+    const opened = qrBox.classList.toggle('is-open');
+    const b = qrBox.querySelector('.site-nav-qr-btn');
+    if (b) b.setAttribute('aria-expanded', String(opened));
+  }
+});
+
 document.addEventListener('keydown', (event) => {
   if (event.key === 'Escape') {
+    document.querySelectorAll('.site-nav-qr.is-open').forEach((el) => {
+      el.classList.remove('is-open');
+      const b = el.querySelector('.site-nav-qr-btn');
+      if (b) b.setAttribute('aria-expanded', 'false');
+    });
     closeLightbox();
     closeShareSheet();
   }
