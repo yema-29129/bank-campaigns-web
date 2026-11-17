@@ -1,5 +1,5 @@
-const STATIC_CACHE = 'yangmao-assistant-static-v16';
-const RUNTIME_CACHE = 'yangmao-assistant-runtime-v16';
+const STATIC_CACHE = 'yangmao-assistant-static-v17';
+const RUNTIME_CACHE = 'yangmao-assistant-runtime-v17';
 const STATIC_ASSETS = [
   '/',
   '/index.html',

@@ -31,6 +31,8 @@ python3 tools/generate-activity-pages.py /tmp/bank-public-activities.json --as-o
 
 检查生成的活动规则、有效期和来源链接，提交到网站仓库的 `main` 分支，GitHub Pages 会部署。确认上线后，可通过 IndexNow 通知参与平台本次新增、更新或退出目录的网址。Google Search Console 使用固定地址 `https://bank.vooqqqm.com/sitemap.xml`，后续更新沿用该地址。搜索引擎和 AI 平台是否最终收录或引用由各平台决定。
 
+生成器会为每项活动创建自然、唯一且与页面正文一致的搜索标题，将常见银行简称规范为用户易懂的名称，并同步更新 `<title>`、页面主标题、描述、Open Graph、结构化数据、站内锚文本和 AI 数据源。不要在生成后的单页里手工堆砌关键词；Google 不使用 `meta keywords` 作为排名依据，标题与描述应准确说明具体活动，完全重复的活动页会合并到一个规范网址。
+
 ## 广告说明
 
 这个网站前端没有接入“小程序激励广告 / 广告解锁图片”逻辑。

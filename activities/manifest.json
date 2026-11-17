@@ -1,6 +1,258 @@
 {
   "activities": [
     {
+      "id": "884",
+      "lastmod": "2026-11-17",
+      "validTo": "2026-12-31",
+      "status": "current"
+    },
+    {
+      "id": "883",
+      "lastmod": "2026-11-17",
+      "validTo": "2026-12-31",
+      "status": "current"
+    },
+    {
+      "id": "882",
+      "lastmod": "2026-11-17",
+      "validTo": "2026-12-31",
+      "status": "current"
+    },
+    {
+      "id": "881",
+      "lastmod": "2026-11-17",
+      "validTo": "2027-03-31",
+      "status": "current"
+    },
+    {
+      "id": "880",
+      "lastmod": "2026-11-17",
+      "validTo": "2026-12-31",
+      "status": "current"
+    },
+    {
+      "id": "879",
+      "lastmod": "2026-11-17",
+      "validTo": "2026-12-31",
+      "status": "current"
+    },
+    {
+      "id": "878",
+      "lastmod": "2026-11-17",
+      "validTo": "2026-12-31",
+      "status": "current"
+    },
+    {
+      "id": "877",
+      "lastmod": "2026-11-17",
+      "validTo": "2026-11-24",
+      "status": "current"
+    },
+    {
+      "id": "876",
+      "lastmod": "2026-11-17",
+      "validTo": "2026-12-31",
+      "status": "current"
+    },
+    {
+      "id": "875",
+      "lastmod": "2026-11-17",
+      "validTo": "2026-12-31",
+      "status": "current"
+    },
+    {
+      "id": "874",
+      "lastmod": "2026-11-17",
+      "validTo": "2026-12-31",
+      "status": "current"
+    },
+    {
+      "id": "873",
+      "lastmod": "2026-11-17",
+      "validTo": "2026-12-31",
+      "status": "current"
+    },
+    {
+      "id": "872",
+      "lastmod": "2026-11-17",
+      "validTo": "2026-12-31",
+      "status": "current"
+    },
+    {
+      "id": "871",
+      "lastmod": "2026-11-17",
+      "validTo": "2026-12-31",
+      "status": "current"
+    },
+    {
+      "id": "870",
+      "lastmod": "2026-11-17",
+      "validTo": "2026-12-31",
+      "status": "current"
+    },
+    {
+      "id": "869",
+      "lastmod": "2026-11-17",
+      "validTo": "2026-12-31",
+      "status": "current"
+    },
+    {
+      "id": "868",
+      "lastmod": "2026-11-17",
+      "validTo": "2027-02-28",
+      "status": "current"
+    },
+    {
+      "id": "867",
+      "lastmod": "2026-11-17",
+      "validTo": "2026-12-31",
+      "status": "current"
+    },
+    {
+      "id": "866",
+      "lastmod": "2026-11-17",
+      "validTo": "2026-12-31",
+      "status": "current"
+    },
+    {
+      "id": "865",
+      "lastmod": "2026-11-17",
+      "validTo": "2026-12-31",
+      "status": "current"
+    },
+    {
+      "id": "864",
+      "lastmod": "2026-11-17",
+      "validTo": "2026-12-31",
+      "status": "current"
+    },
+    {
+      "id": "863",
+      "lastmod": "2026-11-17",
+      "validTo": "2026-12-31",
+      "status": "current"
+    },
+    {
+      "id": "862",
+      "lastmod": "2026-11-17",
+      "validTo": "2026-12-31",
+      "status": "current"
+    },
+    {
+      "id": "861",
+      "lastmod": "2026-11-17",
+      "validTo": "2026-12-31",
+      "status": "current"
+    },
+    {
+      "id": "860",
+      "lastmod": "2026-11-17",
+      "validTo": "2026-12-31",
+      "status": "current"
+    },
+    {
+      "id": "859",
+      "lastmod": "2026-11-17",
+      "validTo": "2026-12-31",
+      "status": "current"
+    },
+    {
+      "id": "858",
+      "lastmod": "2026-11-17",
+      "validTo": "2027-02-28",
+      "status": "current"
+    },
+    {
+      "id": "857",
+      "lastmod": "2026-11-17",
+      "validTo": "2026-12-31",
+      "status": "current"
+    },
+    {
+      "id": "856",
+      "lastmod": "2026-11-17",
+      "validTo": "2026-12-31",
+      "status": "current"
+    },
+    {
+      "id": "855",
+      "lastmod": "2026-11-17",
+      "validTo": "2026-12-31",
+      "status": "current"
+    },
+    {
+      "id": "854",
+      "lastmod": "2026-11-17",
+      "validTo": "2026-12-31",
+      "status": "current"
+    },
+    {
+      "id": "853",
+      "lastmod": "2026-11-17",
+      "validTo": "2026-12-31",
+      "status": "current"
+    },
+    {
+      "id": "852",
+      "lastmod": "2026-11-17",
+      "validTo": "2026-12-31",
+      "status": "current"
+    },
+    {
+      "id": "851",
+      "lastmod": "2026-11-17",
+      "validTo": "2026-12-31",
+      "status": "current"
+    },
+    {
+      "id": "850",
+      "lastmod": "2026-11-17",
+      "validTo": "2026-12-31",
+      "status": "current"
+    },
+    {
+      "id": "849",
+      "lastmod": "2026-11-17",
+      "validTo": "2026-12-31",
+      "status": "current"
+    },
+    {
+      "id": "848",
+      "lastmod": "2026-11-17",
+      "validTo": "2026-12-31",
+      "status": "current"
+    },
+    {
+      "id": "847",
+      "lastmod": "2026-11-17",
+      "validTo": "2026-12-27",
+      "status": "current"
+    },
+    {
+      "id": "846",
+      "lastmod": "2026-11-17",
+      "validTo": "2026-12-31",
+      "status": "current"
+    },
+    {
+      "id": "845",
+      "lastmod": "2026-11-17",
+      "validTo": "2026-12-31",
+      "status": "current"
+    },
+    {
+      "id": "844",
+      "lastmod": "2026-11-17",
+      "validTo": "2026-12-31",
+      "status": "current"
+    },
+    {
+      "id": "843",
+      "lastmod": "2026-11-17",
+      "validTo": "2026-12-31",
+      "status": "current"
+    },
+    {
       "id": "842",
       "lastmod": "2026-11-17",
       "validTo": "2026-11-30",
@@ -4220,9 +4472,9 @@
     },
     {
       "id": "132",
-      "lastmod": "2026-11-14",
-      "validTo": "2026-09-30",
-      "status": "ended"
+      "lastmod": "2026-11-17",
+      "validTo": "2027-03-31",
+      "status": "current"
     },
     {
       "id": "131",
@@ -4664,9 +4916,9 @@
     },
     {
       "id": "54",
-      "lastmod": "2026-11-14",
-      "validTo": "2026-09-30",
-      "status": "ended"
+      "lastmod": "2026-11-17",
+      "validTo": "2027-03-31",
+      "status": "current"
     },
     {
       "id": "53",
@@ -4772,9 +5024,9 @@
     },
     {
       "id": "34",
-      "lastmod": "2026-11-13",
-      "validTo": "2026-03-31",
-      "status": "ended"
+      "lastmod": "2026-11-17",
+      "validTo": "2026-12-31",
+      "status": "current"
     },
     {
       "id": "33",

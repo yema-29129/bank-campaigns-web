@@ -21,6 +21,7 @@ import xml.etree.ElementTree as ET
 SITE = "https://bank.vooqqqm.com"
 BRAND_MAIN = "羊毛助手·羊毛线报活动站"
 SITE_NAME = "羊毛助手"
+TITLE_SUFFIX = f"｜{SITE_NAME}"
 DIRECTORY = f"{SITE}/activities/"
 TOPICS_URL = f"{SITE}/activities/topics/"
 OUTPUT = Path(__file__).resolve().parents[1] / "activities"
@@ -320,6 +321,111 @@ def resolve_bank_profile(bank_name):
     return short, (bank_name, short), None
 
 
+SEARCH_NAME_RULES = (
+    (re.compile(r"中国农业银行|^农业银行$"), "农业银行"),
+    (re.compile(r"中国工商银行"), "工商银行"),
+    (re.compile(r"中国建设银行"), "建设银行"),
+    (re.compile(r"中国邮政储蓄银行"), "邮储银行"),
+    (re.compile(r"中国民生银行"), "民生银行"),
+    (re.compile(r"中国光大银行"), "光大银行"),
+    (re.compile(r"中国银行（香港）|中银信用卡（中国香港）"), "中银香港"),
+    (re.compile(r"建设银行（亚洲）"), "香港建行亚洲"),
+    (re.compile(r"信银国际（香港）"), "香港信银国际"),
+    (re.compile(r"上海商业银行（香港）"), "香港上海商业银行"),
+)
+
+TITLE_PREFIX_EXPANSIONS = (
+    (re.compile(r"^农行"), "农业银行"),
+    (re.compile(r"^工行|^工银"), "工商银行"),
+    (re.compile(r"^建行"), "建设银行"),
+    (re.compile(r"^中行"), "中国银行"),
+    (re.compile(r"^邮储(?!银行)"), "邮储银行"),
+    (re.compile(r"^交行"), "交通银行"),
+    (re.compile(r"^招行"), "招商银行"),
+    (re.compile(r"^兴业(?!银行)"), "兴业银行"),
+    (re.compile(r"^浦发(?!银行)"), "浦发银行"),
+    (re.compile(r"^民生(?!银行)"), "民生银行"),
+    (re.compile(r"^光大(?!银行)"), "光大银行"),
+)
+
+
+def preferred_search_name(bank_name):
+    for pattern, name in SEARCH_NAME_RULES:
+        if pattern.search(bank_name):
+            return name
+    if match := re.fullmatch(r"(.+?)（(?:中国)?香港）", bank_name):
+        name = match.group(1)
+        return name if name.startswith("香港") else f"香港{name}"
+    return bank_name
+
+
+def build_search_title(entry, bank_short, bank_aliases, primary_benefit):
+    """Create a natural query-shaped title without keyword-stuffed boilerplate."""
+    raw_title = clean_line(entry["title"])
+    title = re.sub(r"\s*[·•・]\s*", "", raw_title)
+    for pattern, replacement in TITLE_PREFIX_EXPANSIONS:
+        if pattern.search(title):
+            title = pattern.sub(replacement, title, count=1)
+            break
+
+    preferred_name = preferred_search_name(entry["bankName"])
+    title_institution_tokens = re.findall(r"[\u4e00-\u9fffA-Za-z]{2,10}银行", raw_title)
+    mentions_institution = (
+        entry["bankName"] in raw_title
+        or preferred_name in title
+        or (len(preferred_name.replace("银行", "")) >= 2 and preferred_name.replace("银行", "") in raw_title)
+        or any(entry["bankName"].endswith(token) for token in title_institution_tokens)
+        or bank_short in raw_title
+        or any(alias in raw_title for alias in bank_aliases)
+    )
+    if not mentions_institution and preferred_name and len(preferred_name) <= 14:
+        title = f"{preferred_name}：{title}"
+
+    if "卡组织返现" in title:
+        card_org = clean_line(entry.get("cardOrg", "")).replace(",", "/").replace("，", "/")
+        card_org = card_org or "Visa/万事达"
+        scope = f'{entry["region"]} {entry["desc"]}'
+        spend_scope = "境外消费" if re.search(r"境外|海外|香港|澳门|台湾", scope) else "消费"
+        title = title.replace("卡组织返现", f"{card_org}{spend_scope}返现")
+
+    title = re.sub(r"满(\d+(?:\.\d+)?)元?减(\d+(?:\.\d+)?)(?![\d%元])", r"满\1减\2元", title)
+    title = re.sub(r"银行银行", "银行", title)
+    title = re.sub(r"信用卡信用卡", "信用卡", title)
+    title = clean_line(title).strip("：:|- ")
+
+    has_offer_language = bool(re.search(
+        r"活动|优惠|優惠|立减|满减|减|減|返现|返現|返|回赠|回贈|红包|消费券|刷卡金|积分|抽奖|抽獎|折扣|免费|免|送|領|领|赠|贈|券|礼|禮",
+        title,
+    ))
+    if not has_offer_language:
+        generic_card_benefit = primary_benefit in ("信用卡优惠", "储蓄卡优惠", "银行卡优惠")
+        if title.endswith(("信用卡", "储蓄卡", "银行卡")) or generic_card_benefit:
+            title = f"{title}优惠活动"
+        else:
+            title = f"{title}{primary_benefit}活动"
+    elif len(title) < 14 and not title.endswith("活动"):
+        title = f"{title}活动"
+    return title
+
+
+def build_seo_title(entry, search_title):
+    status = "（已结束）" if entry["status"] == "ended" else ""
+    return f"{search_title}{status}{TITLE_SUFFIX}"
+
+
+def build_seo_description(entry, search_title):
+    status_intro = "该活动已结束，以下为历史规则。" if entry["status"] == "ended" else ""
+    region_txt = entry["region"] or "全国"
+    channel_txt = entry["channel"] or entry["consumeChannel"] or "官方指定渠道"
+    short_path = truncate_clean(entry["pathDesc"].replace("→", "，"), 42)
+    raw_desc = (
+        f"{status_intro}{search_title}：{clean_line(entry['desc'])} "
+        f"有效期{entry['validFrom']}至{entry['validTo']}，适用地区：{region_txt}；"
+        f"参与渠道：{channel_txt}；领取方式：{short_path}。"
+    )
+    return truncate_clean(raw_desc, 150)
+
+
 def build_discount_phrase(entry):
     rate = entry.get("cashbackRate") or ""
     d_amt = entry.get("discountAmount") or ""
@@ -368,48 +474,18 @@ def extract_seo_meta(entry):
             benefit_tags.append(label)
     primary_benefit = benefit_tags[0] if benefit_tags else f"{card_label}优惠"
 
-    # Build rich, natural <title> (target 32–60 chars, never "too short")
-    core_title = title
-    short_stem = re.sub(r"银行$", "", bank_short)
-    if (
-        bank_short not in core_title
-        and bank_name not in core_title
-        and (len(short_stem) < 2 or short_stem not in core_title)
-        and not any(alias in core_title for alias in bank_aliases)
-    ):
-        core_title = f"{bank_short}·{core_title}"
-
-    if entry["status"] == "ended":
-        seo_title = f"{core_title}（已结束归档） - {bank_short}{primary_benefit}规则查询 | {BRAND_MAIN}"
-    else:
-        suffix_parts = []
-        if primary_benefit not in core_title:
-            suffix_parts.append(primary_benefit)
-        suffix_parts.append(f"{year}领取路径与规则")
-        seo_title = f"{core_title} - {'·'.join(suffix_parts)} | {BRAND_MAIN}"
-    if len(seo_title) > 64:
-        seo_title = f"{core_title} - 领取入口与规则 | {BRAND_MAIN}"
-
-    # Build rich, natural <meta name="description"> (target 100–155 chars, never "too short")
-    status_prefix = "【已结束历史资料】" if entry["status"] == "ended" else f"【{year}最新核验】"
-    region_txt = entry["region"] or "全国适用"
-    channel_txt = entry["channel"] or entry["consumeChannel"] or "官方指定渠道"
-    short_path = truncate_clean(entry["pathDesc"].replace("→", "，"), 48)
-    raw_desc = (
-        f"{status_prefix}{bank_name}「{title}」：{clean_line(entry['desc'])} "
-        f"活动有效期：{entry['validFrom']}至{entry['validTo']}；适用地区：{region_txt}；"
-        f"支付渠道：{channel_txt}；参与方式：{short_path}。"
-    )
-    seo_desc = truncate_clean(raw_desc, 152)
+    search_title = build_search_title(entry, bank_short, bank_aliases, primary_benefit)
+    seo_title = build_seo_title(entry, search_title)
+    seo_desc = build_seo_description(entry, search_title)
 
     # Build deduplicated per-page <meta name="keywords">
     kw_pool = [
+        search_title,
         title,
         bank_name,
         *bank_aliases,
         f"{bank_short}优惠活动",
         f"{bank_short}{card_label}优惠",
-        f"{bank_short}羊毛",
         primary_benefit,
         *benefit_tags[:3],
     ]
@@ -419,7 +495,7 @@ def extract_seo_meta(entry):
             kw_pool.append(ch)
     if entry["region"] and len(entry["region"]) <= 12:
         kw_pool.append(entry["region"])
-    kw_pool.extend([f"{year}银行优惠", BRAND_MAIN, SITE_NAME])
+    kw_pool.extend([f"{year}{bank_short}优惠活动", f"{year}银行优惠"])
     keywords = []
     seen_kw = set()
     for kw in kw_pool:
@@ -427,7 +503,7 @@ def extract_seo_meta(entry):
         if kw and kw not in seen_kw:
             seen_kw.add(kw)
             keywords.append(kw)
-        if len(keywords) >= 15:
+        if len(keywords) >= 10:
             break
 
     return {
@@ -436,10 +512,55 @@ def extract_seo_meta(entry):
         "card_label": card_label,
         "primary_benefit": primary_benefit,
         "discount_phrase": build_discount_phrase(entry),
+        "search_title": search_title,
         "seo_title": seo_title,
         "seo_desc": seo_desc,
         "keywords": ",".join(keywords),
     }
+
+
+def mark_exact_duplicates(entries):
+    """Consolidate equivalent campaign records into one canonical page."""
+    fields = (
+        "title", "bankName", "validFrom", "validTo", "desc", "awardDesc",
+        "pathDesc", "region", "channel", "consumeChannel", "cardOrg",
+    )
+    groups = {}
+    for entry in entries:
+        key = tuple(entry.get(field, "") for field in fields)
+        groups.setdefault(key, []).append(entry)
+    for group in groups.values():
+        if len(group) < 2:
+            continue
+        primary = max(group, key=lambda item: (item["lastmod"], int(item["id"])))
+        for entry in group:
+            if entry is not primary:
+                entry["duplicate_of"] = primary["id"]
+
+
+def disambiguate_search_titles(entries):
+    """Keep every indexable page title unique using meaningful page data."""
+    groups = {}
+    for entry in entries:
+        if entry.get("duplicate_of"):
+            continue
+        groups.setdefault(entry["seo"]["search_title"], []).append(entry)
+    for base_title, group in groups.items():
+        if len(group) < 2:
+            continue
+        regions = [re.sub(r"[（）()]", "", clean_line(entry["region"] or "全国")) for entry in group]
+        end_dates = [entry["validTo"] for entry in group]
+        for entry, region in zip(group, regions):
+            if len(set(regions)) == len(regions):
+                qualifier = truncate_clean(region, 16)
+            elif len(set(end_dates)) == len(end_dates):
+                qualifier = f"截止{entry['validTo']}"
+            else:
+                qualifier = f"{truncate_clean(region, 10)}，截止{entry['validTo']}"
+            search_title = f"{base_title}（{qualifier}）"
+            entry["seo"]["search_title"] = search_title
+            entry["seo"]["seo_title"] = build_seo_title(entry, search_title)
+            entry["seo"]["seo_desc"] = build_seo_description(entry, search_title)
 
 
 def parse_entry(activity_id, row, as_of):
@@ -496,16 +617,19 @@ def select_activities(feed, as_of):
             selected[activity_id] = parse_entry(activity_id, row, as_of)
         except (AttributeError, KeyError, TypeError, ValueError):
             rejected += 1
+    mark_exact_duplicates(selected.values())
+    disambiguate_search_titles(selected.values())
     return selected, rejected
 
 
-def document(page_title, summary, url, kind, body, lastmod=None, indexable=True, keywords="", extra_graph=None):
+def document(page_title, summary, url, kind, body, lastmod=None, indexable=True, keywords="", extra_graph=None, canonical_url=None):
+    canonical_url = canonical_url or url
     base_node = {
         "@type": kind,
         "@id": f"{url}#webpage",
         "name": page_title,
         "description": summary,
-        "url": url,
+        "url": canonical_url,
         "inLanguage": "zh-CN",
         "isPartOf": {"@type": "WebSite", "@id": f"{SITE}/#website", "name": BRAND_MAIN, "alternateName": SITE_NAME, "url": f"{SITE}/"},
         "publisher": {"@type": "Organization", "@id": f"{SITE}/#org", "name": BRAND_MAIN, "url": f"{SITE}/"},
@@ -535,13 +659,13 @@ def document(page_title, summary, url, kind, body, lastmod=None, indexable=True,
   <meta name="description" content="{escape(summary)}">{kw_tag}
   <meta name="robots" content="{robots}">
   <meta name="msvalidate.01" content="C09F13C155CD1821058CACBCDCA96FDE">
-  <link rel="canonical" href="{url}">
+  <link rel="canonical" href="{canonical_url}">
   <meta property="og:locale" content="zh_CN">
   <meta property="og:type" content="{og_type}">
   <meta property="og:site_name" content="{BRAND_MAIN}">
   <meta property="og:title" content="{escape(page_title)}">
   <meta property="og:description" content="{escape(summary)}">
-  <meta property="og:url" content="{url}">
+  <meta property="og:url" content="{canonical_url}">
   <meta name="twitter:card" content="summary">
   <meta name="twitter:title" content="{escape(page_title)}">
   <meta name="twitter:description" content="{escape(summary)}">
@@ -588,7 +712,7 @@ def document(page_title, summary, url, kind, body, lastmod=None, indexable=True,
         </a>
         <a class="site-brand" href="/">
           <span class="site-brand-mark" aria-hidden="true"><img src="/assets/logo-lijianjin.png" alt="" width="42" height="42"></span>
-          <span class="site-brand-copy"><strong>{BRAND_MAIN}</strong><small>微信立减金 / 信用卡返现 / 现金红包</small></span>
+          <span class="site-brand-copy"><strong>{BRAND_MAIN}</strong><small>银行优惠 / 微信立减金 / 信用卡返现</small></span>
         </a>
       </div>
       <nav class="site-nav" aria-label="主导航">
@@ -662,7 +786,7 @@ def fact(label, value):
 def build_faq_items(entry):
     seo = entry["seo"]
     bank_short = seo["bank_short"]
-    title = entry["title"]
+    title = seo["search_title"]
     region_txt = entry["region"] or "全国（具体以官方活动页说明为准）"
     channel_txt = entry["channel"] or entry["consumeChannel"] or "银行指定App或支付渠道"
     status_txt = "当前在有效期内" if entry["status"] == "current" else ("即将开始" if entry["status"] == "upcoming" else "目前已结束（仅供历史查询）")
@@ -716,8 +840,8 @@ def matching_topics_for_entry(entry):
 
 
 def detail(entry, active_entries):
-    title = entry["title"]
     seo = entry["seo"]
+    title = seo["search_title"]
     activity_id = entry["id"]
     url = f"{DIRECTORY}{activity_id}.html"
 
@@ -817,7 +941,7 @@ def detail(entry, active_entries):
     if related:
         rel_items = "\n".join(
             f"""                  <li>
-                    <a href="/activities/{r["id"]}.html">{escape(r["title"])}</a>
+                    <a href="/activities/{r["id"]}.html">{escape(r["seo"]["search_title"])}</a>
                     <span class="seo-rel-meta">{escape(r["bankName"])} · 截止 {r["validTo"]}</span>
                   </li>"""
             for r in related
@@ -899,6 +1023,8 @@ def detail(entry, active_entries):
       </article>
     </main>
   </div>"""
+    duplicate_of = entry.get("duplicate_of")
+    canonical_url = f"{DIRECTORY}{duplicate_of}.html" if duplicate_of else url
     return document(
         seo["seo_title"],
         seo["seo_desc"],
@@ -906,9 +1032,10 @@ def detail(entry, active_entries):
         "WebPage",
         body,
         lastmod=entry["lastmod"],
-        indexable=True,
+        indexable=not bool(duplicate_of),
         keywords=seo["keywords"],
         extra_graph=[breadcrumb_schema, faq_schema],
+        canonical_url=canonical_url,
     )
 
 
@@ -939,10 +1066,10 @@ def build_topic_page(spec, active_entries, ended_entries, generated_on):
     matched_ended = [e for e in ended_entries if spec["match"](e)][:12]
     url = f'{TOPICS_URL}{spec["slug"]}.html'
     lastmod = matched_active[0]["lastmod"] if matched_active else generated_on.isoformat()
-    page_title = f'{spec["title"]} | {BRAND_MAIN}'
+    page_title = f'{spec["title"]}{TITLE_SUFFIX}'
 
     top_samples = "；".join(
-        f'{e["title"]}（{e["seo"]["discount_phrase"]}，截止{e["validTo"]}）'
+        f'{e["seo"]["search_title"]}（{e["seo"]["discount_phrase"]}，截止{e["validTo"]}）'
         for e in matched_active[:4]
     ) or "详见下方实时更新列表"
     seo_topic_desc = truncate_clean(
@@ -979,7 +1106,7 @@ def build_topic_page(spec, active_entries, ended_entries, generated_on):
     }
 
     cards = "\n".join(f"""        <li class="detail-section">
-          <h2><a href="/activities/{e["id"]}.html">{escape(e["title"])}</a></h2>
+          <h2><a href="/activities/{e["id"]}.html">{escape(e["seo"]["search_title"])}</a></h2>
           <p><strong>{escape(e["seo"]["discount_phrase"])}</strong> · {escape(e["desc"])}</p>
           <p class="seo-card-meta">{escape(e["bankName"])} · {escape(e["region"] or "全国")} · {escape(e["channel"] or e["consumeChannel"] or "官方渠道")} · {period(e)}</p>
           <p class="seo-card-path">参与路径：{escape(truncate_clean(e["pathDesc"], 78))}</p>
@@ -988,7 +1115,7 @@ def build_topic_page(spec, active_entries, ended_entries, generated_on):
     ended_block = ""
     if matched_ended:
         ended_items = "\n".join(
-            f'        <li><a href="/activities/{e["id"]}.html">{escape(e["title"])}</a>（已于 {e["validTo"]} 结束）</li>'
+            f'        <li><a href="/activities/{e["id"]}.html">{escape(e["seo"]["search_title"])}</a>（已于 {e["validTo"]} 结束）</li>'
             for e in matched_ended
         )
         ended_block = f"""      <section class="seo-ended-sub">
@@ -1046,7 +1173,7 @@ def build_topic_page(spec, active_entries, ended_entries, generated_on):
 
 
 def topics_index_page(topic_stats, active_total, generated_on):
-    page_title = f"2026银行优惠专题导航：按银行与支付方式查立减金、返现与红包 | {BRAND_MAIN}"
+    page_title = f"2026银行优惠专题导航：按银行与支付方式查立减金、返现与红包{TITLE_SUFFIX}"
     summary = (
         f"羊毛助手·羊毛线报活动站优惠专题导航页，按微信立减金、云闪付、支付宝、信用卡返现、港卡境外返现及农行、工行、建行、中行、邮储、招行等20大专题分类汇总 {active_total} 条实时有效银行活动。"
     )
@@ -1088,13 +1215,13 @@ def topics_index_page(topic_stats, active_total, generated_on):
 
 
 def directory(entries, generated_on):
-    page_title = f"2026当前有效银行优惠活动目录（共{len(entries)}项立减金/返现/满减） | {BRAND_MAIN}"
+    page_title = f"2026当前有效银行优惠活动目录：立减金、返现与满减{TITLE_SUFFIX}"
     summary = (
         f"浏览羊毛助手·羊毛线报活动站核验整理的 {len(entries)} 项当前有效银行及支付优惠活动，涵盖微信立减金、云闪付消费券、支付宝红包、数币红包与信用卡境外返现，附活动时间、领取入口与详细规则。"
     )
     keywords = "银行优惠活动目录,2026银行羊毛大全,微信立减金目录,信用卡返现汇总,云闪付满减,羊毛助手·羊毛线报活动站,羊毛助手"
     cards = "\n".join(f"""        <li class="detail-section">
-          <h2><a href="/activities/{entry["id"]}.html">{escape(entry["title"])}</a></h2>
+          <h2><a href="/activities/{entry["id"]}.html">{escape(entry["seo"]["search_title"])}</a></h2>
           <p><strong>{escape(entry["seo"]["discount_phrase"])}</strong> · {escape(entry["desc"])}</p>
           <p class="seo-card-meta">{escape(entry["bankName"])} · {escape(entry["region"] or "全国")} · {period(entry)}</p>
         </li>""" for entry in entries)
@@ -1115,14 +1242,14 @@ def directory(entries, generated_on):
 
 
 def archive_directory(entries, generated_on):
-    page_title = f"已结束银行优惠活动历史资料归档（共{len(entries)}项） | {BRAND_MAIN}"
+    page_title = f"已结束银行优惠活动规则与历史资料归档{TITLE_SUFFIX}"
     summary = (
         f"归档查询羊毛助手·羊毛线报活动站收录的 {len(entries)} 项已结束银行立减金、信用卡返现与支付满减历史活动资料，供往期活动规则核对与参考。"
     )
     keywords = "历史银行活动归档,已结束银行优惠查询,往期信用卡活动规则,羊毛助手·羊毛线报活动站"
     cards = "\n".join(f"""        <li class="detail-section">
           <p><strong>已结束</strong></p>
-          <h2><a href="/activities/{entry["id"]}.html">{escape(entry["title"])}</a></h2>
+          <h2><a href="/activities/{entry["id"]}.html">{escape(entry["seo"]["search_title"])}</a></h2>
           <p>{escape(entry["desc"])}</p>
           <p class="seo-card-meta">{escape(entry["bankName"])} · {period(entry)}</p>
         </li>""" for entry in entries)
@@ -1184,6 +1311,7 @@ def ai_feed(entries, generated_on):
         "activities": [{
             "id": entry["id"],
             "title": entry["title"],
+        "searchTitle": entry["seo"]["search_title"],
             "summary": entry["desc"],
             "discount": entry["seo"]["discount_phrase"],
             "institution": entry["bankName"],
@@ -1242,7 +1370,7 @@ def llms_full(entries, generated_on):
     for entry in entries:
         source_text = "、".join(entry["sources"]) if entry["sources"] else "所属机构官方App或活动页"
         lines.extend([
-            f'## {clean_line(entry["title"])}',
+            f'## {clean_line(entry["seo"]["search_title"])}',
             "",
             f'- 详情网址：{DIRECTORY}{entry["id"]}.html',
             f'- 状态：{"当前有效" if entry["status"] == "current" else "尚未开始" if entry["status"] == "upcoming" else "已结束"}',
@@ -1268,8 +1396,14 @@ def main():
 
     feed = json.loads(args.feed.read_text(encoding="utf-8"))
     selected, rejected = select_activities(feed, args.as_of)
-    active = [entry for entry in selected.values() if entry["status"] in ("current", "upcoming")]
-    ended = [entry for entry in selected.values() if entry["status"] == "ended"]
+    active = [
+        entry for entry in selected.values()
+        if entry["status"] in ("current", "upcoming") and not entry.get("duplicate_of")
+    ]
+    ended = [
+        entry for entry in selected.values()
+        if entry["status"] == "ended" and not entry.get("duplicate_of")
+    ]
     active.sort(key=lambda entry: (entry["lastmod"], int(entry["id"])), reverse=True)
     ended.sort(key=lambda entry: (entry["validTo"], int(entry["id"])), reverse=True)
     public_entries = active + ended
