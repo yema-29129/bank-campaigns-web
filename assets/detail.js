@@ -834,6 +834,8 @@ if (els.shareSheet) {
 function openMpQrModal() {
   let modal = document.getElementById('mpQrModal');
   if (!modal) {
+    const navQrImg = document.querySelector('.site-nav-qr-pop img');
+    const qrSrc = (navQrImg && navQrImg.src) ? navQrImg.src : './assets/miniprogram-qr.jpg';
     modal = document.createElement('div');
     modal.id = 'mpQrModal';
     modal.className = 'mp-qr-modal hidden';
@@ -841,7 +843,7 @@ function openMpQrModal() {
     modal.innerHTML = `
       <div class="mp-qr-backdrop" data-close-mp-qr="true"></div>
       <div class="mp-qr-dialog" role="dialog" aria-modal="true" aria-label="微信小程序二维码">
-        <img src="./assets/miniprogram-qr.jpg" alt="好羊毛助手微信小程序码" width="250" height="264">
+        <img src="${qrSrc}" alt="好羊毛助手微信小程序码" width="250" height="264">
         <p class="mp-qr-title">好羊毛助手小程序</p>
         <p class="mp-qr-hint">微信内可长按图片识别 · 或微信扫一扫</p>
         <button type="button" class="mp-qr-close" data-close-mp-qr="true">关闭</button>
@@ -874,7 +876,7 @@ document.addEventListener('click', (event) => {
     }
   });
   if (qrBox && event.target.closest('.site-nav-qr-btn')) {
-    if (window.matchMedia('(max-width: 760px)').matches) {
+    if (window.matchMedia('(max-width: 860px)').matches) {
       openMpQrModal();
       return;
     }

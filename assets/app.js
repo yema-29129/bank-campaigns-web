@@ -1355,6 +1355,8 @@ function closeMobileSidebar() {
 function openMpQrModal() {
   let modal = document.getElementById('mpQrModal');
   if (!modal) {
+    const navQrImg = document.querySelector('.site-nav-qr-pop img');
+    const qrSrc = (navQrImg && navQrImg.src) ? navQrImg.src : './assets/miniprogram-qr.jpg';
     modal = document.createElement('div');
     modal.id = 'mpQrModal';
     modal.className = 'mp-qr-modal hidden';
@@ -1362,7 +1364,7 @@ function openMpQrModal() {
     modal.innerHTML = `
       <div class="mp-qr-backdrop" data-close-mp-qr="true"></div>
       <div class="mp-qr-dialog" role="dialog" aria-modal="true" aria-label="微信小程序二维码">
-        <img src="./assets/miniprogram-qr.jpg" alt="好羊毛助手微信小程序码" width="250" height="264">
+        <img src="${escapeAttribute(qrSrc)}" alt="好羊毛助手微信小程序码" width="250" height="264">
         <p class="mp-qr-title">好羊毛助手小程序</p>
         <p class="mp-qr-hint">微信内可长按图片识别 · 或微信扫一扫</p>
         <button type="button" class="mp-qr-close" data-close-mp-qr="true">关闭</button>
@@ -1459,7 +1461,13 @@ function bindEvents() {
     els.openSidebarBtn.addEventListener('click', openMobileSidebar);
   }
   if (els.topMobileMenuBtn) {
-    els.topMobileMenuBtn.addEventListener('click', openMobileSidebar);
+    els.topMobileMenuBtn.addEventListener('click', () => {
+      if (els.radarSidebar && els.radarSidebar.classList.contains('is-mobile-open')) {
+        closeMobileSidebar();
+      } else {
+        openMobileSidebar();
+      }
+    });
   }
 
   if (els.drawerShareBtn) {
@@ -1536,7 +1544,7 @@ function bindEvents() {
       }
     });
     if (qrBox && event.target.closest('.site-nav-qr-btn')) {
-      if (window.matchMedia('(max-width: 760px)').matches) {
+      if (window.matchMedia('(max-width: 860px)').matches) {
         openMpQrModal();
         return;
       }
@@ -1701,9 +1709,17 @@ function initializeCampaignPage() {
   if (query) state.keyword = query;
   const view = params.get('view');
   if (view && ['credit', 'debit'].includes(view)) state.view = view;
+  const shouldOpenMenu = params.get('menu') === '1';
 
   syncFilterControls();
   updateSidebarCounts();
+  if (shouldOpenMenu && window.matchMedia('(max-width: 860px)').matches) {
+    openMobileSidebar();
+    params.delete('menu');
+    const cleanSearch = params.toString();
+    const cleanUrl = `${window.location.pathname}${cleanSearch ? `?${cleanSearch}` : ''}${window.location.hash || ''}`;
+    window.history.replaceState(null, '', cleanUrl);
+  }
   fetchCampaigns();
 }
 

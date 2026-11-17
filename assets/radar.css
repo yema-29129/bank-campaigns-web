@@ -27,16 +27,6 @@ body.radar-page {
   width: min(1380px, calc(100% - 32px));
 }
 
-.site-brand-bar {
-  display: flex;
-  align-items: center;
-  min-width: 0;
-}
-
-.site-mobile-menu-btn {
-  display: none;
-}
-
 .radar-page .share-sheet,
 .radar-page .lightbox {
   z-index: 220;
