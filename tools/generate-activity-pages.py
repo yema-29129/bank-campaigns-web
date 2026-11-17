@@ -636,6 +636,9 @@ def document(page_title, summary, url, kind, body, lastmod=None, indexable=True,
         "inLanguage": "zh-CN",
         "isPartOf": {"@type": "WebSite", "@id": f"{SITE}/#website", "name": BRAND_MAIN, "alternateName": SITE_NAME, "url": f"{SITE}/"},
         "publisher": {"@type": "Organization", "@id": f"{SITE}/#org", "name": BRAND_MAIN, "url": f"{SITE}/"},
+        "author": {"@type": "Organization", "@id": f"{SITE}/#editorial-team", "name": "羊毛助手编辑组", "url": f"{SITE}/about.html"},
+        "reviewedBy": {"@type": "Organization", "@id": f"{SITE}/#editorial-team", "name": "羊毛助手编辑组", "url": f"{SITE}/about.html"},
+        "publishingPrinciples": f"{SITE}/editorial-policy.html",
     }
     if keywords:
         base_node["keywords"] = keywords
@@ -679,29 +682,7 @@ def document(page_title, summary, url, kind, body, lastmod=None, indexable=True,
   <link rel="stylesheet" href="{styles}">
   <link rel="stylesheet" href="/activities/styles.css?v=20261118-editorial1">
   <script type="application/ld+json">{schema_text}</script>
-  <script>
-  var _hmt = _hmt || [];
-  (function() {{
-    var hm = document.createElement("script");
-    hm.src = "https://hm.baidu.com/hm.js?5a215c4d20e9848b4a15ef5dd602d64e";
-    var s = document.getElementsByTagName("script")[0];
-    s.parentNode.insertBefore(hm, s);
-  }})();
-  (function() {{
-    var el = document.createElement("script");
-    el.src = "https://lf1-cdn-tos.bytegoofy.com/goofy/ttzz/push.js?de566e6ef1de0b221926cc924d964af7b5f3beb5809d0e0020d409059de975c0bc434964556b7d7129e9b750ed197d397efd7b0c6c715c1701396e1af40cec962b8d7c8c6655c9b00211740aa8a98e2e";
-    el.id = "ttzz";
-    var s = document.getElementsByTagName("script")[0];
-    s.parentNode.insertBefore(el, s);
-  }})();
-  </script>
-  <script async src="https://www.googletagmanager.com/gtag/js?id=G-2C78TMMNY4"></script>
-  <script>
-    window.dataLayer = window.dataLayer || [];
-    function gtag(){{dataLayer.push(arguments);}}
-    gtag('js', new Date());
-    gtag('config', 'G-2C78TMMNY4');
-  </script>
+  <script defer src="/assets/privacy-consent.js?v=20261118-consent1"></script>
 </head>
 <body>
   <header class="site-header">
@@ -746,6 +727,7 @@ def document(page_title, summary, url, kind, body, lastmod=None, indexable=True,
       <a href="/sitemap.xml">站点地图</a>
       <a href="/llms.txt">AI 索引</a>
       <a href="/about.html">关于我们</a>
+      <a href="/editorial-policy.html">编辑规范</a>
       <a href="/terms.html">使用条款</a>
       <a href="/privacy.html">隐私政策</a>
       <a href="/disclaimer.html">免责声明</a>
@@ -1082,6 +1064,7 @@ def detail(entry, active_entries):
 {sources}
                 </ul>
                 <p class="detail-section-copy">本站按公开活动信息核验整理，最近更新于 {time_element(entry["lastmod"])}。活动资格、名额和领取入口以所属机构最新规则为准。</p>
+                <p class="seo-card-meta">编辑与复核：羊毛助手编辑组 · <a class="detail-link" href="/editorial-policy.html">查看核验、更正与发布规范</a></p>
                 <a class="detail-link" href="/detail.html?id={activity_id}">打开交互式详情与活动海报图片</a>
               </section>
               <aside class="telegram-subscribe detail-telegram-reminder" id="telegram-reminder" aria-label="订阅优惠更新">
@@ -1346,6 +1329,7 @@ def sitemap_xml(entries, topic_stats, generated_on):
         ("/activities/topics/", today_str),
         ("/activities/archive.html", today_str),
         ("/about.html", None),
+        ("/editorial-policy.html", None),
         ("/terms.html", None),
         ("/privacy.html", None),
         ("/disclaimer.html", None),

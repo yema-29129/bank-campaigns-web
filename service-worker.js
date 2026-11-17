@@ -1,10 +1,11 @@
-const STATIC_CACHE = 'yangmao-assistant-static-v18';
-const RUNTIME_CACHE = 'yangmao-assistant-runtime-v18';
+const STATIC_CACHE = 'yangmao-assistant-static-v19';
+const RUNTIME_CACHE = 'yangmao-assistant-runtime-v19';
 const STATIC_ASSETS = [
   '/',
   '/index.html',
   '/detail.html',
   '/about.html',
+  '/editorial-policy.html',
   '/terms.html',
   '/privacy.html',
   '/disclaimer.html',
@@ -18,6 +19,8 @@ const STATIC_ASSETS = [
   '/assets/detail-v2.css?v=20261117-radar10',
   '/assets/app.js?v=20261118-overseas1',
   '/assets/detail.js?v=20261118-seo1',
+  '/assets/privacy-consent.js?v=20261118-consent1',
+  '/assets/privacy-consent.css?v=20261118-consent1',
   '/assets/miniprogram-qr.jpg',
   '/assets/wechat-contact-qr.jpg',
   '/assets/logo-lijianjin.png'

@@ -1,0 +1,119 @@
+.privacy-consent {
+  position: fixed;
+  z-index: 10000;
+  right: 18px;
+  bottom: calc(18px + env(safe-area-inset-bottom));
+  left: 18px;
+  display: flex;
+  gap: 20px;
+  align-items: center;
+  max-width: 920px;
+  margin: 0 auto;
+  padding: 18px 20px;
+  border: 1px solid #d9e2f0;
+  border-radius: 18px;
+  background: rgba(255, 255, 255, 0.98);
+  color: #0f1d31;
+  box-shadow: 0 18px 55px rgba(15, 29, 49, 0.22);
+  backdrop-filter: blur(14px);
+}
+
+.privacy-consent-copy {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.privacy-consent h2 {
+  margin: 0 0 6px;
+  font-size: 18px;
+  line-height: 1.35;
+}
+
+.privacy-consent p {
+  margin: 0;
+  color: #53647c;
+  font-size: 14px;
+  line-height: 1.65;
+}
+
+.privacy-consent a {
+  display: inline-block;
+  margin-top: 6px;
+  color: #155eef;
+  font-size: 14px;
+  text-underline-offset: 3px;
+}
+
+.privacy-consent-actions {
+  display: flex;
+  flex: 0 0 auto;
+  gap: 10px;
+}
+
+.privacy-consent-btn,
+.privacy-settings-link {
+  appearance: none;
+  border: 0;
+  font: inherit;
+  cursor: pointer;
+}
+
+.privacy-consent-btn {
+  min-height: 44px;
+  padding: 0 16px;
+  border-radius: 12px;
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.privacy-consent-btn.is-primary {
+  background: #155eef;
+  color: #fff;
+}
+
+.privacy-consent-btn.is-secondary {
+  border: 1px solid #cbd7e8;
+  background: #fff;
+  color: #22334d;
+}
+
+.privacy-consent-btn:focus-visible,
+.privacy-settings-link:focus-visible {
+  outline: 3px solid rgba(21, 94, 239, 0.32);
+  outline-offset: 2px;
+}
+
+.privacy-settings-link {
+  padding: 0;
+  background: transparent;
+  color: inherit;
+  font-size: inherit;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+@media (max-width: 720px) {
+  .privacy-consent {
+    right: 10px;
+    bottom: calc(10px + env(safe-area-inset-bottom));
+    left: 10px;
+    display: block;
+    padding: 16px;
+    border-radius: 16px;
+  }
+
+  .privacy-consent-actions {
+    margin-top: 14px;
+  }
+
+  .privacy-consent-btn {
+    flex: 1 1 0;
+    padding: 0 10px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .privacy-consent {
+    backdrop-filter: none;
+  }
+}
