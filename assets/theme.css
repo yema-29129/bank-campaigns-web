@@ -55,16 +55,34 @@ body {
    顶部导航
    ========================================================= */
 .site-header {
-  background: rgba(255, 255, 255, .86);
-  backdrop-filter: saturate(180%) blur(18px);
-  -webkit-backdrop-filter: saturate(180%) blur(18px);
+  background: transparent;
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
   border-bottom: 1px solid var(--t-line);
   box-shadow: none;
+}
+.site-header::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background: rgba(255, 255, 255, .88);
+  backdrop-filter: saturate(180%) blur(18px);
+  -webkit-backdrop-filter: saturate(180%) blur(18px);
+  pointer-events: none;
 }
 .site-header-inner {
   padding: 0;
   min-height: 64px;
   gap: 20px;
+}
+.site-brand-bar {
+  display: flex;
+  align-items: center;
+  min-width: 0;
+}
+.site-mobile-menu-btn {
+  display: none;
 }
 .site-brand-mark,
 .site-footer-logo {
@@ -1181,33 +1199,79 @@ details:not([open]) .filter-collapse { display: none; }
   .site-footer-brand { grid-column: 1 / -1; }
 }
 
-@media (max-width: 760px) {
-  /* 手机端导航：品牌 + 单行横向滑动菜单，不再占半屏 */
+@media (max-width: 860px) {
+  /* 手机端 / 窄屏导航：第一行「品牌 + 菜单栏按钮」，第二行横向导航 */
+  .site-header {
+    background: #ffffff;
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+  }
+  .site-header::before { display: none; }
   .site-header-inner {
     flex-direction: column;
     align-items: stretch;
     gap: 0;
     min-height: 0;
+    padding: 0;
   }
-  .site-brand { padding: 10px 0 6px; }
-  .site-brand-mark { width: 32px; height: 32px; font-size: 16px; border-radius: 10px; }
+  .site-brand-bar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    width: 100%;
+    padding: 9px 0 6px;
+  }
+  .site-brand { padding: 0; gap: 9px; min-width: 0; }
+  .site-brand-mark { width: 32px; height: 32px; font-size: 16px; border-radius: 10px; flex: none; }
   .site-brand-copy small { display: none; }
-  .site-brand-copy strong { font-size: 15px; }
+  .site-brand-copy strong { font-size: 15px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .site-mobile-menu-btn {
+    flex: none;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    height: 34px;
+    padding: 0 12px;
+    border-radius: 999px;
+    border: 1px solid #bfd4ff;
+    background: #eaf1ff;
+    color: #1f5eff;
+    font-size: 13px;
+    font-weight: 700;
+    font-family: inherit;
+    line-height: 1;
+    cursor: pointer;
+    text-decoration: none;
+    white-space: nowrap;
+    transition: background 0.15s ease, border-color 0.15s ease, transform 0.12s ease;
+  }
+  .site-mobile-menu-btn:hover,
+  .site-mobile-menu-btn:active {
+    background: #dce8ff;
+    border-color: #a9c5ff;
+  }
+  .site-mobile-menu-btn:focus:not(:focus-visible) { outline: none; }
+  .site-mobile-menu-icon { width: 15px; height: 15px; flex: none; }
   .site-nav {
     flex-wrap: nowrap;
     overflow-x: auto;
     margin: 0 -16px;
-    padding: 0 16px 8px;
+    padding: 0 16px 10px;
+    gap: 0;
+    justify-content: space-between;
     scrollbar-width: none;
     -webkit-overflow-scrolling: touch;
   }
   .site-nav::-webkit-scrollbar { display: none; }
-  .site-nav-link { min-height: 32px; padding: 0 12px; font-size: 13px; flex: none; }
+  .site-nav-link { min-height: 32px; padding: 0 10px; font-size: 13px; flex: none; }
   .site-nav-link.is-active,
   .site-nav-link[aria-current="page"] { background: var(--t-brand-soft); }
   .site-nav-link.is-active::after,
   .site-nav-link[aria-current="page"]::after { display: none; }
-  .site-nav-link[href*="t.me"] { margin-left: 0; }
+  .site-nav-link[href*="t.me"] { margin-left: 0; font-size: 0; padding: 0 12px; }
+  .site-nav-link[href*="t.me"]::before { content: "✈ 社群"; font-size: 13px; }
 }
 
 @media (max-width: 640px) {
@@ -1357,26 +1421,14 @@ html, body { overflow-x: clip; }
   top: 76px;
   box-shadow: 0 -14px 0 0 var(--bg), var(--t-shadow);
 }
-@media (max-width: 760px) {
-  .site-nav { gap: 0; }
-  .site-nav-link { padding: 0 10px; font-size: 13px; }
+@media (max-width: 860px) {
   .detail-card .detail-section-nav { top: 96px; }
 }
 
 .campaign-card.tone-default,
 .campaign-card.tone-recurring,
 .campaign-card.tone-credit { border: 1px solid var(--t-line); }
-@media (max-width: 760px) {
-  .site-header-inner { padding: 0; }
-  .site-nav { padding-bottom: 10px; }
-}
 
-/* 手机端：Telegram 按钮缩短为「✈ 社群」，保证一行放得下全部菜单 */
-@media (max-width: 760px) {
-  .site-nav-link[href*="t.me"] { font-size: 0; padding: 0 12px; }
-  .site-nav-link[href*="t.me"]::before { content: "✈ 社群"; font-size: 13px; }
-  .site-nav { justify-content: space-between; }
-}
 @media (max-width: 360px) {
   .site-nav-link { padding: 0 7px; font-size: 12px; }
   .site-nav-link[href*="t.me"]::before { font-size: 12px; }
@@ -1435,7 +1487,7 @@ html, body { overflow-x: clip; }
   line-height: 1.4;
 }
 
-@media (min-width: 761px) {
+@media (min-width: 861px) {
   .site-nav-qr-pop {
     position: absolute;
     top: calc(100% + 10px);
@@ -1488,26 +1540,85 @@ html, body { overflow-x: clip; }
   }
 }
 
-@media (max-width: 760px) {
+@media (max-width: 860px) {
   .site-nav-qr-pop {
-    display: none;
-    position: fixed;
-    top: 94px;
-    left: 50%;
-    width: 224px;
-    padding: 12px;
-    border-radius: 16px;
-    background: #ffffff;
-    border: 1px solid #e2e8f0;
-    box-shadow: 0 20px 50px rgba(15, 27, 45, 0.25);
-    text-align: center;
-    z-index: 300;
-    transform: translateX(-50%);
+    display: none !important;
   }
+}
 
-  .site-nav-qr.is-open .site-nav-qr-pop {
-    display: block;
-  }
+/* 手机端独立顶层小程序码弹窗（直接挂在 body 下，彻底杜绝 header / nav 裁切） */
+.mp-qr-modal {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  display: grid;
+  place-items: center;
+  padding: 16px;
+}
+
+.mp-qr-modal.hidden {
+  display: none !important;
+}
+
+.mp-qr-backdrop {
+  position: absolute;
+  inset: 0;
+  background: rgba(15, 27, 45, 0.52);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+}
+
+.mp-qr-dialog {
+  position: relative;
+  z-index: 1;
+  width: min(290px, calc(100vw - 32px));
+  max-height: calc(100dvh - 32px);
+  overflow-y: auto;
+  padding: 16px 16px 14px;
+  border-radius: 20px;
+  background: #ffffff;
+  box-shadow: 0 24px 60px rgba(15, 27, 45, 0.28);
+  text-align: center;
+}
+
+.mp-qr-dialog img {
+  display: block;
+  width: auto;
+  max-width: 100%;
+  max-height: min(56dvh, 256px);
+  height: auto;
+  margin: 0 auto;
+  border-radius: 12px;
+}
+
+.mp-qr-title {
+  margin: 12px 0 4px;
+  font-size: 15px;
+  font-weight: 800;
+  color: #0f1b2d;
+}
+
+.mp-qr-hint {
+  margin: 0 0 12px;
+  font-size: 12.5px;
+  color: #64748b;
+  line-height: 1.5;
+}
+
+.mp-qr-close {
+  width: 100%;
+  height: 36px;
+  border: 0;
+  border-radius: 10px;
+  background: #f1f5f9;
+  color: #334155;
+  font-size: 13.5px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.mp-qr-close:active {
+  background: #e2e8f0;
 }
 
 @media (max-width: 420px) {

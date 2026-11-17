@@ -23,8 +23,8 @@
   <link rel="shortcut icon" href="./assets/favicon.svg">
   <link rel="preconnect" href="https://mini.vooqqqm.com" crossorigin>
   <link rel="stylesheet" href="./assets/styles.css">
-  <link rel="stylesheet" href="./assets/theme.css?v=20261117-radar7">
-  <link rel="stylesheet" href="./assets/radar.css?v=20261117-radar7">
+  <link rel="stylesheet" href="./assets/theme.css?v=20261117-radar8">
+  <link rel="stylesheet" href="./assets/radar.css?v=20261117-radar8">
   <script type="application/ld+json">
   {
     "@context": "https://schema.org",
@@ -65,13 +65,22 @@
 <body class="home-page radar-page">
   <header class="site-header">
     <div class="site-header-inner">
-      <a class="site-brand" href="./index.html">
-        <span class="site-brand-mark">薅</span>
-        <span class="site-brand-copy">
-          <strong>好羊毛银行活动站</strong>
-          <small>微信立减金 / 信用卡返现 / 现金红包</small>
-        </span>
-      </a>
+      <div class="site-brand-bar">
+        <a class="site-brand" href="./index.html">
+          <span class="site-brand-mark">薅</span>
+          <span class="site-brand-copy">
+            <strong>好羊毛银行活动站</strong>
+            <small>微信立减金 / 信用卡返现 / 现金红包</small>
+          </span>
+        </a>
+        <button id="topMobileMenuBtn" type="button" class="site-mobile-menu-btn" aria-label="展开左侧分类菜单" aria-controls="radarSidebar" aria-expanded="false">
+          <svg class="site-mobile-menu-icon" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true">
+            <path d="M3 5h14M3 10h14M3 15h14"></path>
+          </svg>
+          <span>分类菜单</span>
+          <span id="topMobileMenuBadge" class="radar-filter-badge hidden">0</span>
+        </button>
+      </div>
       <nav class="site-nav" aria-label="主导航">
         <a class="site-nav-link is-active" href="./index.html" data-nav-view="all">首页</a>
         <a class="site-nav-link" href="./index.html?view=credit" data-nav-view="credit">信用卡活动</a>
@@ -93,7 +102,7 @@
 
     <aside id="radarSidebar" class="radar-sidebar" aria-label="侧边筛选与导航">
       <div class="radar-sidebar-mobile-head">
-        <strong>筛选条件</strong>
+        <strong>菜单与分类筛选</strong>
         <button type="button" class="radar-close-btn" data-close-sidebar="true">完成</button>
       </div>
 
@@ -329,7 +338,7 @@
     </div>
   </div>
 
-  <script async src="./assets/app.js?v=20261117-radar7"></script>
+  <script async src="./assets/app.js?v=20261117-radar8"></script>
   <noscript><p class="state-card">请启用 JavaScript 后刷新，以查看活动列表。</p></noscript>
 </body>
 </html>

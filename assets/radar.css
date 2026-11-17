@@ -27,6 +27,16 @@ body.radar-page {
   width: min(1380px, calc(100% - 32px));
 }
 
+.site-brand-bar {
+  display: flex;
+  align-items: center;
+  min-width: 0;
+}
+
+.site-mobile-menu-btn {
+  display: none;
+}
+
 .radar-page .share-sheet,
 .radar-page .lightbox {
   z-index: 220;
@@ -1346,7 +1356,7 @@ body.radar-page {
     box-shadow: 16px 0 40px rgba(15, 27, 45, 0.18);
     transform: translateX(-105%);
     transition: transform 0.2s ease;
-    padding: 14px 14px calc(20px + env(safe-area-inset-bottom, 0px));
+    padding: 0 14px calc(24px + env(safe-area-inset-bottom, 0px));
     -webkit-overflow-scrolling: touch;
   }
 
@@ -1355,10 +1365,17 @@ body.radar-page {
   }
 
   .radar-sidebar-mobile-head {
+    position: sticky;
+    top: 0;
+    z-index: 5;
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding-bottom: 10px;
+    margin: 0 -14px;
+    padding: calc(12px + env(safe-area-inset-top, 0px)) 14px 11px;
+    background: rgba(255, 255, 255, 0.96);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
     border-bottom: 1px solid #eef1f6;
   }
 
@@ -1602,5 +1619,14 @@ body.radar-page {
 
   .clean-steps {
     padding: 10px 12px 10px 28px;
+  }
+}
+
+/* 手机端 / 平板窄屏顶部栏：显式左侧分类菜单入口按钮 */
+@media (max-width: 860px) {
+  .radar-page .site-brand-bar {
+    width: 100%;
+    justify-content: space-between;
+    gap: 10px;
   }
 }

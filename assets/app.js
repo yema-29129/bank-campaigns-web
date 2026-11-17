@@ -238,6 +238,8 @@ const els = {
   radarSidebar: document.getElementById('radarSidebar'),
   sidebarBackdrop: document.getElementById('sidebarBackdrop'),
   openSidebarBtn: document.getElementById('openSidebarBtn'),
+  topMobileMenuBtn: document.getElementById('topMobileMenuBtn'),
+  topMobileMenuBadge: document.getElementById('topMobileMenuBadge'),
   mobileFilterCount: document.getElementById('mobileFilterCount'),
   detailDrawer: document.getElementById('detailDrawer'),
   drawerBackdrop: document.getElementById('drawerBackdrop'),
@@ -750,6 +752,10 @@ function syncFilterControls() {
   if (els.mobileFilterCount) {
     els.mobileFilterCount.textContent = String(extraCount);
     els.mobileFilterCount.classList.toggle('hidden', extraCount === 0);
+  }
+  if (els.topMobileMenuBadge) {
+    els.topMobileMenuBadge.textContent = String(extraCount);
+    els.topMobileMenuBadge.classList.toggle('hidden', extraCount === 0);
   }
 
   if (els.activeFilterSummary) {
@@ -1334,6 +1340,7 @@ function openMobileSidebar() {
   if (!els.radarSidebar) return;
   els.radarSidebar.classList.add('is-mobile-open');
   if (els.sidebarBackdrop) els.sidebarBackdrop.classList.remove('hidden');
+  if (els.topMobileMenuBtn) els.topMobileMenuBtn.setAttribute('aria-expanded', 'true');
   document.body.classList.add('sidebar-open');
 }
 
@@ -1341,7 +1348,37 @@ function closeMobileSidebar() {
   if (!els.radarSidebar) return;
   els.radarSidebar.classList.remove('is-mobile-open');
   if (els.sidebarBackdrop) els.sidebarBackdrop.classList.add('hidden');
+  if (els.topMobileMenuBtn) els.topMobileMenuBtn.setAttribute('aria-expanded', 'false');
   document.body.classList.remove('sidebar-open');
+}
+
+function openMpQrModal() {
+  let modal = document.getElementById('mpQrModal');
+  if (!modal) {
+    modal = document.createElement('div');
+    modal.id = 'mpQrModal';
+    modal.className = 'mp-qr-modal hidden';
+    modal.setAttribute('aria-hidden', 'true');
+    modal.innerHTML = `
+      <div class="mp-qr-backdrop" data-close-mp-qr="true"></div>
+      <div class="mp-qr-dialog" role="dialog" aria-modal="true" aria-label="微信小程序二维码">
+        <img src="./assets/miniprogram-qr.jpg" alt="好羊毛助手微信小程序码" width="250" height="264">
+        <p class="mp-qr-title">好羊毛助手小程序</p>
+        <p class="mp-qr-hint">微信内可长按图片识别 · 或微信扫一扫</p>
+        <button type="button" class="mp-qr-close" data-close-mp-qr="true">关闭</button>
+      </div>
+    `;
+    document.body.appendChild(modal);
+  }
+  modal.classList.remove('hidden');
+  modal.setAttribute('aria-hidden', 'false');
+}
+
+function closeMpQrModal() {
+  const modal = document.getElementById('mpQrModal');
+  if (!modal) return;
+  modal.classList.add('hidden');
+  modal.setAttribute('aria-hidden', 'true');
 }
 
 function openShareSheet() {
@@ -1421,6 +1458,9 @@ function bindEvents() {
   if (els.openSidebarBtn) {
     els.openSidebarBtn.addEventListener('click', openMobileSidebar);
   }
+  if (els.topMobileMenuBtn) {
+    els.topMobileMenuBtn.addEventListener('click', openMobileSidebar);
+  }
 
   if (els.drawerShareBtn) {
     els.drawerShareBtn.addEventListener('click', openShareSheet);
@@ -1482,6 +1522,11 @@ function bindEvents() {
   }
 
   document.addEventListener('click', (event) => {
+    if (event.target.closest('[data-close-mp-qr="true"]')) {
+      closeMpQrModal();
+      return;
+    }
+
     const qrBox = event.target.closest('.site-nav-qr');
     document.querySelectorAll('.site-nav-qr.is-open').forEach((el) => {
       if (el !== qrBox) {
@@ -1491,6 +1536,10 @@ function bindEvents() {
       }
     });
     if (qrBox && event.target.closest('.site-nav-qr-btn')) {
+      if (window.matchMedia('(max-width: 760px)').matches) {
+        openMpQrModal();
+        return;
+      }
       const opened = qrBox.classList.toggle('is-open');
       const b = qrBox.querySelector('.site-nav-qr-btn');
       if (b) b.setAttribute('aria-expanded', String(opened));
@@ -1501,7 +1550,8 @@ function bindEvents() {
       !event.target.closest('#detailDrawer') &&
       !event.target.closest('.radar-row') &&
       !event.target.closest('#shareSheet') &&
-      !event.target.closest('#imageLightbox')
+      !event.target.closest('#imageLightbox') &&
+      !event.target.closest('#mpQrModal')
     ) {
       closeDetailDrawer();
     }
@@ -1551,6 +1601,8 @@ function bindEvents() {
 
   document.addEventListener('keydown', (event) => {
     if (event.key === 'Escape') {
+      const mpModal = document.getElementById('mpQrModal');
+      if (mpModal && !mpModal.classList.contains('hidden')) return closeMpQrModal();
       document.querySelectorAll('.site-nav-qr.is-open').forEach((el) => {
         el.classList.remove('is-open');
         const b = el.querySelector('.site-nav-qr-btn');

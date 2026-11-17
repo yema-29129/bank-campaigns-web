@@ -1,5 +1,5 @@
-const STATIC_CACHE = 'yangmao-pro-static-v2';
-const RUNTIME_CACHE = 'yangmao-pro-runtime-v2';
+const STATIC_CACHE = 'yangmao-pro-static-v3';
+const RUNTIME_CACHE = 'yangmao-pro-runtime-v3';
 const STATIC_ASSETS = [
   '/',
   '/index.html',
@@ -13,11 +13,12 @@ const STATIC_ASSETS = [
   '/sitemap.xml',
   '/manifest.webmanifest',
   '/assets/styles.css',
-  '/assets/theme.css?v=20261115-brand-pro',
-  '/assets/detail-v2.css?v=20261115-brand-pro',
-  '/assets/app.js?v=20261115-brand-pro',
-  '/assets/detail.js?v=20261115-brand-pro',
-  '/assets/pwa.js',
+  '/assets/theme.css?v=20261117-radar8',
+  '/assets/radar.css?v=20261117-radar8',
+  '/assets/detail-v2.css?v=20261117-radar8',
+  '/assets/app.js?v=20261117-radar8',
+  '/assets/detail.js?v=20261117-radar8',
+  '/assets/miniprogram-qr.jpg',
   '/assets/favicon.svg'
 ];
 
