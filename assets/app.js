@@ -1486,9 +1486,42 @@ function syncRowSelection() {
   });
 }
 
-async function openDetailDrawer(listItem) {
+function syncDetailDrawerHistory(id) {
+  const currentState = window.history.state && typeof window.history.state === 'object'
+    ? window.history.state
+    : {};
+  const drawerAlreadyOpen = Boolean(
+    selectedId &&
+    els.detailDrawer &&
+    !els.detailDrawer.classList.contains('hidden') &&
+    currentState.radarDrawer
+  );
+
+  if (drawerAlreadyOpen) {
+    window.history.replaceState(
+      { ...currentState, radarDrawer: true, radarDrawerId: String(id) },
+      '',
+      window.location.href
+    );
+  } else {
+    const cleanState = { ...currentState };
+    delete cleanState.radarDrawer;
+    delete cleanState.radarDrawerId;
+    if (currentState.radarDrawer) {
+      window.history.replaceState(cleanState, '', window.location.href);
+    }
+    window.history.pushState(
+      { ...cleanState, radarDrawer: true, radarDrawerId: String(id) },
+      '',
+      window.location.href
+    );
+  }
+}
+
+async function openDetailDrawer(listItem, { syncHistory = true } = {}) {
   if (!els.detailDrawer || !els.drawerBody) return;
   const id = String(listItem.id);
+  if (syncHistory) syncDetailDrawerHistory(id);
   selectedId = id;
   currentDrawerActivity = listItem;
   syncRowSelection();
@@ -1556,8 +1589,12 @@ async function openDetailDrawer(listItem) {
   }
 }
 
-function closeDetailDrawer() {
+function closeDetailDrawer({ fromHistory = false } = {}) {
   if (!els.detailDrawer) return;
+  if (!fromHistory && window.history.state && window.history.state.radarDrawer) {
+    window.history.back();
+    return;
+  }
   selectedId = null;
   syncRowSelection();
   els.detailDrawer.classList.remove('is-open');
@@ -1718,6 +1755,21 @@ function bindEvents() {
   if (els.sidebarResetBtn) els.sidebarResetBtn.addEventListener('click', doReset);
   if (els.mobileResetFiltersBtn) els.mobileResetFiltersBtn.addEventListener('click', doReset);
   if (els.mobileApplyFiltersBtn) els.mobileApplyFiltersBtn.addEventListener('click', closeMobileSidebar);
+
+  window.addEventListener('popstate', (event) => {
+    const drawerState = event.state && event.state.radarDrawer;
+    if (drawerState) {
+      const drawerId = String(event.state.radarDrawerId || '');
+      const item = state.campaigns.find((campaign) => String(campaign.id) === drawerId);
+      if (item && String(selectedId || '') !== drawerId) {
+        openDetailDrawer(item, { syncHistory: false });
+      }
+      return;
+    }
+    if (els.detailDrawer && !els.detailDrawer.classList.contains('hidden')) {
+      closeDetailDrawer({ fromHistory: true });
+    }
+  });
 
   if (els.viewTabs) {
     els.viewTabs.addEventListener('click', (event) => {
