@@ -1,5 +1,5 @@
-const STATIC_CACHE = 'yangmao-assistant-static-v19';
-const RUNTIME_CACHE = 'yangmao-assistant-runtime-v19';
+const STATIC_CACHE = 'yangmao-assistant-static-v20';
+const RUNTIME_CACHE = 'yangmao-assistant-runtime-v20';
 const STATIC_ASSETS = [
   '/',
   '/index.html',
@@ -21,6 +21,8 @@ const STATIC_ASSETS = [
   '/assets/detail.js?v=20261118-seo1',
   '/assets/privacy-consent.js?v=20261118-consent1',
   '/assets/privacy-consent.css?v=20261118-consent1',
+  '/assets/mobile-back.js?v=20261118-back1',
+  '/assets/mobile-back.css?v=20261118-back1',
   '/assets/miniprogram-qr.jpg',
   '/assets/wechat-contact-qr.jpg',
   '/assets/logo-lijianjin.png'

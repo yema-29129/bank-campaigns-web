@@ -683,6 +683,7 @@ def document(page_title, summary, url, kind, body, lastmod=None, indexable=True,
   <link rel="stylesheet" href="/activities/styles.css?v=20261118-editorial1">
   <script type="application/ld+json">{schema_text}</script>
   <script defer src="/assets/privacy-consent.js?v=20261118-consent1"></script>
+  <script defer src="/assets/mobile-back.js?v=20261118-back1"></script>
 </head>
 <body>
   <header class="site-header">
