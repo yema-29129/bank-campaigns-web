@@ -154,6 +154,69 @@ const SHOPPING_TYPE_OPTIONS = [
 
 const KNOWN_OVERSEAS_DESTINATION_RE = /中国香港|香港|中国澳门|澳门|中国台湾|台湾|日本|东京|大阪|京都|冲绳|北海道|韩国|首尔|济州|釜山|东南亚|新加坡|泰国|曼谷|清迈|普吉|马来西亚|吉隆坡|槟城|沙巴|印度尼西亚|印尼|巴厘岛|雅加达|越南|河内|胡志明|岘港|菲律宾|马尼拉|长滩岛|宿务|柬埔寨|老挝|缅甸|文莱|美国|美利坚|纽约|洛杉矶|旧金山|夏威夷|关岛|加拿大|温哥华|多伦多|欧洲|欧盟|英国|法国|德国|意大利|西班牙|瑞士|荷兰|奥地利|葡萄牙|希腊|北欧|挪威|瑞典|芬兰|丹麦|冰岛|澳大利亚|澳洲|悉尼|墨尔本|布里斯班|珀斯|新西兰|奥克兰|皇后镇|中东|阿联酋|迪拜|阿布扎比|卡塔尔|多哈|沙特|土耳其|以色列/;
 
+// Destination filters are coverage filters, not literal keyword filters. A campaign
+// that applies to all overseas spending also applies in Japan, the US, Europe, etc.
+const BROAD_OVERSEAS_SCOPE_RE = /境外|海外|国外|全球|全世界|世界各地|全球范围|国际(?:消费|签账|交易|支付|商户)|外币(?:消费|签账|交易|支付)/i;
+const OVERSEAS_REGIONAL_SCOPE_RE = /港澳台|大湾区|亚洲|亚太|东亚|东南亚|北美|南美|美洲|欧洲|欧盟|大洋洲|中东|西亚/;
+const OVERSEAS_DESTINATION_SCOPE = {
+  '中国香港': { explicit: /中国香港|香港/, regional: /港澳台|大湾区/ },
+  '中国澳门': { explicit: /中国澳门|澳门/, regional: /港澳台|大湾区/ },
+  '中国台湾': { explicit: /中国台湾|台湾/, regional: /港澳台/ },
+  '日本': { explicit: /日本|东京|大阪|京都|冲绳|北海道/, regional: /亚洲|亚太|东亚/ },
+  '韩国': { explicit: /韩国|首尔|济州|釜山/, regional: /亚洲|亚太|东亚/ },
+  '泰国': { explicit: /泰国|曼谷|清迈|普吉/, regional: /东南亚|亚洲|亚太/ },
+  '东南亚': { explicit: /东南亚|新加坡|泰国|马来西亚|印度尼西亚|印尼|越南|菲律宾|柬埔寨|老挝|缅甸|文莱|巴厘岛/, regional: /亚洲|亚太/ },
+  '美国': { explicit: /美国|美利坚|纽约|洛杉矶|旧金山|夏威夷|关岛/, regional: /北美|美洲/ },
+  '欧洲': { explicit: /欧洲|欧盟|英国|法国|德国|意大利|西班牙|瑞士|荷兰|奥地利|葡萄牙|希腊|北欧|挪威|瑞典|芬兰|丹麦|冰岛/ },
+  '澳新': { explicit: /澳大利亚|澳洲|悉尼|墨尔本|布里斯班|珀斯|新西兰|奥克兰|皇后镇/, regional: /大洋洲|亚太/ },
+  '中东': { explicit: /中东|阿联酋|迪拜|阿布扎比|卡塔尔|多哈|沙特|土耳其|以色列/, regional: /西亚/ }
+};
+
+const DESTINATION_EXCLUSION_WORDS = '不含|不包括|不适用|不支持|不覆盖|排除|除外|不可用于|不能用于|不参与';
+
+function stripIssuerOnlyPhrases(text) {
+  return String(text || '')
+    .replace(/(?:中国香港|香港|中国澳门|澳门|中国台湾|台湾|日本|韩国|泰国|美国|英国|法国|德国|澳大利亚|澳洲|新西兰|境外|海外|国外)(?:地区)?(?:发行|发卡|银行卡|信用卡|银联卡|卡片|账户|客户)/g, '')
+    .replace(/(?:发卡|发行|持卡|账户)地区[^。；;，,\n]{0,24}/g, '');
+}
+
+function hasDestinationExclusion(text, destinationPattern) {
+  const source = destinationPattern.source;
+  const before = new RegExp(`(?:${DESTINATION_EXCLUSION_WORDS})[^。；;，,\\n]{0,20}(?:${source})`, 'i');
+  const after = new RegExp(`(?:${source})[^。；;，,\\n]{0,12}(?:${DESTINATION_EXCLUSION_WORDS})`, 'i');
+  return before.test(text) || after.test(text);
+}
+
+function isRestrictedToAnotherDestination(text, destinationPattern) {
+  const restrictions = String(text || '').match(/(?:仅限|只限|限于|仅适用于|只适用于)[^。；;，,\n]{1,40}/g) || [];
+  return restrictions.some((segment) => (
+    KNOWN_OVERSEAS_DESTINATION_RE.test(segment) && !destinationPattern.test(segment)
+  ));
+}
+
+function matchesOverseasDestination(item, selected) {
+  if (!selected || selected === '全部') return true;
+  const regionText = stripIssuerOnlyPhrases(item.overseasRegionText || '');
+  const campaignText = stripIssuerOnlyPhrases(item.overseasCampaignText || item.overseasDestinationText || '');
+  const text = `${regionText} ${campaignText}`.trim();
+  const option = OVERSEAS_DESTINATION_OPTIONS.find((entry) => entry.key === selected);
+  if (selected === '其他境外') return option ? option.test(text) : true;
+
+  const scope = OVERSEAS_DESTINATION_SCOPE[selected];
+  if (!scope) return option ? option.test(text) : true;
+  if (hasDestinationExclusion(text, scope.explicit)) return false;
+  if (scope.explicit.test(text)) return true;
+  if (isRestrictedToAnotherDestination(text, scope.explicit)) return false;
+
+  // A specific region field is authoritative. Do not let a generic tag such as
+  // "境外返现" turn a Macau-only or Europe-only campaign into a Japan result.
+  const regionHasSpecificScope = KNOWN_OVERSEAS_DESTINATION_RE.test(regionText) || OVERSEAS_REGIONAL_SCOPE_RE.test(regionText);
+  const selectedRegionMatches = !!(scope.regional && scope.regional.test(regionText));
+  if (regionHasSpecificScope && !BROAD_OVERSEAS_SCOPE_RE.test(regionText) && !selectedRegionMatches) return false;
+
+  return BROAD_OVERSEAS_SCOPE_RE.test(text) || !!(scope.regional && scope.regional.test(text));
+}
+
 const OVERSEAS_DESTINATION_OPTIONS = [
   { key: '全部', label: '全部境外', test: () => true },
   { key: '中国香港', label: '中国香港', test: (text) => /中国香港|香港/.test(text) },
@@ -545,6 +608,11 @@ function normalizeCampaign(item) {
       normalized.cardOrg, normalized.cashbackText, normalized.recurringText,
       ...normalizedTags
     ].filter(Boolean).join(' '),
+    overseasRegionText: overseasDestination(normalized.region),
+    overseasCampaignText: [
+      normalized.title, normalized.desc,
+      normalized.consumeChannel, normalized.channel, ...normalizedTags
+    ].filter(Boolean).join(' '),
     overseasDestinationText: [
       overseasDestination(normalized.region), normalized.title, normalized.desc,
       normalized.consumeChannel, normalized.channel, ...normalizedTags
@@ -635,6 +703,7 @@ function matchesSecondaryFilter(
 ) {
   const group = getSecondaryFilterGroup(scene, cashback);
   if (!group || !selected || selected === '全部') return true;
+  if (group.key === 'overseas') return matchesOverseasDestination(item, selected);
   const rule = group.options.find((opt) => opt.key === selected);
   const text = group.textField ? item[group.textField] : item.secondaryText;
   return rule ? rule.test(text || '') : true;
