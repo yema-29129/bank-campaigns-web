@@ -677,7 +677,7 @@ def document(page_title, summary, url, kind, body, lastmod=None, indexable=True,
   <link rel="alternate" type="text/plain" href="https://bank.vooqqqm.com/llms-full.txt" title="LLMs-Full.txt">
   <link rel="alternate" type="application/json" href="https://bank.vooqqqm.com/activities/feed.json" title="银行优惠活动结构化数据">
   <link rel="stylesheet" href="{styles}">
-  <link rel="stylesheet" href="/activities/styles.css?v=20261117-seo12">
+  <link rel="stylesheet" href="/activities/styles.css?v=20261118-editorial1">
   <script type="application/ld+json">{schema_text}</script>
   <script>
   var _hmt = _hmt || [];
@@ -772,6 +772,71 @@ def prose(value):
         f'                <p class="detail-section-copy activity-copy">{escape(paragraph)}</p>'
         for paragraph in paragraphs
     )
+
+
+def extract_rule_section(value, labels, limit=180):
+    """Pull a concise, verified rule excerpt for the website-only editorial view."""
+    for label in labels:
+        match = re.search(
+            rf"【{re.escape(label)}】\s*(.*?)(?=\n\s*\n【|\Z)",
+            value,
+            re.S,
+        )
+        if match:
+            return truncate_clean(match.group(1), limit)
+    return ""
+
+
+def build_editorial_review(entry):
+    """Create website-only interpretation without changing API or mini-program data."""
+    seo = entry["seo"]
+    audience = extract_rule_section(entry["awardDesc"], ("参与对象", "参与资格", "适用对象"), 190)
+    if not audience:
+        audience = clean_line(entry["desc"])
+
+    benefit_summary = clean_line(entry["desc"]).rstrip("。")
+    benefit = f"{benefit_summary}。实际计算口径、封顶金额、币种和合资格交易范围仍以活动官方规则为准。"
+
+    reminders = []
+    for labels in (
+        ("不参与范围", "参与限制", "资格限制"),
+        ("名额与次数", "名额限制", "次数限制"),
+        ("费用与续费", "费用说明"),
+        ("退款与取消", "退款规则"),
+    ):
+        note = extract_rule_section(entry["awardDesc"], labels, 150)
+        if note and note not in reminders:
+            reminders.append(note)
+        if len(reminders) >= 3:
+            break
+    if not reminders:
+        reminders.append("参加前再次核对卡种、地区、支付渠道、报名状态及活动剩余名额，避免仅凭标题判断资格。")
+    if entry["status"] == "ended":
+        reminders.insert(0, f"该活动已于 {entry['validTo']} 结束，本页仅用于查询历史规则，不代表当前仍可参加。")
+    elif entry["status"] == "upcoming":
+        reminders.insert(0, f"该活动计划于 {entry['validFrom']} 开始，开放时间和实际名额以官方页面为准。")
+    reminder_html = "\n".join(f"                  <li>{escape(note)}</li>" for note in reminders[:4])
+
+    return f"""              <section class="detail-section editorial-review" id="editorial-review" aria-label="羊毛助手编辑解读">
+                <div class="detail-section-head"><h2>羊毛助手编辑解读</h2></div>
+                <p class="editorial-review-note">以下内容由本站根据已核验的结构化字段重新归纳，帮助快速判断，不替代银行或活动主办方的官方规则。</p>
+                <div class="editorial-review-grid">
+                  <article class="editorial-review-item">
+                    <h3>适合谁</h3>
+                    <p>{escape(audience)}</p>
+                  </article>
+                  <article class="editorial-review-item">
+                    <h3>优惠口径</h3>
+                    <p>{escape(benefit)}</p>
+                  </article>
+                  <article class="editorial-review-item editorial-review-item-wide">
+                    <h3>参加前重点检查</h3>
+                    <ul>
+{reminder_html}
+                    </ul>
+                  </article>
+                </div>
+              </section>"""
 
 
 def status_notice(status):
@@ -910,6 +975,7 @@ def detail(entry, active_entries):
                   <li><strong>快速参与路径：</strong>{escape(clean_line(entry["pathDesc"]))}</li>
                 </ul>
               </section>"""
+    editorial_review_html = build_editorial_review(entry)
 
     # FAQ Section + JSON-LD
     faq_items = build_faq_items(entry)
@@ -982,6 +1048,7 @@ def detail(entry, active_entries):
           <nav class="detail-section-nav" aria-label="活动详情目录">
             <p class="detail-section-nav-title">本页内容</p>
             <a href="#ai-summary">核心要点速览</a>
+            <a href="#editorial-review">编辑解读</a>
             <a href="#offer-details">优惠内容与条件</a>
             <a href="#participation">参与方式</a>
             <a href="#faq">常见问题解答</a>
@@ -991,6 +1058,7 @@ def detail(entry, active_entries):
           <div class="detail-layout-content">
             <div class="detail-main">
 {ai_summary_html}
+{editorial_review_html}
               <section class="detail-section detail-section-emphasis" id="offer-details">
                 <div class="detail-section-head"><h2>优惠内容与条件</h2></div>
 {prose(entry["awardDesc"])}

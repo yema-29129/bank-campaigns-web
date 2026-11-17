@@ -1114,6 +1114,47 @@ details:not([open]) .filter-collapse { display: none; }
   font-weight: 700;
 }
 
+.editorial-review {
+  border-color: #cfe0ff !important;
+  background: linear-gradient(145deg, #ffffff 0%, #f7faff 100%) !important;
+}
+.editorial-review-note {
+  margin: -4px 0 18px;
+  color: var(--t-muted);
+  font-size: 13px;
+  line-height: 1.7;
+}
+.editorial-review-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px;
+}
+.editorial-review-item {
+  padding: 18px;
+  border: 1px solid #e1e9f6;
+  border-radius: 16px;
+  background: rgba(255, 255, 255, .88);
+}
+.editorial-review-item-wide { grid-column: 1 / -1; }
+.editorial-review-item h3 {
+  margin: 0 0 9px;
+  color: var(--t-ink);
+  font-size: 15px;
+  font-weight: 800;
+}
+.editorial-review-item p,
+.editorial-review-item li {
+  color: var(--t-ink-2);
+  font-size: 14px;
+  line-height: 1.75;
+}
+.editorial-review-item p { margin: 0; }
+.editorial-review-item ul {
+  margin: 0;
+  padding-left: 1.25em;
+}
+.editorial-review-item li + li { margin-top: 6px; }
+
 /* Telegram 横条（静态页 & 其他位置） */
 .telegram-subscribe {
   display: flex;
@@ -1348,6 +1389,9 @@ details:not([open]) .filter-collapse { display: none; }
   .detail-card > .detail-hero { padding: 22px 18px; }
   .detail-card .detail-section,
   .detail-card .detail-side-panel { padding: 20px 18px; }
+  .editorial-review-grid { grid-template-columns: 1fr; }
+  .editorial-review-item-wide { grid-column: auto; }
+  .editorial-review-item { padding: 16px; }
   .detail-card .detail-section-nav { top: 84px; }
   .telegram-subscribe { flex-direction: column; align-items: stretch; text-align: center; }
 
