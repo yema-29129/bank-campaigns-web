@@ -1255,7 +1255,10 @@ function buildDiscountText(activity) {
 }
 
 function getDetailShareUrl(id) {
-  return `https://bank.vooqqqm.com/detail.html?id=${encodeURIComponent(id || '')}`;
+  const value = String(id || '').trim();
+  return /^\d+$/.test(value)
+    ? `https://bank.vooqqqm.com/activities/${encodeURIComponent(value)}.html`
+    : 'https://bank.vooqqqm.com/activities/';
 }
 
 function buildShareText(activity) {

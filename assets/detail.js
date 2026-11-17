@@ -74,7 +74,7 @@ async function preferPublishedDetail(id, activity, description) {
     const response = await fetch('./activities/manifest.json');
     if (!response.ok) return;
     const { activities } = await response.json();
-    if (activities.some((entry) => entry.id === id && entry.status === 'current')) {
+    if (activities.some((entry) => entry.id === id)) {
       const canonical = new URL(`./activities/${id}.html`, window.location.href).href;
       setCanonical(canonical);
       updateStructuredData(activity, canonical, description);
@@ -116,7 +116,7 @@ function updateDetailMeta(activity) {
     activity.region ? `地区：${activity.region}` : ''
   ].filter(Boolean).join('，').slice(0, 120);
 
-  const url = `https://bank.vooqqqm.com/detail.html?id=${encodeURIComponent(campaignId)}`;
+  const url = getDetailUrl();
   const structuredDescription = description || '查看银行立减金活动详情、活动时间、参与路径和二维码图片。';
 
   document.title = title;
@@ -185,7 +185,10 @@ function buildDiscountText(activity) {
 }
 
 function getDetailUrl() {
-  return `https://bank.vooqqqm.com/detail.html?id=${encodeURIComponent(campaignId || '')}`;
+  const id = String(campaignId || '').trim();
+  return /^\d+$/.test(id)
+    ? `https://bank.vooqqqm.com/activities/${encodeURIComponent(id)}.html`
+    : 'https://bank.vooqqqm.com/activities/';
 }
 
 function buildShareText(activity) {
