@@ -556,6 +556,13 @@ def document(page_title, summary, url, kind, body, lastmod=None, indexable=True,
     var s = document.getElementsByTagName("script")[0];
     s.parentNode.insertBefore(hm, s);
   }})();
+  (function() {{
+    var el = document.createElement("script");
+    el.src = "https://lf1-cdn-tos.bytegoofy.com/goofy/ttzz/push.js?de566e6ef1de0b221926cc924d964af7b5f3beb5809d0e0020d409059de975c0bc434964556b7d7129e9b750ed197d397efd7b0c6c715c1701396e1af40cec962b8d7c8c6655c9b00211740aa8a98e2e";
+    el.id = "ttzz";
+    var s = document.getElementsByTagName("script")[0];
+    s.parentNode.insertBefore(el, s);
+  }})();
   </script>
   <script async src="https://www.googletagmanager.com/gtag/js?id=G-2C78TMMNY4"></script>
   <script>
