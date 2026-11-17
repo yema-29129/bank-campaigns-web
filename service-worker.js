@@ -1,5 +1,5 @@
-const STATIC_CACHE = 'yangmao-assistant-static-v10';
-const RUNTIME_CACHE = 'yangmao-assistant-runtime-v10';
+const STATIC_CACHE = 'yangmao-assistant-static-v11';
+const RUNTIME_CACHE = 'yangmao-assistant-runtime-v11';
 const STATIC_ASSETS = [
   '/',
   '/index.html',
@@ -13,10 +13,10 @@ const STATIC_ASSETS = [
   '/sitemap.xml',
   '/manifest.webmanifest',
   '/assets/styles.css',
-  '/assets/theme.css?v=20261118-mobileopt1',
-  '/assets/radar.css?v=20261118-mobileopt1',
+  '/assets/theme.css?v=20261118-mobileopt2',
+  '/assets/radar.css?v=20261118-mobileopt2',
   '/assets/detail-v2.css?v=20261117-radar10',
-  '/assets/app.js?v=20261118-mobileopt1',
+  '/assets/app.js?v=20261118-mobileopt2',
   '/assets/detail.js?v=20261117-radar10',
   '/assets/miniprogram-qr.jpg',
   '/assets/wechat-contact-qr.jpg',

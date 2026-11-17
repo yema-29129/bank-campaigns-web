@@ -68,6 +68,14 @@ body.radar-page {
   scrollbar-color: #cbd5e1 transparent;
 }
 
+.radar-sidebar-scroll {
+  display: flex;
+  flex: 1 1 auto;
+  min-height: 0;
+  flex-direction: column;
+  gap: 14px;
+}
+
 .radar-sidebar::-webkit-scrollbar {
   width: 5px;
 }
@@ -1451,8 +1459,9 @@ body.radar-page {
     box-shadow: 16px 0 40px rgba(15, 27, 45, 0.18);
     transform: translateX(-105%);
     transition: transform 0.2s ease;
-    padding: 0 14px calc(104px + env(safe-area-inset-bottom, 0px));
-    -webkit-overflow-scrolling: touch;
+    gap: 0;
+    padding: 0;
+    overflow: hidden;
   }
 
   .radar-sidebar.is-mobile-open {
@@ -1460,18 +1469,27 @@ body.radar-page {
   }
 
   .radar-sidebar-mobile-head {
-    position: sticky;
-    top: 0;
+    position: relative;
     z-index: 5;
+    flex: none;
     display: flex;
     align-items: center;
     justify-content: space-between;
-    margin: 0 -14px;
+    margin: 0;
     padding: calc(12px + env(safe-area-inset-top, 0px)) 14px 11px;
     background: rgba(255, 255, 255, 0.96);
     backdrop-filter: blur(8px);
     -webkit-backdrop-filter: blur(8px);
     border-bottom: 1px solid #eef1f6;
+  }
+
+  .radar-sidebar-scroll {
+    flex: 1 1 auto;
+    min-height: 0;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    padding: 14px 14px 20px;
+    -webkit-overflow-scrolling: touch;
   }
 
   .radar-sidebar-mobile-head strong {
@@ -1532,11 +1550,9 @@ body.radar-page {
   }
 
   .radar-sidebar-mobile-actions {
-    position: fixed;
-    left: 0;
-    right: 0;
-    bottom: 0;
+    position: relative;
     z-index: 8;
+    flex: none;
     display: grid;
     grid-template-columns: minmax(0, 0.88fr) minmax(0, 1.4fr);
     gap: 8px;
