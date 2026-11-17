@@ -1380,7 +1380,7 @@ body.radar-page {
   .radar-drawer-mobile-nav {
     flex: none;
     display: block;
-    padding: 10px 14px calc(68px + env(safe-area-inset-bottom, 0px));
+    padding: 10px 14px calc(8px + env(safe-area-inset-bottom, 0px));
     border-top: 1px solid #e6ebf2;
     background: rgba(255, 255, 255, 0.97);
     backdrop-filter: blur(12px);
