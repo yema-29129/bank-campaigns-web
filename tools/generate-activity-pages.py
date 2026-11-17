@@ -22,6 +22,7 @@ SITE = "https://bank.vooqqqm.com"
 BRAND_MAIN = "羊毛助手·羊毛线报活动站"
 SITE_NAME = "羊毛助手"
 TITLE_SUFFIX = f"｜{SITE_NAME}"
+SEO_REVISION_DATE = date(2026, 11, 18)
 DIRECTORY = f"{SITE}/activities/"
 TOPICS_URL = f"{SITE}/activities/topics/"
 OUTPUT = Path(__file__).resolve().parents[1] / "activities"
@@ -585,11 +586,13 @@ def parse_entry(activity_id, row, as_of):
     ))
 
     status = "ended" if end < as_of else "upcoming" if start > as_of else "current"
+    page_lastmod = max(lastmod, min(SEO_REVISION_DATE, as_of))
     entry.update(
         id=activity_id,
         validFrom=start.isoformat(),
         validTo=end.isoformat(),
-        lastmod=lastmod.isoformat(),
+        sourceLastmod=lastmod.isoformat(),
+        lastmod=page_lastmod.isoformat(),
         sources=sources,
         status=status,
         isCredit=bool(row.get("isCredit")),
@@ -1404,7 +1407,7 @@ def main():
         entry for entry in selected.values()
         if entry["status"] == "ended" and not entry.get("duplicate_of")
     ]
-    active.sort(key=lambda entry: (entry["lastmod"], int(entry["id"])), reverse=True)
+    active.sort(key=lambda entry: (entry["sourceLastmod"], int(entry["id"])), reverse=True)
     ended.sort(key=lambda entry: (entry["validTo"], int(entry["id"])), reverse=True)
     public_entries = active + ended
     if not active:
