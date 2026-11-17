@@ -586,7 +586,7 @@ body.radar-page {
   color: #ffffff;
 }
 
-.radar-overseas-tabs {
+.radar-secondary-tabs {
   flex: 1 0 100%;
   display: flex;
   flex-wrap: wrap;
@@ -600,11 +600,11 @@ body.radar-page {
   -webkit-overflow-scrolling: touch;
 }
 
-.radar-overseas-tabs::-webkit-scrollbar {
+.radar-secondary-tabs::-webkit-scrollbar {
   display: none;
 }
 
-.radar-overseas-tab {
+.radar-secondary-tab {
   flex: none;
   height: 29px;
   padding: 0 12px;
@@ -618,12 +618,12 @@ body.radar-page {
   cursor: pointer;
 }
 
-.radar-overseas-tab:hover {
+.radar-secondary-tab:hover {
   border-color: #b9c8dd;
   color: #0f1b2d;
 }
 
-.radar-overseas-tab.is-active {
+.radar-secondary-tab.is-active {
   border-color: #1f5eff;
   background: #eaf1ff;
   color: #1f5eff;
@@ -1579,7 +1579,7 @@ body.radar-page {
     padding-bottom: 2px;
   }
 
-  .radar-overseas-tabs {
+  .radar-secondary-tabs {
     display: grid;
     grid-auto-flow: column;
     grid-template-rows: repeat(2, 30px);
@@ -1594,7 +1594,7 @@ body.radar-page {
     scroll-snap-type: x proximity;
   }
 
-  .radar-overseas-tab {
+  .radar-secondary-tab {
     height: 30px;
     padding: 0 11px;
     font-size: 12px;

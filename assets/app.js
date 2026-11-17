@@ -124,6 +124,33 @@ const TOP_CATEGORIES = [
   { key: 'general', label: '通用优惠', scene: '通用优惠', cashback: false }
 ];
 
+const KNOWN_FOOD_TYPE_RE = /餐饮|餐厅|饭店|酒楼|中餐|西餐|火锅|烤肉|日料|料理|咖啡|星巴克|瑞幸|茶饮|奶茶|喜茶|奈雪|茶百道|霸王茶姬|库迪|Manner|麦当劳|肯德基|汉堡|快餐|小吃|必胜客|汉堡王|达美乐|德克士|外卖|饿了么|美团外卖|到家|配送|烘焙|蛋糕|甜品|面包|糕点|冰淇淋|冰激凌|酒吧|夜宵|啤酒|清吧|烧烤/i;
+
+const FOOD_TYPE_OPTIONS = [
+  { key: '全部', label: '全部吃喝', test: () => true },
+  { key: '餐厅正餐', label: '餐厅正餐', test: (text) => /餐饮|餐厅|饭店|酒楼|中餐|西餐|火锅|烤肉|日料|料理/.test(text) },
+  { key: '咖啡茶饮', label: '咖啡茶饮', test: (text) => /咖啡|星巴克|瑞幸|茶饮|奶茶|喜茶|奈雪|茶百道|霸王茶姬|库迪|Manner/i.test(text) },
+  { key: '快餐小吃', label: '快餐小吃', test: (text) => /麦当劳|肯德基|汉堡|快餐|小吃|必胜客|汉堡王|达美乐|德克士/.test(text) },
+  { key: '外卖到家', label: '外卖到家', test: (text) => /外卖|饿了么|美团外卖|到家|配送/.test(text) },
+  { key: '烘焙甜品', label: '烘焙甜品', test: (text) => /烘焙|蛋糕|甜品|面包|糕点|冰淇淋|冰激凌/.test(text) },
+  { key: '酒吧夜宵', label: '酒吧夜宵', test: (text) => /酒吧|夜宵|啤酒|清吧|烧烤/.test(text) },
+  { key: '其他吃喝', label: '其他吃喝', test: (text) => !KNOWN_FOOD_TYPE_RE.test(text) }
+];
+
+const KNOWN_SHOPPING_TYPE_RE = /超市|商超|便利店|山姆|盒马|永辉|沃尔玛|大润发|罗森|7-Eleven|京东|淘宝|天猫|拼多多|唯品会|抖音商城|苏宁|小红书|得物|百货|商场|购物中心|奥特莱斯|银泰|万象城|SOGO|SKP|手机|数码|家电|电脑|电器|苹果|Apple Store|小米|华为|国美|服饰|服装|鞋|箱包|美妆|护肤|化妆品|珠宝|黄金|家居|家具|家装|宜家|IKEA|日用品|母婴|亲子|儿童|玩具|宝宝/i;
+
+const SHOPPING_TYPE_OPTIONS = [
+  { key: '全部', label: '全部购物', test: () => true },
+  { key: '商超便利', label: '商超便利', test: (text) => /超市|商超|便利店|山姆|盒马|永辉|沃尔玛|大润发|罗森|7-Eleven/i.test(text) },
+  { key: '电商平台', label: '电商平台', test: (text) => /京东|淘宝|天猫|拼多多|唯品会|抖音商城|苏宁|小红书|得物/.test(text) },
+  { key: '百货商场', label: '百货商场', test: (text) => /百货|商场|购物中心|奥特莱斯|银泰|万象城|SOGO|SKP/i.test(text) },
+  { key: '数码家电', label: '数码家电', test: (text) => /手机|数码|家电|电脑|电器|苹果|Apple Store|小米|华为|苏宁易购|国美/i.test(text) },
+  { key: '服饰美妆', label: '服饰美妆', test: (text) => /服饰|服装|鞋|箱包|美妆|护肤|化妆品|珠宝|黄金/.test(text) },
+  { key: '家居生活', label: '家居生活', test: (text) => /家居|家具|家装|宜家|IKEA|日用品/i.test(text) },
+  { key: '母婴亲子', label: '母婴亲子', test: (text) => /母婴|亲子|儿童|玩具|宝宝/.test(text) },
+  { key: '其他购物', label: '其他购物', test: (text) => !KNOWN_SHOPPING_TYPE_RE.test(text) }
+];
+
 const KNOWN_OVERSEAS_DESTINATION_RE = /中国香港|香港|中国澳门|澳门|中国台湾|台湾|日本|东京|大阪|京都|冲绳|北海道|韩国|首尔|济州|釜山|东南亚|新加坡|泰国|曼谷|清迈|普吉|马来西亚|吉隆坡|槟城|沙巴|印度尼西亚|印尼|巴厘岛|雅加达|越南|河内|胡志明|岘港|菲律宾|马尼拉|长滩岛|宿务|柬埔寨|老挝|缅甸|文莱|美国|美利坚|纽约|洛杉矶|旧金山|夏威夷|关岛|加拿大|温哥华|多伦多|欧洲|欧盟|英国|法国|德国|意大利|西班牙|瑞士|荷兰|奥地利|葡萄牙|希腊|北欧|挪威|瑞典|芬兰|丹麦|冰岛|澳大利亚|澳洲|悉尼|墨尔本|布里斯班|珀斯|新西兰|奥克兰|皇后镇|中东|阿联酋|迪拜|阿布扎比|卡塔尔|多哈|沙特|土耳其|以色列/;
 
 const OVERSEAS_DESTINATION_OPTIONS = [
@@ -148,16 +175,86 @@ const TRAVEL_MODE_OPTIONS = [
   { key: '全部', label: '全部出行', test: () => true },
   { key: '飞机', label: '飞机', test: (text) => /机票|航空|航班|飞机|飞猪/.test(text) },
   { key: '高铁/火车', label: '高铁/火车', test: (text) => /高铁|火车|铁路|12306|动车|列车/.test(text) },
-  { key: '船舶/邮轮', label: '船舶/邮轮', test: (text) => /船舶|轮船|船票|邮轮|游轮|客轮|渡轮/.test(text) },
   { key: '打车', label: '打车', test: (text) => /滴滴|打车|出租车|网约车|的士|T3出行|曹操出行|高德打车|花小猪/.test(text) },
   { key: '公交/地铁', label: '公交/地铁', test: (text) => /公交|地铁|八达通|交通卡|乘车码|一卡通|轨道交通/.test(text) },
-  { key: '自驾/加油', label: '自驾/加油', test: (text) => /加油|加气|充电桩|停车|高速|ETC|洗车|自驾|车主/.test(text) },
-  { key: '租车', label: '租车', test: (text) => /租车|神州租车|一嗨租车/.test(text) },
   { key: '酒店住宿', label: '酒店住宿', test: (text) => /酒店|住宿|订房|宾馆|民宿|旅馆|度假村/.test(text) },
   { key: '景区门票', label: '景区门票', test: (text) => /景区|景点|门票|乐园|主题公园|博物馆/.test(text) },
+  { key: '自驾/加油', label: '自驾/加油', test: (text) => /加油|加气|充电桩|停车|高速|ETC|洗车|自驾|车主/.test(text) },
+  { key: '租车', label: '租车', test: (text) => /租车|神州租车|一嗨租车/.test(text) },
   { key: '机场服务', label: '机场服务', test: (text) => /机场|贵宾厅|休息室|接送机|机场停车/.test(text) },
+  { key: '船舶/邮轮', label: '船舶/邮轮', test: (text) => /船舶|轮船|船票|邮轮|游轮|客轮|渡轮/.test(text) },
   { key: '其他出行', label: '其他出行', test: (text) => !KNOWN_TRAVEL_MODE_RE.test(text) }
 ];
+
+const KNOWN_CASHBACK_TYPE_RE = /返\d+(?:\.\d+)?%|百分之|笔笔返|返现率|返\d+(?:\.\d+)?(?:元|港币|美元)|返现\d+|返人民币|返港币|返美元|刷卡金|账单金|消费金|抵扣金|达标|累计消费|消费满|境外|海外|国外|跨境|港澳|新户|新客|首刷|首绑|首次|微信|支付宝|云闪付|线上支付|快捷支付/i;
+
+const CASHBACK_TYPE_OPTIONS = [
+  { key: '全部', label: '全部返现', test: () => true },
+  { key: '比例返现', label: '比例返现', test: (text) => /返\d+(?:\.\d+)?%|百分之|笔笔返|返现率/.test(text) },
+  { key: '固定金额返现', label: '固定金额返现', test: (text) => /返\d+(?:\.\d+)?(?:元|港币|美元)|返现\d+|返(?:人民币|港币|美元)/.test(text) },
+  { key: '刷卡金/账单金', label: '刷卡金/账单金', test: (text) => /刷卡金|账单金|消费金|抵扣金/.test(text) },
+  { key: '达标返现', label: '达标返现', test: (text) => /达标|累计消费|满\d+[^。；;，,]*返|消费满/.test(text) },
+  { key: '境外返现', label: '境外返现', test: (text) => /境外|海外|国外|跨境|港澳/.test(text) },
+  { key: '新户/首刷', label: '新户/首刷', test: (text) => /新户|新客|首刷|首绑|首次/.test(text) },
+  { key: '线上支付返现', label: '线上支付返现', test: (text) => /微信|支付宝|云闪付|线上支付|快捷支付/.test(text) },
+  { key: '其他返现', label: '其他返现', test: (text) => !KNOWN_CASHBACK_TYPE_RE.test(text) }
+];
+
+const KNOWN_LIFE_TYPE_RE = /话费|流量|手机充值|通信|宽带|电信|移动|联通|水费|电费|燃气|水电|供暖|生活缴费|物业|社保|公积金|交通罚款|医疗|医院|药店|健康|体检|牙科|口腔|运动|健身|体育|瑜伽|游泳|电影|影院|演出|音乐|游戏|KTV|娱乐|洗衣|家政|保洁|维修|快递|洗护|保险|保费/i;
+
+const LIFE_TYPE_OPTIONS = [
+  { key: '全部', label: '全部生活', test: () => true },
+  { key: '话费流量', label: '话费流量', test: (text) => /话费|流量|手机充值|通信|宽带|电信|移动|联通/.test(text) },
+  { key: '水电燃气', label: '水电燃气', test: (text) => /水费|电费|燃气|水电|供暖/.test(text) },
+  { key: '日常缴费', label: '日常缴费', test: (text) => /生活缴费|物业|社保|公积金|交通罚款|缴费/.test(text) },
+  { key: '医疗健康', label: '医疗健康', test: (text) => /医疗|医院|药店|健康|体检|牙科|口腔/.test(text) },
+  { key: '运动健身', label: '运动健身', test: (text) => /运动|健身|体育|瑜伽|游泳/.test(text) },
+  { key: '影音娱乐', label: '影音娱乐', test: (text) => /电影|影院|演出|音乐|游戏|KTV|娱乐/i.test(text) },
+  { key: '洗护家政', label: '洗护家政', test: (text) => /洗衣|家政|保洁|维修|快递|洗护/.test(text) },
+  { key: '保险保障', label: '保险保障', test: (text) => /保险|保费/.test(text) },
+  { key: '其他生活', label: '其他生活', test: (text) => !KNOWN_LIFE_TYPE_RE.test(text) }
+];
+
+const KNOWN_MEMBER_BENEFIT_RE = /腾讯视频|爱奇艺|优酷|芒果|哔哩|视频会员|QQ音乐|网易云|喜马拉雅|音乐会员|阅读会员|知乎|WPS|贵宾厅|休息室|机场|高铁贵宾|酒店|住宿|房晚|早餐|延迟退房|餐饮|咖啡|茶饮|美食|餐厅|京东PLUS|88VIP|淘宝|天猫|苏宁|电商会员|打车|滴滴|加油|租车|出行|白金卡|钻石卡|高端卡|年费|积分兑换|权益平台/i;
+
+const MEMBER_BENEFIT_OPTIONS = [
+  { key: '全部', label: '全部权益', test: () => true },
+  { key: '视频会员', label: '视频会员', test: (text) => /腾讯视频|爱奇艺|优酷|芒果|哔哩|视频会员/.test(text) },
+  { key: '音乐阅读', label: '音乐阅读', test: (text) => /QQ音乐|网易云|喜马拉雅|音乐会员|阅读会员|知乎|WPS/i.test(text) },
+  { key: '机场/高铁贵宾', label: '机场/高铁贵宾', test: (text) => /贵宾厅|休息室|机场|高铁贵宾/.test(text) },
+  { key: '酒店权益', label: '酒店权益', test: (text) => /酒店|住宿|房晚|早餐|延迟退房/.test(text) },
+  { key: '餐饮权益', label: '餐饮权益', test: (text) => /餐饮|咖啡|茶饮|美食|餐厅/.test(text) },
+  { key: '电商会员', label: '电商会员', test: (text) => /京东PLUS|88VIP|淘宝|天猫|苏宁|电商会员/i.test(text) },
+  { key: '出行权益', label: '出行权益', test: (text) => /打车|滴滴|加油|租车|出行/.test(text) },
+  { key: '银行专属权益', label: '银行专属权益', test: (text) => /白金卡|钻石卡|高端卡|年费|积分兑换|权益平台/.test(text) },
+  { key: '其他权益', label: '其他权益', test: (text) => !KNOWN_MEMBER_BENEFIT_RE.test(text) }
+];
+
+const KNOWN_GENERAL_DISCOUNT_RE = /微信立减金|微信支付|微信|支付宝|支付宝红包|云闪付|银联|数字人民币|数币|手机银行|掌上银行|掌银|银行App|生活App|消费券|红包|优惠券|券包|满\d|随机减|立减|满减|抽奖|积分|签到|任务/i;
+
+const GENERAL_DISCOUNT_OPTIONS = [
+  { key: '全部', label: '全部通用', test: () => true },
+  { key: '微信立减金', label: '微信立减金', test: (text) => /微信立减金|微信支付|微信/.test(text) },
+  { key: '支付宝优惠', label: '支付宝优惠', test: (text) => /支付宝|支付宝红包/.test(text) },
+  { key: '云闪付/银联', label: '云闪付/银联', test: (text) => /云闪付|银联/.test(text) },
+  { key: '数字人民币', label: '数字人民币', test: (text) => /数字人民币|数币/.test(text) },
+  { key: '银行App', label: '银行App', test: (text) => /手机银行|掌上银行|掌银|银行App|生活App/i.test(text) },
+  { key: '消费券/红包', label: '消费券/红包', test: (text) => /消费券|红包|优惠券|券包/.test(text) },
+  { key: '满减/随机减', label: '满减/随机减', test: (text) => /满\d|随机减|立减|满减/.test(text) },
+  { key: '抽奖/积分', label: '抽奖/积分', test: (text) => /抽奖|积分|签到|任务/.test(text) },
+  { key: '其他通用', label: '其他通用', test: (text) => !KNOWN_GENERAL_DISCOUNT_RE.test(text) }
+];
+
+const SECONDARY_FILTER_GROUPS = {
+  '吃喝': { key: 'food', ariaLabel: '吃喝类型筛选', options: FOOD_TYPE_OPTIONS },
+  '购物': { key: 'shopping', ariaLabel: '购物类型筛选', options: SHOPPING_TYPE_OPTIONS },
+  '出行': { key: 'travel', ariaLabel: '出行方式筛选', options: TRAVEL_MODE_OPTIONS },
+  '境外游': { key: 'overseas', ariaLabel: '境外游目的地筛选', options: OVERSEAS_DESTINATION_OPTIONS, textField: 'overseasDestinationText' },
+  '返现': { key: 'cashback', ariaLabel: '返现类型筛选', options: CASHBACK_TYPE_OPTIONS },
+  '生活': { key: 'life', ariaLabel: '生活类型筛选', options: LIFE_TYPE_OPTIONS },
+  '会员权益': { key: 'member', ariaLabel: '会员权益类型筛选', options: MEMBER_BENEFIT_OPTIONS },
+  '通用优惠': { key: 'general', ariaLabel: '通用优惠类型筛选', options: GENERAL_DISCOUNT_OPTIONS }
+};
 
 // A card's issuing country or bank name is not the campaign's travel destination.
 function overseasDestination(region) {
@@ -236,8 +333,7 @@ const state = {
   pay: '全部',          // PAY_OPTIONS.key
   regionGroup: '全部',  // REGION_OPTIONS.key
   scene: '全部',        // SCENE_OPTIONS
-  travelMode: '全部',   // TRAVEL_MODE_OPTIONS.key
-  overseasDestination: '全部', // OVERSEAS_DESTINATION_OPTIONS.key
+  secondaryFilter: '全部', // 当前一级分类对应的二级筛选
   cashback: false,     // top tab '返现'
   keyword: '',
   loadStatus: 'loading',
@@ -266,8 +362,7 @@ const els = {
   regionFilters: document.getElementById('regionFilters'),
   sceneFilters: document.getElementById('sceneFilters'),
   topCategoryBar: document.getElementById('topCategoryBar'),
-  travelModeBar: document.getElementById('travelModeBar'),
-  overseasDestinationBar: document.getElementById('overseasDestinationBar'),
+  secondaryFilterBar: document.getElementById('secondaryFilterBar'),
   activeViewBadge: document.getElementById('activeViewBadge'),
   activeCardOrgBadge: document.getElementById('activeCardOrgBadge'),
   activeBankBadge: document.getElementById('activeBankBadge'),
@@ -438,9 +533,11 @@ function normalizeCampaign(item) {
     orgText: [normalized.cardOrg, normalized.title, normalized.desc, normalized.bankName, normalized.channel, normalized.consumeChannel, ...normalizedTags].filter(Boolean).join(' '),
     payText: [normalized.channel, normalized.consumeChannel, normalized.title].filter(Boolean).join(' '),
     regionText: String(normalized.region || '').trim(),
-    travelText: [
-      normalized.title, normalized.desc, normalized.consumeChannel,
-      normalized.channel, normalized.region, ...normalizedTags
+    secondaryText: [
+      normalized.title, normalized.desc, normalized.awardDesc, normalized.pathDesc,
+      normalized.consumeChannel, normalized.channel, normalized.region,
+      normalized.cardOrg, normalized.cashbackText, normalized.recurringText,
+      ...normalizedTags
     ].filter(Boolean).join(' '),
     overseasDestinationText: [
       overseasDestination(normalized.region), normalized.title, normalized.desc,
@@ -519,16 +616,22 @@ function matchesSceneOrCashback(item, scene = state.scene, cashback = state.cash
   return scene === '全部' || item.sceneLabels.includes(scene);
 }
 
-function matchesOverseasDestination(item, destination = state.overseasDestination) {
-  if (state.scene !== '境外游' || !destination || destination === '全部') return true;
-  const rule = OVERSEAS_DESTINATION_OPTIONS.find((opt) => opt.key === destination);
-  return rule ? rule.test(item.overseasDestinationText) : true;
+function getSecondaryFilterGroup(scene = state.scene, cashback = state.cashback) {
+  const groupName = cashback ? '返现' : scene;
+  return SECONDARY_FILTER_GROUPS[groupName] || null;
 }
 
-function matchesTravelMode(item, mode = state.travelMode) {
-  if (state.scene !== '出行' || !mode || mode === '全部') return true;
-  const rule = TRAVEL_MODE_OPTIONS.find((opt) => opt.key === mode);
-  return rule ? rule.test(item.travelText) : true;
+function matchesSecondaryFilter(
+  item,
+  selected = state.secondaryFilter,
+  scene = state.scene,
+  cashback = state.cashback
+) {
+  const group = getSecondaryFilterGroup(scene, cashback);
+  if (!group || !selected || selected === '全部') return true;
+  const rule = group.options.find((opt) => opt.key === selected);
+  const text = group.textField ? item[group.textField] : item.secondaryText;
+  return rule ? rule.test(text || '') : true;
 }
 
 function matchesQuick(item, quick = state.quick) {
@@ -539,6 +642,8 @@ function matchesQuick(item, quick = state.quick) {
 }
 
 function matchesAll(item, override = {}) {
+  const selectedScene = 'scene' in override ? override.scene : state.scene;
+  const selectedCashback = 'cashback' in override ? override.cashback : state.cashback;
   return (
     matchesKeyword(item) &&
     matchesView(item) &&
@@ -546,18 +651,12 @@ function matchesAll(item, override = {}) {
     matchesBank(item, 'bank' in override ? override.bank : state.bank) &&
     matchesPay(item, 'pay' in override ? override.pay : state.pay) &&
     matchesRegion(item, 'regionGroup' in override ? override.regionGroup : state.regionGroup) &&
-    matchesSceneOrCashback(
+    matchesSceneOrCashback(item, selectedScene, selectedCashback) &&
+    matchesSecondaryFilter(
       item,
-      'scene' in override ? override.scene : state.scene,
-      'cashback' in override ? override.cashback : state.cashback
-    ) &&
-    matchesTravelMode(
-      item,
-      'travelMode' in override ? override.travelMode : state.travelMode
-    ) &&
-    matchesOverseasDestination(
-      item,
-      'overseasDestination' in override ? override.overseasDestination : state.overseasDestination
+      'secondaryFilter' in override ? override.secondaryFilter : state.secondaryFilter,
+      selectedScene,
+      selectedCashback
     ) &&
     matchesQuick(item, 'quick' in override ? override.quick : state.quick)
   );
@@ -572,8 +671,7 @@ function hasDefaultFilters() {
     state.pay === '全部' &&
     state.regionGroup === '全部' &&
     state.scene === '全部' &&
-    state.travelMode === '全部' &&
-    state.overseasDestination === '全部' &&
+    state.secondaryFilter === '全部' &&
     !state.cashback &&
     !state.keyword.trim()
   );
@@ -587,8 +685,7 @@ function countActiveExtraFilters() {
   if (state.pay !== '全部') n++;
   if (state.regionGroup !== '全部') n++;
   if (state.scene !== '全部' || state.cashback) n++;
-  if (state.travelMode !== '全部') n++;
-  if (state.overseasDestination !== '全部') n++;
+  if (state.secondaryFilter !== '全部') n++;
   return n;
 }
 
@@ -601,8 +698,7 @@ function resetFilters() {
     pay: '全部',
     regionGroup: '全部',
     scene: '全部',
-    travelMode: '全部',
-    overseasDestination: '全部',
+    secondaryFilter: '全部',
     cashback: false,
     keyword: '',
     showExpired: false
@@ -626,13 +722,11 @@ function mountTopCategories() {
       if (cat.key === 'all' || isAlready) {
         state.scene = '全部';
         state.cashback = false;
-        state.travelMode = '全部';
-        state.overseasDestination = '全部';
+        state.secondaryFilter = '全部';
       } else {
         state.scene = cat.scene;
         state.cashback = !!cat.cashback;
-        if (cat.scene !== '出行') state.travelMode = '全部';
-        if (cat.scene !== '境外游') state.overseasDestination = '全部';
+        state.secondaryFilter = '全部';
       }
       applyFilters();
     });
@@ -640,43 +734,26 @@ function mountTopCategories() {
   });
 }
 
-function mountTravelModes() {
-  if (!els.travelModeBar) return;
-  els.travelModeBar.innerHTML = '';
-  TRAVEL_MODE_OPTIONS.forEach((opt) => {
+function mountSecondaryFilters(group = getSecondaryFilterGroup()) {
+  if (!els.secondaryFilterBar) return;
+  els.secondaryFilterBar.innerHTML = '';
+  els.secondaryFilterBar.dataset.secondaryGroup = group ? group.key : '';
+  if (!group) return;
+  els.secondaryFilterBar.setAttribute('aria-label', group.ariaLabel);
+  group.options.forEach((opt) => {
     const btn = document.createElement('button');
     btn.type = 'button';
-    btn.className = 'radar-overseas-tab';
-    btn.dataset.travelMode = opt.key;
-    btn.setAttribute('aria-pressed', String(opt.key === state.travelMode));
+    btn.className = 'radar-secondary-tab';
+    btn.dataset.secondaryFilter = opt.key;
+    btn.setAttribute('aria-pressed', String(opt.key === state.secondaryFilter));
     btn.textContent = opt.label;
     btn.addEventListener('click', () => {
-      state.travelMode = opt.key === '全部' || state.travelMode === opt.key
+      state.secondaryFilter = opt.key === '全部' || state.secondaryFilter === opt.key
         ? '全部'
         : opt.key;
       applyFilters();
     });
-    els.travelModeBar.appendChild(btn);
-  });
-}
-
-function mountOverseasDestinations() {
-  if (!els.overseasDestinationBar) return;
-  els.overseasDestinationBar.innerHTML = '';
-  OVERSEAS_DESTINATION_OPTIONS.forEach((opt) => {
-    const btn = document.createElement('button');
-    btn.type = 'button';
-    btn.className = 'radar-overseas-tab';
-    btn.dataset.overseasDestination = opt.key;
-    btn.setAttribute('aria-pressed', String(opt.key === state.overseasDestination));
-    btn.textContent = opt.label;
-    btn.addEventListener('click', () => {
-      state.overseasDestination = opt.key === '全部' || state.overseasDestination === opt.key
-        ? '全部'
-        : opt.key;
-      applyFilters();
-    });
-    els.overseasDestinationBar.appendChild(btn);
+    els.secondaryFilterBar.appendChild(btn);
   });
 }
 
@@ -769,8 +846,7 @@ function mountMiniChips(container, options, stateKey) {
       if (stateKey === 'scene') {
         state.cashback = false;
         state.scene = (key === '全部' || state.scene === key) ? '全部' : key;
-        if (state.scene !== '出行') state.travelMode = '全部';
-        if (state.scene !== '境外游') state.overseasDestination = '全部';
+        state.secondaryFilter = '全部';
       } else {
         state[stateKey] = (key === '全部' || state[stateKey] === key) ? '全部' : key;
       }
@@ -794,23 +870,15 @@ function syncFilterControls() {
     });
   }
 
-  if (els.overseasDestinationBar) {
-    const shouldShowDestinations = state.scene === '境外游' && !state.cashback;
-    els.overseasDestinationBar.classList.toggle('hidden', !shouldShowDestinations);
-    els.overseasDestinationBar.setAttribute('aria-hidden', String(!shouldShowDestinations));
-    els.overseasDestinationBar.querySelectorAll('[data-overseas-destination]').forEach((btn) => {
-      const isActive = btn.dataset.overseasDestination === state.overseasDestination;
-      btn.classList.toggle('is-active', isActive);
-      btn.setAttribute('aria-pressed', String(isActive));
-    });
-  }
-
-  if (els.travelModeBar) {
-    const shouldShowTravelModes = state.scene === '出行' && !state.cashback;
-    els.travelModeBar.classList.toggle('hidden', !shouldShowTravelModes);
-    els.travelModeBar.setAttribute('aria-hidden', String(!shouldShowTravelModes));
-    els.travelModeBar.querySelectorAll('[data-travel-mode]').forEach((btn) => {
-      const isActive = btn.dataset.travelMode === state.travelMode;
+  if (els.secondaryFilterBar) {
+    const group = getSecondaryFilterGroup();
+    if (group && els.secondaryFilterBar.dataset.secondaryGroup !== group.key) {
+      mountSecondaryFilters(group);
+    }
+    els.secondaryFilterBar.classList.toggle('hidden', !group);
+    els.secondaryFilterBar.setAttribute('aria-hidden', String(!group));
+    els.secondaryFilterBar.querySelectorAll('[data-secondary-filter]').forEach((btn) => {
+      const isActive = btn.dataset.secondaryFilter === state.secondaryFilter;
       btn.classList.toggle('is-active', isActive);
       btn.setAttribute('aria-pressed', String(isActive));
     });
@@ -908,9 +976,9 @@ function syncFilterControls() {
     if (bankLabel) parts.push(bankLabel);
     if (state.pay !== '全部') parts.push(state.pay);
     if (state.regionGroup !== '全部') parts.push(state.regionGroup);
-    if (state.scene !== '全部' && !state.cashback) parts.push(state.scene);
-    if (state.travelMode !== '全部') parts.push(state.travelMode);
-    if (state.overseasDestination !== '全部') parts.push(state.overseasDestination);
+    if (state.cashback) parts.push('返现');
+    else if (state.scene !== '全部') parts.push(state.scene);
+    if (state.secondaryFilter !== '全部') parts.push(state.secondaryFilter);
     if (state.quick === 'today') parts.push('今日新增');
     if (state.quick === 'expiring') parts.push('快到期');
     if (state.quick === 'recurring') parts.push('循环活动');
@@ -1842,8 +1910,7 @@ function initializeCampaignPage() {
   if (!isListPage()) return;
 
   mountTopCategories();
-  mountTravelModes();
-  mountOverseasDestinations();
+  mountSecondaryFilters();
   mountCardOrgFilters();
   mountBankGroups();
   mountMiniChips(els.payFilters, PAY_OPTIONS, 'pay');

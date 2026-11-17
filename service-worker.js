@@ -1,5 +1,5 @@
-const STATIC_CACHE = 'yangmao-assistant-static-v7';
-const RUNTIME_CACHE = 'yangmao-assistant-runtime-v7';
+const STATIC_CACHE = 'yangmao-assistant-static-v8';
+const RUNTIME_CACHE = 'yangmao-assistant-runtime-v8';
 const STATIC_ASSETS = [
   '/',
   '/index.html',
@@ -14,9 +14,9 @@ const STATIC_ASSETS = [
   '/manifest.webmanifest',
   '/assets/styles.css',
   '/assets/theme.css?v=20261118-brandlogo1',
-  '/assets/radar.css?v=20261118-travelbrand1',
+  '/assets/radar.css?v=20261118-allsecondary1',
   '/assets/detail-v2.css?v=20261117-radar10',
-  '/assets/app.js?v=20261118-travelbrand1',
+  '/assets/app.js?v=20261118-allsecondary1',
   '/assets/detail.js?v=20261117-radar10',
   '/assets/miniprogram-qr.jpg',
   '/assets/logo-lijianjin.png'
