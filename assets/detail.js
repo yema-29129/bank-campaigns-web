@@ -517,7 +517,7 @@ function renderDetail(activity) {
   const html = `
     <div class="dx-clean-wrap">
       <div class="dx-clean-topbar">
-        <a class="dx-clean-back" href="./index.html">← 返回活动列表</a>
+        <a class="dx-clean-back" href="./index.html#listTitle">← 返回活动列表</a>
         <button class="dx-clean-share-btn" type="button" data-dx-share>分享</button>
       </div>
 
@@ -568,11 +568,12 @@ function renderDetail(activity) {
         </footer>
       </article>
 
-      <div class="dx-clean-mobile-bar">
+      <div class="dx-clean-mobile-bar${isPathUrlLink ? ' has-direct' : ''}">
+        <a class="dx-clean-btn dx-clean-mobile-back" href="./index.html#listTitle">← 返回列表</a>
         <button class="dx-clean-btn" type="button" data-dx-share>分享</button>
         ${isPathUrlLink
           ? `<a class="dx-clean-btn is-primary" href="${escapeAttribute(pathUrl)}" target="_blank" rel="noopener noreferrer">直达活动入口 ↗</a>`
-          : `<a class="dx-clean-btn is-primary" href="./index.html">返回列表</a>`}
+          : ''}
       </div>
     </div>
   `;

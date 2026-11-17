@@ -124,6 +124,16 @@ const TOP_CATEGORIES = [
   { key: 'general', label: '通用优惠', scene: '通用优惠', cashback: false }
 ];
 
+const OVERSEAS_DESTINATION_OPTIONS = [
+  { key: '全部', label: '全部境外', test: () => true },
+  { key: '中国香港', label: '中国香港', test: (text) => /中国香港|香港/.test(text) },
+  { key: '中国澳门', label: '中国澳门', test: (text) => /中国澳门|澳门/.test(text) },
+  { key: '中国台湾', label: '中国台湾', test: (text) => /中国台湾|台湾/.test(text) },
+  { key: '日本', label: '日本', test: (text) => /日本|东京|大阪|京都|冲绳|北海道/.test(text) },
+  { key: '美国', label: '美国', test: (text) => /美国|美利坚|纽约|洛杉矶|旧金山|夏威夷|关岛/.test(text) },
+  { key: '欧洲', label: '欧洲', test: (text) => /欧洲|欧盟|英国|法国|德国|意大利|西班牙|瑞士|荷兰|奥地利|葡萄牙|希腊|北欧|挪威|瑞典|芬兰|丹麦|冰岛/.test(text) }
+];
+
 // A card's issuing country or bank name is not the campaign's travel destination.
 function overseasDestination(region) {
   return String(region || '').split(/[·；;，,]/)
@@ -201,6 +211,7 @@ const state = {
   pay: '全部',          // PAY_OPTIONS.key
   regionGroup: '全部',  // REGION_OPTIONS.key
   scene: '全部',        // SCENE_OPTIONS
+  overseasDestination: '全部', // OVERSEAS_DESTINATION_OPTIONS.key
   cashback: false,     // top tab '返现'
   keyword: '',
   loadStatus: 'loading',
@@ -229,6 +240,7 @@ const els = {
   regionFilters: document.getElementById('regionFilters'),
   sceneFilters: document.getElementById('sceneFilters'),
   topCategoryBar: document.getElementById('topCategoryBar'),
+  overseasDestinationBar: document.getElementById('overseasDestinationBar'),
   activeViewBadge: document.getElementById('activeViewBadge'),
   activeCardOrgBadge: document.getElementById('activeCardOrgBadge'),
   activeBankBadge: document.getElementById('activeBankBadge'),
@@ -399,6 +411,10 @@ function normalizeCampaign(item) {
     orgText: [normalized.cardOrg, normalized.title, normalized.desc, normalized.bankName, normalized.channel, normalized.consumeChannel, ...normalizedTags].filter(Boolean).join(' '),
     payText: [normalized.channel, normalized.consumeChannel, normalized.title].filter(Boolean).join(' '),
     regionText: String(normalized.region || '').trim(),
+    overseasDestinationText: [
+      overseasDestination(normalized.region), normalized.title, normalized.desc,
+      normalized.consumeChannel, normalized.channel, ...normalizedTags
+    ].filter(Boolean).join(' '),
     isCredit: hasCreditTag(normalized),
     hasCashback: hasCashbackEvidence(normalized),
     sceneLabels: classifyScenes(normalized),
@@ -472,6 +488,12 @@ function matchesSceneOrCashback(item, scene = state.scene, cashback = state.cash
   return scene === '全部' || item.sceneLabels.includes(scene);
 }
 
+function matchesOverseasDestination(item, destination = state.overseasDestination) {
+  if (state.scene !== '境外游' || !destination || destination === '全部') return true;
+  const rule = OVERSEAS_DESTINATION_OPTIONS.find((opt) => opt.key === destination);
+  return rule ? rule.test(item.overseasDestinationText) : true;
+}
+
 function matchesQuick(item, quick = state.quick) {
   if (quick === 'today') return item.isTodayAdded;
   if (quick === 'expiring') return item.isSoon;
@@ -492,6 +514,10 @@ function matchesAll(item, override = {}) {
       'scene' in override ? override.scene : state.scene,
       'cashback' in override ? override.cashback : state.cashback
     ) &&
+    matchesOverseasDestination(
+      item,
+      'overseasDestination' in override ? override.overseasDestination : state.overseasDestination
+    ) &&
     matchesQuick(item, 'quick' in override ? override.quick : state.quick)
   );
 }
@@ -505,6 +531,7 @@ function hasDefaultFilters() {
     state.pay === '全部' &&
     state.regionGroup === '全部' &&
     state.scene === '全部' &&
+    state.overseasDestination === '全部' &&
     !state.cashback &&
     !state.keyword.trim()
   );
@@ -518,6 +545,7 @@ function countActiveExtraFilters() {
   if (state.pay !== '全部') n++;
   if (state.regionGroup !== '全部') n++;
   if (state.scene !== '全部' || state.cashback) n++;
+  if (state.overseasDestination !== '全部') n++;
   return n;
 }
 
@@ -530,6 +558,7 @@ function resetFilters() {
     pay: '全部',
     regionGroup: '全部',
     scene: '全部',
+    overseasDestination: '全部',
     cashback: false,
     keyword: '',
     showExpired: false
@@ -553,13 +582,35 @@ function mountTopCategories() {
       if (cat.key === 'all' || isAlready) {
         state.scene = '全部';
         state.cashback = false;
+        state.overseasDestination = '全部';
       } else {
         state.scene = cat.scene;
         state.cashback = !!cat.cashback;
+        if (cat.scene !== '境外游') state.overseasDestination = '全部';
       }
       applyFilters();
     });
     els.topCategoryBar.appendChild(btn);
+  });
+}
+
+function mountOverseasDestinations() {
+  if (!els.overseasDestinationBar) return;
+  els.overseasDestinationBar.innerHTML = '';
+  OVERSEAS_DESTINATION_OPTIONS.forEach((opt) => {
+    const btn = document.createElement('button');
+    btn.type = 'button';
+    btn.className = 'radar-overseas-tab';
+    btn.dataset.overseasDestination = opt.key;
+    btn.setAttribute('aria-pressed', String(opt.key === state.overseasDestination));
+    btn.textContent = opt.label;
+    btn.addEventListener('click', () => {
+      state.overseasDestination = opt.key === '全部' || state.overseasDestination === opt.key
+        ? '全部'
+        : opt.key;
+      applyFilters();
+    });
+    els.overseasDestinationBar.appendChild(btn);
   });
 }
 
@@ -652,6 +703,7 @@ function mountMiniChips(container, options, stateKey) {
       if (stateKey === 'scene') {
         state.cashback = false;
         state.scene = (key === '全部' || state.scene === key) ? '全部' : key;
+        if (state.scene !== '境外游') state.overseasDestination = '全部';
       } else {
         state[stateKey] = (key === '全部' || state[stateKey] === key) ? '全部' : key;
       }
@@ -672,6 +724,17 @@ function syncFilterControls() {
         : (cat.cashback ? state.cashback : (!state.cashback && state.scene === cat.scene));
       btn.classList.toggle('is-active', isActive);
       btn.setAttribute('aria-selected', String(isActive));
+    });
+  }
+
+  if (els.overseasDestinationBar) {
+    const shouldShowDestinations = state.scene === '境外游' && !state.cashback;
+    els.overseasDestinationBar.classList.toggle('hidden', !shouldShowDestinations);
+    els.overseasDestinationBar.setAttribute('aria-hidden', String(!shouldShowDestinations));
+    els.overseasDestinationBar.querySelectorAll('[data-overseas-destination]').forEach((btn) => {
+      const isActive = btn.dataset.overseasDestination === state.overseasDestination;
+      btn.classList.toggle('is-active', isActive);
+      btn.setAttribute('aria-pressed', String(isActive));
     });
   }
 
@@ -767,6 +830,8 @@ function syncFilterControls() {
     if (bankLabel) parts.push(bankLabel);
     if (state.pay !== '全部') parts.push(state.pay);
     if (state.regionGroup !== '全部') parts.push(state.regionGroup);
+    if (state.scene !== '全部' && !state.cashback) parts.push(state.scene);
+    if (state.overseasDestination !== '全部') parts.push(state.overseasDestination);
     if (state.quick === 'today') parts.push('今日新增');
     if (state.quick === 'expiring') parts.push('快到期');
     if (state.quick === 'recurring') parts.push('循环活动');
@@ -1698,6 +1763,7 @@ function initializeCampaignPage() {
   if (!isListPage()) return;
 
   mountTopCategories();
+  mountOverseasDestinations();
   mountCardOrgFilters();
   mountBankGroups();
   mountMiniChips(els.payFilters, PAY_OPTIONS, 'pay');
