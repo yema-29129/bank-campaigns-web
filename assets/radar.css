@@ -1,5 +1,5 @@
 /* =========================================================
-   好羊毛银行活动站 · 极简雷达列表页 + 分组侧栏 + 右侧详情抽屉
+   羊毛助手·羊毛线报活动站 · 极简雷达列表页 + 分组侧栏 + 右侧详情抽屉
    仅作用于 body.radar-page（首页），不影响详情页与其它页面
    ========================================================= */
 
@@ -247,7 +247,7 @@ body.radar-page {
 
 /* 一级目录：银行分类 / 消费场景 / 支付方式 / 卡组织 / 银行卡种 / 适用地区 */
 .radar-l1 {
-  border: 1px solid #d8e3f5;
+  border: 1px solid #e5e7eb;
   border-radius: 10px;
   background: #ffffff;
   overflow: hidden;
@@ -260,9 +260,9 @@ body.radar-page {
   gap: 6px;
   min-height: 36px;
   padding: 0 10px;
-  background: #eef3fc;
-  border-left: 3px solid #1f5eff;
-  color: #163a70;
+  background: #f7f8fa;
+  border-left: 0;
+  color: #1f2937;
   font-size: 13px;
   font-weight: 700;
   cursor: pointer;
@@ -278,14 +278,14 @@ body.radar-page {
   content: "›";
   margin-left: auto;
   font-size: 15px;
-  color: #5b7bb2;
+  color: #94a3b8;
   transition: transform 0.15s ease;
 }
 
 .radar-l1[open] > summary {
-  background: #e3ecfb;
-  border-bottom: 1px solid #d8e3f5;
-  color: #0f2d5c;
+  background: #f3f4f6;
+  border-bottom: 1px solid #e5e7eb;
+  color: #111827;
 }
 
 .radar-l1[open] > summary::after {
@@ -299,7 +299,7 @@ body.radar-page {
 .radar-l1-badge {
   padding: 1px 7px;
   border-radius: 999px;
-  background: #1f5eff;
+  background: #334155;
   color: #ffffff;
   font-size: 10.5px;
   font-weight: 700;
@@ -589,6 +589,7 @@ body.radar-page {
 .radar-overseas-tabs {
   flex: 1 0 100%;
   display: flex;
+  flex-wrap: wrap;
   align-items: center;
   gap: 7px;
   padding: 8px 10px;
@@ -1579,10 +1580,25 @@ body.radar-page {
   }
 
   .radar-overseas-tabs {
+    display: grid;
+    grid-auto-flow: column;
+    grid-template-rows: repeat(2, 30px);
+    grid-auto-columns: max-content;
+    align-content: start;
+    justify-content: start;
     margin-top: 2px;
     margin-left: -2px;
     margin-right: -2px;
     padding: 8px;
+    overflow-x: auto;
+    scroll-snap-type: x proximity;
+  }
+
+  .radar-overseas-tab {
+    height: 30px;
+    padding: 0 11px;
+    font-size: 12px;
+    scroll-snap-align: start;
   }
 
   .radar-cat-tabs::-webkit-scrollbar {

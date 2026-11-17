@@ -1,7 +1,7 @@
 {
   "id": "/",
-  "name": "羊毛助手Pro",
-  "short_name": "羊毛助手Pro",
+  "name": "羊毛助手·羊毛线报活动站",
+  "short_name": "羊毛助手",
   "description": "实时查看微信立减金、银行优惠、信用卡返现与现金红包活动。",
   "start_url": "/?source=pwa",
   "scope": "/",
@@ -12,16 +12,10 @@
   "categories": ["finance", "shopping", "productivity"],
   "icons": [
     {
-      "src": "/assets/favicon.svg",
-      "sizes": "any",
-      "type": "image/svg+xml",
+      "src": "/assets/logo-lijianjin.png",
+      "sizes": "200x200",
+      "type": "image/png",
       "purpose": "any"
-    },
-    {
-      "src": "/assets/favicon.svg",
-      "sizes": "any",
-      "type": "image/svg+xml",
-      "purpose": "maskable"
     }
   ]
 }

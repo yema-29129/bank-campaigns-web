@@ -19,8 +19,8 @@ from urllib.parse import urlsplit
 import xml.etree.ElementTree as ET
 
 SITE = "https://bank.vooqqqm.com"
-BRAND_MAIN = "好羊毛银行活动站"
-SITE_NAME = "羊毛助手Pro"
+BRAND_MAIN = "羊毛助手·羊毛线报活动站"
+SITE_NAME = "羊毛助手"
 DIRECTORY = f"{SITE}/activities/"
 TOPICS_URL = f"{SITE}/activities/topics/"
 OUTPUT = Path(__file__).resolve().parents[1] / "activities"
@@ -269,7 +269,11 @@ TOPIC_SPECS = (
 
 
 def normalize_brand(value):
-    return value.replace("好羊毛银行活动站", SITE_NAME).replace("好羊毛助手Pro", SITE_NAME)
+    return (
+        value.replace("好羊毛银行活动站", BRAND_MAIN)
+        .replace("好羊毛助手Pro", BRAND_MAIN)
+        .replace("羊毛助手Pro", BRAND_MAIN)
+    )
 
 
 def clean_line(value):
@@ -519,7 +523,7 @@ def document(page_title, summary, url, kind, body, lastmod=None, indexable=True,
 
     og_type = "article" if lastmod else "website"
     robots = INDEX_ROBOTS if indexable else ARCHIVE_ROBOTS
-    styles = "/assets/styles.css?v=20261115-path-highlight" if kind == "WebPage" else "/assets/styles.css"
+    styles = "/assets/styles.css?v=20261118-brandlogo1"
     kw_tag = f'\n  <meta name="keywords" content="{escape(keywords)}">' if keywords else ""
 
     return f"""<!doctype html>
@@ -541,7 +545,7 @@ def document(page_title, summary, url, kind, body, lastmod=None, indexable=True,
   <meta name="twitter:card" content="summary">
   <meta name="twitter:title" content="{escape(page_title)}">
   <meta name="twitter:description" content="{escape(summary)}">
-  <link rel="icon" href="/assets/favicon.svg" type="image/svg+xml">
+  <link rel="icon" href="/assets/logo-lijianjin.png" type="image/png">
   <link rel="alternate" type="text/plain" href="https://bank.vooqqqm.com/llms.txt" title="LLMs.txt">
   <link rel="alternate" type="text/plain" href="https://bank.vooqqqm.com/llms-full.txt" title="LLMs-Full.txt">
   <link rel="alternate" type="application/json" href="https://bank.vooqqqm.com/activities/feed.json" title="银行优惠活动结构化数据">
@@ -583,8 +587,8 @@ def document(page_title, summary, url, kind, body, lastmod=None, indexable=True,
           <span>菜单栏</span>
         </a>
         <a class="site-brand" href="/">
-          <span class="site-brand-mark" aria-hidden="true">薅</span>
-          <span class="site-brand-copy"><strong>好羊毛银行活动站</strong><small>微信立减金 / 信用卡返现 / 现金红包</small></span>
+          <span class="site-brand-mark" aria-hidden="true"><img src="/assets/logo-lijianjin.png" alt="" width="42" height="42"></span>
+          <span class="site-brand-copy"><strong>{BRAND_MAIN}</strong><small>微信立减金 / 信用卡返现 / 现金红包</small></span>
         </a>
       </div>
       <nav class="site-nav" aria-label="主导航">
@@ -608,7 +612,7 @@ def document(page_title, summary, url, kind, body, lastmod=None, indexable=True,
 
   <footer class="site-footer">
     <div class="site-footer-bottom">
-      <span>© 2026 {BRAND_MAIN}（{SITE_NAME}）</span>
+      <span>© 2026 {BRAND_MAIN}</span>
       <a href="/activities/">精选活动目录</a>
       <a href="/activities/topics/">银行与渠道专题</a>
       <a href="/activities/archive.html">历史活动归档</a>
@@ -666,7 +670,7 @@ def build_faq_items(entry):
     q1 = f"{bank_short}「{title}」活动怎么参加、在哪里领取？"
     a1 = f"参与路径：{clean_line(entry['pathDesc'])}。主要参与/支付渠道为：{channel_txt}。"
     if entry["status"] == "ended":
-        a1 = f"该活动已于 {entry['validTo']} 结束。原参与路径为：{clean_line(entry['pathDesc'])}。如需查看最新可领活动，请访问好羊毛银行活动站「{bank_short}优惠专区」。"
+        a1 = f"该活动已于 {entry['validTo']} 结束。原参与路径为：{clean_line(entry['pathDesc'])}。如需查看最新可领活动，请访问羊毛助手·羊毛线报活动站「{bank_short}优惠专区」。"
 
     q2 = f"「{title}」优惠力度是多少？有什么门槛或次数限制？"
     quota_match = re.search(r"【名额与次数】\s*([^\n【]+)", entry["awardDesc"])
@@ -942,14 +946,14 @@ def build_topic_page(spec, active_entries, ended_entries, generated_on):
         for e in matched_active[:4]
     ) or "详见下方实时更新列表"
     seo_topic_desc = truncate_clean(
-        f'【{generated_on.isoformat()}更新·共{len(matched_active)}条有效】{spec["desc"]} 好羊毛银行活动站（羊毛助手Pro）核验整理每项活动的优惠额度、适用卡种、截止日期与详细领取步骤。',
+        f'【{generated_on.isoformat()}更新·共{len(matched_active)}条有效】{spec["desc"]} 羊毛助手·羊毛线报活动站核验整理每项活动的优惠额度、适用卡种、截止日期与详细领取步骤。',
         150,
     )
 
     faq_pairs = [
         (
             f'2026年最新{spec["short"]}活动有哪些？一共有多少条？',
-            f'截至 {generated_on.isoformat()}，好羊毛银行活动站共核验收录 {len(matched_active)} 条当前有效的「{spec["short"]}」公开优惠活动。代表性活动包括：{top_samples}。',
+            f'截至 {generated_on.isoformat()}，羊毛助手·羊毛线报活动站共核验收录 {len(matched_active)} 条当前有效的「{spec["short"]}」公开优惠活动。代表性活动包括：{top_samples}。',
         ),
         (
             f'{spec["short"]}怎么领取最划算？需要注意什么？',
@@ -1044,9 +1048,9 @@ def build_topic_page(spec, active_entries, ended_entries, generated_on):
 def topics_index_page(topic_stats, active_total, generated_on):
     page_title = f"2026银行优惠专题导航：按银行与支付方式查立减金、返现与红包 | {BRAND_MAIN}"
     summary = (
-        f"好羊毛银行活动站（羊毛助手Pro）优惠专题导航页，按微信立减金、云闪付、支付宝、信用卡返现、港卡境外返现及农行、工行、建行、中行、邮储、招行等20大专题分类汇总 {active_total} 条实时有效银行活动。"
+        f"羊毛助手·羊毛线报活动站优惠专题导航页，按微信立减金、云闪付、支付宝、信用卡返现、港卡境外返现及农行、工行、建行、中行、邮储、招行等20大专题分类汇总 {active_total} 条实时有效银行活动。"
     )
-    keywords = "银行优惠专题,微信立减金汇总,云闪付满减汇总,支付宝银行卡优惠,信用卡返现大全,农行优惠,工行优惠,建行优惠,中行优惠,港卡返现,好羊毛银行活动站"
+    keywords = "银行优惠专题,微信立减金汇总,云闪付满减汇总,支付宝银行卡优惠,信用卡返现大全,农行优惠,工行优惠,建行优惠,中行优惠,港卡返现,羊毛助手·羊毛线报活动站"
 
     channel_cards = []
     bank_cards = []
@@ -1086,9 +1090,9 @@ def topics_index_page(topic_stats, active_total, generated_on):
 def directory(entries, generated_on):
     page_title = f"2026当前有效银行优惠活动目录（共{len(entries)}项立减金/返现/满减） | {BRAND_MAIN}"
     summary = (
-        f"浏览好羊毛银行活动站核验整理的 {len(entries)} 项当前有效银行及支付优惠活动，涵盖微信立减金、云闪付消费券、支付宝红包、数币红包与信用卡境外返现，附活动时间、领取入口与详细规则。"
+        f"浏览羊毛助手·羊毛线报活动站核验整理的 {len(entries)} 项当前有效银行及支付优惠活动，涵盖微信立减金、云闪付消费券、支付宝红包、数币红包与信用卡境外返现，附活动时间、领取入口与详细规则。"
     )
-    keywords = "银行优惠活动目录,2026银行羊毛大全,微信立减金目录,信用卡返现汇总,云闪付满减,好羊毛银行活动站,羊毛助手Pro"
+    keywords = "银行优惠活动目录,2026银行羊毛大全,微信立减金目录,信用卡返现汇总,云闪付满减,羊毛助手·羊毛线报活动站,羊毛助手"
     cards = "\n".join(f"""        <li class="detail-section">
           <h2><a href="/activities/{entry["id"]}.html">{escape(entry["title"])}</a></h2>
           <p><strong>{escape(entry["seo"]["discount_phrase"])}</strong> · {escape(entry["desc"])}</p>
@@ -1113,9 +1117,9 @@ def directory(entries, generated_on):
 def archive_directory(entries, generated_on):
     page_title = f"已结束银行优惠活动历史资料归档（共{len(entries)}项） | {BRAND_MAIN}"
     summary = (
-        f"归档查询好羊毛银行活动站收录的 {len(entries)} 项已结束银行立减金、信用卡返现与支付满减历史活动资料，供往期活动规则核对与参考。"
+        f"归档查询羊毛助手·羊毛线报活动站收录的 {len(entries)} 项已结束银行立减金、信用卡返现与支付满减历史活动资料，供往期活动规则核对与参考。"
     )
-    keywords = "历史银行活动归档,已结束银行优惠查询,往期信用卡活动规则,好羊毛银行活动站"
+    keywords = "历史银行活动归档,已结束银行优惠查询,往期信用卡活动规则,羊毛助手·羊毛线报活动站"
     cards = "\n".join(f"""        <li class="detail-section">
           <p><strong>已结束</strong></p>
           <h2><a href="/activities/{entry["id"]}.html">{escape(entry["title"])}</a></h2>
@@ -1203,7 +1207,7 @@ def llms_index(current, ended, topic_stats, generated_on):
         f'- [{spec["h1"]}]({TOPICS_URL}{spec["slug"]}.html): 当前有效 {count} 条，{spec["desc"]}'
         for spec, count, _ in topic_stats
     )
-    return f"""# {BRAND_MAIN}（{SITE_NAME}）
+    return f"""# {BRAND_MAIN}
 
 > 中国银行卡与移动支付公开优惠信息检索库（https://bank.vooqqqm.com/）。截至 {generated_on.isoformat()}，当前有效活动共 {len(current)} 条，已结束归档活动共 {len(ended)} 条。覆盖微信立减金、云闪付满减、支付宝红包、数字人民币（数币）红包、信用卡消费返现及港卡境外返现。每条活动均具备独立静态 HTML 页面、优惠额度、适用地区、有效期限、领取步骤与常见问答（FAQ），适合搜索引擎与 AI 助手（豆包、DeepSeek、腾讯元宝、Kimi、ChatGPT、Claude、Perplexity 等）直接检索与引用。
 
@@ -1230,7 +1234,7 @@ def llms_index(current, ended, topic_stats, generated_on):
 
 def llms_full(entries, generated_on):
     lines = [
-        f"# {BRAND_MAIN}（{SITE_NAME}）全量银行优惠活动索引",
+        f"# {BRAND_MAIN}全量银行优惠活动索引",
         "",
         f"> 更新于 {generated_on.isoformat()}，共 {len(entries)} 条公开活动（含当前有效与历史归档）。每条记录包含机构名称、优惠力度、适用地区、支付渠道、有效期、参与步骤及独立详情网址。",
         "",

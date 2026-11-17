@@ -124,14 +124,39 @@ const TOP_CATEGORIES = [
   { key: 'general', label: '通用优惠', scene: '通用优惠', cashback: false }
 ];
 
+const KNOWN_OVERSEAS_DESTINATION_RE = /中国香港|香港|中国澳门|澳门|中国台湾|台湾|日本|东京|大阪|京都|冲绳|北海道|韩国|首尔|济州|釜山|东南亚|新加坡|泰国|曼谷|清迈|普吉|马来西亚|吉隆坡|槟城|沙巴|印度尼西亚|印尼|巴厘岛|雅加达|越南|河内|胡志明|岘港|菲律宾|马尼拉|长滩岛|宿务|柬埔寨|老挝|缅甸|文莱|美国|美利坚|纽约|洛杉矶|旧金山|夏威夷|关岛|加拿大|温哥华|多伦多|欧洲|欧盟|英国|法国|德国|意大利|西班牙|瑞士|荷兰|奥地利|葡萄牙|希腊|北欧|挪威|瑞典|芬兰|丹麦|冰岛|澳大利亚|澳洲|悉尼|墨尔本|布里斯班|珀斯|新西兰|奥克兰|皇后镇|中东|阿联酋|迪拜|阿布扎比|卡塔尔|多哈|沙特|土耳其|以色列/;
+
 const OVERSEAS_DESTINATION_OPTIONS = [
   { key: '全部', label: '全部境外', test: () => true },
   { key: '中国香港', label: '中国香港', test: (text) => /中国香港|香港/.test(text) },
   { key: '中国澳门', label: '中国澳门', test: (text) => /中国澳门|澳门/.test(text) },
   { key: '中国台湾', label: '中国台湾', test: (text) => /中国台湾|台湾/.test(text) },
   { key: '日本', label: '日本', test: (text) => /日本|东京|大阪|京都|冲绳|北海道/.test(text) },
+  { key: '韩国', label: '韩国', test: (text) => /韩国|首尔|济州|釜山/.test(text) },
+  { key: '泰国', label: '泰国', test: (text) => /泰国|曼谷|清迈|普吉/.test(text) },
+  { key: '东南亚', label: '东南亚', test: (text) => /东南亚|新加坡|泰国|马来西亚|印度尼西亚|印尼|越南|菲律宾|柬埔寨|老挝|缅甸|文莱|巴厘岛/.test(text) },
   { key: '美国', label: '美国', test: (text) => /美国|美利坚|纽约|洛杉矶|旧金山|夏威夷|关岛/.test(text) },
-  { key: '欧洲', label: '欧洲', test: (text) => /欧洲|欧盟|英国|法国|德国|意大利|西班牙|瑞士|荷兰|奥地利|葡萄牙|希腊|北欧|挪威|瑞典|芬兰|丹麦|冰岛/.test(text) }
+  { key: '欧洲', label: '欧洲', test: (text) => /欧洲|欧盟|英国|法国|德国|意大利|西班牙|瑞士|荷兰|奥地利|葡萄牙|希腊|北欧|挪威|瑞典|芬兰|丹麦|冰岛/.test(text) },
+  { key: '澳新', label: '澳新', test: (text) => /澳大利亚|澳洲|悉尼|墨尔本|布里斯班|珀斯|新西兰|奥克兰|皇后镇/.test(text) },
+  { key: '中东', label: '中东', test: (text) => /中东|阿联酋|迪拜|阿布扎比|卡塔尔|多哈|沙特|土耳其|以色列/.test(text) },
+  { key: '其他境外', label: '其他境外', test: (text) => !KNOWN_OVERSEAS_DESTINATION_RE.test(text) }
+];
+
+const KNOWN_TRAVEL_MODE_RE = /机票|航空|航班|飞机|飞猪|高铁|火车|铁路|12306|动车|列车|船舶|轮船|船票|邮轮|游轮|客轮|渡轮|滴滴|打车|出租车|网约车|的士|T3出行|曹操出行|高德打车|花小猪|公交|地铁|八达通|交通卡|乘车码|一卡通|轨道交通|加油|加气|充电桩|停车|高速|ETC|洗车|自驾|车主|租车|酒店|住宿|订房|宾馆|民宿|旅馆|度假村|景区|景点|门票|乐园|主题公园|博物馆|机场|贵宾厅|休息室|接送机/;
+
+const TRAVEL_MODE_OPTIONS = [
+  { key: '全部', label: '全部出行', test: () => true },
+  { key: '飞机', label: '飞机', test: (text) => /机票|航空|航班|飞机|飞猪/.test(text) },
+  { key: '高铁/火车', label: '高铁/火车', test: (text) => /高铁|火车|铁路|12306|动车|列车/.test(text) },
+  { key: '船舶/邮轮', label: '船舶/邮轮', test: (text) => /船舶|轮船|船票|邮轮|游轮|客轮|渡轮/.test(text) },
+  { key: '打车', label: '打车', test: (text) => /滴滴|打车|出租车|网约车|的士|T3出行|曹操出行|高德打车|花小猪/.test(text) },
+  { key: '公交/地铁', label: '公交/地铁', test: (text) => /公交|地铁|八达通|交通卡|乘车码|一卡通|轨道交通/.test(text) },
+  { key: '自驾/加油', label: '自驾/加油', test: (text) => /加油|加气|充电桩|停车|高速|ETC|洗车|自驾|车主/.test(text) },
+  { key: '租车', label: '租车', test: (text) => /租车|神州租车|一嗨租车/.test(text) },
+  { key: '酒店住宿', label: '酒店住宿', test: (text) => /酒店|住宿|订房|宾馆|民宿|旅馆|度假村/.test(text) },
+  { key: '景区门票', label: '景区门票', test: (text) => /景区|景点|门票|乐园|主题公园|博物馆/.test(text) },
+  { key: '机场服务', label: '机场服务', test: (text) => /机场|贵宾厅|休息室|接送机|机场停车/.test(text) },
+  { key: '其他出行', label: '其他出行', test: (text) => !KNOWN_TRAVEL_MODE_RE.test(text) }
 ];
 
 // A card's issuing country or bank name is not the campaign's travel destination.
@@ -211,6 +236,7 @@ const state = {
   pay: '全部',          // PAY_OPTIONS.key
   regionGroup: '全部',  // REGION_OPTIONS.key
   scene: '全部',        // SCENE_OPTIONS
+  travelMode: '全部',   // TRAVEL_MODE_OPTIONS.key
   overseasDestination: '全部', // OVERSEAS_DESTINATION_OPTIONS.key
   cashback: false,     // top tab '返现'
   keyword: '',
@@ -240,6 +266,7 @@ const els = {
   regionFilters: document.getElementById('regionFilters'),
   sceneFilters: document.getElementById('sceneFilters'),
   topCategoryBar: document.getElementById('topCategoryBar'),
+  travelModeBar: document.getElementById('travelModeBar'),
   overseasDestinationBar: document.getElementById('overseasDestinationBar'),
   activeViewBadge: document.getElementById('activeViewBadge'),
   activeCardOrgBadge: document.getElementById('activeCardOrgBadge'),
@@ -289,11 +316,11 @@ function setMeta(selector, value) {
 function setHomeMeta() {
   const isCredit = state.view === 'credit';
   const title = isCredit
-    ? '2026信用卡活动专区：信用卡返现、刷卡金与首绑立减汇总 | 好羊毛银行活动站'
-    : '2026银行优惠与微信立减金汇总：信用卡返现/云闪付满减/数币红包 | 好羊毛银行活动站';
+    ? '2026信用卡活动专区：信用卡返现、刷卡金与首绑立减汇总 | 羊毛助手·羊毛线报活动站'
+    : '2026银行优惠与微信立减金汇总：信用卡返现/云闪付满减/数币红包 | 羊毛助手·羊毛线报活动站';
   const description = isCredit
-    ? '好羊毛银行活动站（羊毛助手Pro）实时汇总全国银行信用卡返现、刷卡金、首绑立减与港卡境外消费返现活动，支持按银行、卡组织、支付方式与场景筛选并查看领取路径。'
-    : '好羊毛银行活动站（羊毛助手Pro）每日实时核验更新全国银行微信立减金、云闪付满减、支付宝红包、数币红包、信用卡返现与港卡境外优惠，附详细领取入口与参与步骤。';
+    ? '羊毛助手·羊毛线报活动站实时汇总全国银行信用卡返现、刷卡金、首绑立减与港卡境外消费返现活动，支持按银行、卡组织、支付方式与场景筛选并查看领取路径。'
+    : '羊毛助手·羊毛线报活动站每日实时核验更新全国银行微信立减金、云闪付满减、支付宝红包、数币红包、信用卡返现与港卡境外优惠，附详细领取入口与参与步骤。';
 
   document.title = title;
   setMeta('meta[name="description"]', description);
@@ -411,6 +438,10 @@ function normalizeCampaign(item) {
     orgText: [normalized.cardOrg, normalized.title, normalized.desc, normalized.bankName, normalized.channel, normalized.consumeChannel, ...normalizedTags].filter(Boolean).join(' '),
     payText: [normalized.channel, normalized.consumeChannel, normalized.title].filter(Boolean).join(' '),
     regionText: String(normalized.region || '').trim(),
+    travelText: [
+      normalized.title, normalized.desc, normalized.consumeChannel,
+      normalized.channel, normalized.region, ...normalizedTags
+    ].filter(Boolean).join(' '),
     overseasDestinationText: [
       overseasDestination(normalized.region), normalized.title, normalized.desc,
       normalized.consumeChannel, normalized.channel, ...normalizedTags
@@ -494,6 +525,12 @@ function matchesOverseasDestination(item, destination = state.overseasDestinatio
   return rule ? rule.test(item.overseasDestinationText) : true;
 }
 
+function matchesTravelMode(item, mode = state.travelMode) {
+  if (state.scene !== '出行' || !mode || mode === '全部') return true;
+  const rule = TRAVEL_MODE_OPTIONS.find((opt) => opt.key === mode);
+  return rule ? rule.test(item.travelText) : true;
+}
+
 function matchesQuick(item, quick = state.quick) {
   if (quick === 'today') return item.isTodayAdded;
   if (quick === 'expiring') return item.isSoon;
@@ -514,6 +551,10 @@ function matchesAll(item, override = {}) {
       'scene' in override ? override.scene : state.scene,
       'cashback' in override ? override.cashback : state.cashback
     ) &&
+    matchesTravelMode(
+      item,
+      'travelMode' in override ? override.travelMode : state.travelMode
+    ) &&
     matchesOverseasDestination(
       item,
       'overseasDestination' in override ? override.overseasDestination : state.overseasDestination
@@ -531,6 +572,7 @@ function hasDefaultFilters() {
     state.pay === '全部' &&
     state.regionGroup === '全部' &&
     state.scene === '全部' &&
+    state.travelMode === '全部' &&
     state.overseasDestination === '全部' &&
     !state.cashback &&
     !state.keyword.trim()
@@ -545,6 +587,7 @@ function countActiveExtraFilters() {
   if (state.pay !== '全部') n++;
   if (state.regionGroup !== '全部') n++;
   if (state.scene !== '全部' || state.cashback) n++;
+  if (state.travelMode !== '全部') n++;
   if (state.overseasDestination !== '全部') n++;
   return n;
 }
@@ -558,6 +601,7 @@ function resetFilters() {
     pay: '全部',
     regionGroup: '全部',
     scene: '全部',
+    travelMode: '全部',
     overseasDestination: '全部',
     cashback: false,
     keyword: '',
@@ -582,15 +626,37 @@ function mountTopCategories() {
       if (cat.key === 'all' || isAlready) {
         state.scene = '全部';
         state.cashback = false;
+        state.travelMode = '全部';
         state.overseasDestination = '全部';
       } else {
         state.scene = cat.scene;
         state.cashback = !!cat.cashback;
+        if (cat.scene !== '出行') state.travelMode = '全部';
         if (cat.scene !== '境外游') state.overseasDestination = '全部';
       }
       applyFilters();
     });
     els.topCategoryBar.appendChild(btn);
+  });
+}
+
+function mountTravelModes() {
+  if (!els.travelModeBar) return;
+  els.travelModeBar.innerHTML = '';
+  TRAVEL_MODE_OPTIONS.forEach((opt) => {
+    const btn = document.createElement('button');
+    btn.type = 'button';
+    btn.className = 'radar-overseas-tab';
+    btn.dataset.travelMode = opt.key;
+    btn.setAttribute('aria-pressed', String(opt.key === state.travelMode));
+    btn.textContent = opt.label;
+    btn.addEventListener('click', () => {
+      state.travelMode = opt.key === '全部' || state.travelMode === opt.key
+        ? '全部'
+        : opt.key;
+      applyFilters();
+    });
+    els.travelModeBar.appendChild(btn);
   });
 }
 
@@ -703,6 +769,7 @@ function mountMiniChips(container, options, stateKey) {
       if (stateKey === 'scene') {
         state.cashback = false;
         state.scene = (key === '全部' || state.scene === key) ? '全部' : key;
+        if (state.scene !== '出行') state.travelMode = '全部';
         if (state.scene !== '境外游') state.overseasDestination = '全部';
       } else {
         state[stateKey] = (key === '全部' || state[stateKey] === key) ? '全部' : key;
@@ -733,6 +800,17 @@ function syncFilterControls() {
     els.overseasDestinationBar.setAttribute('aria-hidden', String(!shouldShowDestinations));
     els.overseasDestinationBar.querySelectorAll('[data-overseas-destination]').forEach((btn) => {
       const isActive = btn.dataset.overseasDestination === state.overseasDestination;
+      btn.classList.toggle('is-active', isActive);
+      btn.setAttribute('aria-pressed', String(isActive));
+    });
+  }
+
+  if (els.travelModeBar) {
+    const shouldShowTravelModes = state.scene === '出行' && !state.cashback;
+    els.travelModeBar.classList.toggle('hidden', !shouldShowTravelModes);
+    els.travelModeBar.setAttribute('aria-hidden', String(!shouldShowTravelModes));
+    els.travelModeBar.querySelectorAll('[data-travel-mode]').forEach((btn) => {
+      const isActive = btn.dataset.travelMode === state.travelMode;
       btn.classList.toggle('is-active', isActive);
       btn.setAttribute('aria-pressed', String(isActive));
     });
@@ -831,6 +909,7 @@ function syncFilterControls() {
     if (state.pay !== '全部') parts.push(state.pay);
     if (state.regionGroup !== '全部') parts.push(state.regionGroup);
     if (state.scene !== '全部' && !state.cashback) parts.push(state.scene);
+    if (state.travelMode !== '全部') parts.push(state.travelMode);
     if (state.overseasDestination !== '全部') parts.push(state.overseasDestination);
     if (state.quick === 'today') parts.push('今日新增');
     if (state.quick === 'expiring') parts.push('快到期');
@@ -1763,6 +1842,7 @@ function initializeCampaignPage() {
   if (!isListPage()) return;
 
   mountTopCategories();
+  mountTravelModes();
   mountOverseasDestinations();
   mountCardOrgFilters();
   mountBankGroups();
