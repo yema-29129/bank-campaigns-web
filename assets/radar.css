@@ -1612,11 +1612,18 @@ body.radar-page {
   }
 }
 
-/* 手机端 / 平板窄屏顶部栏：显式左侧分类菜单入口按钮 */
+/* 手机端 / 平板窄屏顶部栏：左侧紧凑侧栏图标入口 */
 @media (max-width: 860px) {
   .radar-page .site-brand-bar {
     width: 100%;
-    justify-content: space-between;
+    justify-content: flex-start;
     gap: 10px;
+  }
+
+  .radar-mobile-filter-icon {
+    width: 14px;
+    height: 14px;
+    flex: none;
+    color: #1f5eff;
   }
 }

@@ -21,28 +21,51 @@
   <meta name="twitter:description" content="实时更新微信立减金、返现、信用卡返现、信用卡活动、现金红包等信息。">
   <link rel="icon" type="image/svg+xml" href="./assets/favicon.svg">
   <link rel="shortcut icon" href="./assets/favicon.svg">
+  <link rel="alternate" type="text/plain" href="https://bank.vooqqqm.com/llms.txt" title="LLMs.txt">
+  <link rel="alternate" type="text/plain" href="https://bank.vooqqqm.com/llms-full.txt" title="LLMs-Full.txt">
+  <link rel="alternate" type="application/json" href="https://bank.vooqqqm.com/activities/feed.json" title="银行优惠活动结构化数据">
   <link rel="preconnect" href="https://mini.vooqqqm.com" crossorigin>
   <link rel="stylesheet" href="./assets/styles.css">
-  <link rel="stylesheet" href="./assets/theme.css?v=20261117-radar9">
-  <link rel="stylesheet" href="./assets/radar.css?v=20261117-radar9">
+  <link rel="stylesheet" href="./assets/theme.css?v=20261117-radar10">
+  <link rel="stylesheet" href="./assets/radar.css?v=20261117-radar10">
   <script type="application/ld+json">
   {
     "@context": "https://schema.org",
-    "@type": "WebSite",
-    "name": "好羊毛银行活动站",
-    "url": "https://bank.vooqqqm.com/",
-    "description": "整理微信立减金、返现、信用卡返现、信用卡活动、现金红包等公开活动信息，支持按银行、标签和时间筛选。",
-    "publisher": {
-      "@type": "Organization",
-      "name": "好羊毛银行活动站",
-      "url": "https://bank.vooqqqm.com/",
-      "email": "mashuya29129@gmail.com"
-    },
-    "potentialAction": {
-      "@type": "SearchAction",
-      "target": "https://bank.vooqqqm.com/?q={search_term_string}",
-      "query-input": "required name=search_term_string"
-    }
+    "@graph": [
+      {
+        "@type": "WebSite",
+        "@id": "https://bank.vooqqqm.com/#website",
+        "name": "好羊毛银行活动站",
+        "alternateName": ["羊毛助手Pro", "好羊毛助手Pro"],
+        "url": "https://bank.vooqqqm.com/",
+        "inLanguage": "zh-CN",
+        "description": "整理微信立减金、返现、信用卡返现、信用卡活动、现金红包等公开活动信息，支持按银行、消费场景、支付方式、卡组织和时间实时筛选。",
+        "publisher": {
+          "@type": "Organization",
+          "@id": "https://bank.vooqqqm.com/#org",
+          "name": "好羊毛银行活动站",
+          "url": "https://bank.vooqqqm.com/",
+          "email": "mashuya29129@gmail.com",
+          "sameAs": ["https://t.me/yangmaozhushou"]
+        },
+        "potentialAction": {
+          "@type": "SearchAction",
+          "target": "https://bank.vooqqqm.com/?q={search_term_string}",
+          "query-input": "required name=search_term_string"
+        }
+      },
+      {
+        "@type": "CollectionPage",
+        "@id": "https://bank.vooqqqm.com/#collection",
+        "name": "银行立减金与信用卡返现活动实时汇总",
+        "url": "https://bank.vooqqqm.com/",
+        "isPartOf": { "@id": "https://bank.vooqqqm.com/#website" },
+        "hasPart": [
+          { "@type": "CollectionPage", "name": "精选活动目录", "url": "https://bank.vooqqqm.com/activities/" },
+          { "@type": "CollectionPage", "name": "历史活动资料归档", "url": "https://bank.vooqqqm.com/activities/archive.html" }
+        ]
+      }
+    ]
   }
   </script>
   <script>
@@ -66,13 +89,6 @@
   <header class="site-header">
     <div class="site-header-inner">
       <div class="site-brand-bar">
-        <a class="site-brand" href="./index.html">
-          <span class="site-brand-mark">薅</span>
-          <span class="site-brand-copy">
-            <strong>好羊毛银行活动站</strong>
-            <small>微信立减金 / 信用卡返现 / 现金红包</small>
-          </span>
-        </a>
         <button id="topMobileMenuBtn" type="button" class="site-mobile-menu-btn" aria-label="展开左侧菜单栏" aria-controls="radarSidebar" aria-expanded="false">
           <svg class="site-mobile-menu-icon" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true">
             <path d="M3 5h14M3 10h14M3 15h14"></path>
@@ -80,6 +96,13 @@
           <span>菜单栏</span>
           <span id="topMobileMenuBadge" class="radar-filter-badge hidden">0</span>
         </button>
+        <a class="site-brand" href="./index.html">
+          <span class="site-brand-mark">薅</span>
+          <span class="site-brand-copy">
+            <strong>好羊毛银行活动站</strong>
+            <small>微信立减金 / 信用卡返现 / 现金红包</small>
+          </span>
+        </a>
       </div>
       <nav class="site-nav" aria-label="主导航">
         <a class="site-nav-link is-active" href="./index.html" data-nav-view="all">首页</a>
@@ -225,8 +248,11 @@
             </svg>
             <input id="mobileSearchInput" type="search" placeholder="搜索活动关键词或银行名称…" aria-label="搜索活动">
           </label>
-          <button id="openSidebarBtn" type="button" class="radar-mobile-filter-btn">
-            <span>筛选</span>
+          <button id="openSidebarBtn" type="button" class="radar-mobile-filter-btn" aria-label="展开左侧分类菜单与筛选">
+            <svg class="radar-mobile-filter-icon" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true">
+              <path d="M3 5h14M3 10h10M3 15h14"></path>
+            </svg>
+            <span>分类菜单</span>
             <span id="mobileFilterCount" class="radar-filter-badge hidden">0</span>
           </button>
         </div>
@@ -276,6 +302,9 @@
         <div class="radar-footer-links">
           <span>网站信息：</span>
           <a href="./activities/">精选活动目录</a>
+          <a href="./activities/archive.html">历史活动归档</a>
+          <a href="./sitemap.xml">站点地图</a>
+          <a href="./llms.txt">AI 索引 (llms.txt)</a>
           <a href="./about.html">关于我们</a>
           <a href="./terms.html">使用条款</a>
           <a href="./privacy.html">隐私政策</a>
@@ -338,7 +367,7 @@
     </div>
   </div>
 
-  <script async src="./assets/app.js?v=20261117-radar9"></script>
-  <noscript><p class="state-card">请启用 JavaScript 后刷新，以查看活动列表。</p></noscript>
+  <script async src="./assets/app.js?v=20261117-radar10"></script>
+  <noscript><p class="state-card">请启用 JavaScript 以使用实时筛选；也可直接浏览静态归档目录：<a href="./activities/">当前银行优惠活动目录</a> · <a href="./activities/archive.html">历史活动资料归档</a> · <a href="./sitemap.xml">站点地图</a>。</p></noscript>
 </body>
 </html>

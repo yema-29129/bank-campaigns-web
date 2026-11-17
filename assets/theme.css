@@ -1217,7 +1217,7 @@ details:not([open]) .filter-collapse { display: none; }
   .site-brand-bar {
     display: flex;
     align-items: center;
-    justify-content: space-between;
+    justify-content: flex-start;
     gap: 10px;
     width: 100%;
     padding: 9px 0 6px;
@@ -1227,17 +1227,19 @@ details:not([open]) .filter-collapse { display: none; }
   .site-brand-copy small { display: none; }
   .site-brand-copy strong { font-size: 15px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
   .site-mobile-menu-btn {
+    order: -1;
+    position: relative;
     flex: none;
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    gap: 6px;
+    width: 34px;
     height: 34px;
-    padding: 0 12px;
-    border-radius: 999px;
-    border: 1px solid #bfd4ff;
-    background: #eaf1ff;
-    color: #1f5eff;
+    padding: 0;
+    border-radius: 10px;
+    border: 1px solid #e2e8f0;
+    background: #f8fafc;
+    color: #0f1b2d;
     font-size: 13px;
     font-weight: 700;
     font-family: inherit;
@@ -1245,15 +1247,29 @@ details:not([open]) .filter-collapse { display: none; }
     cursor: pointer;
     text-decoration: none;
     white-space: nowrap;
-    transition: background 0.15s ease, border-color 0.15s ease, transform 0.12s ease;
+    transition: background 0.15s ease, border-color 0.15s ease, color 0.15s ease;
+  }
+  .site-mobile-menu-btn > span:not(.radar-filter-badge) {
+    display: none;
+  }
+  .site-mobile-menu-btn .radar-filter-badge {
+    position: absolute;
+    top: -5px;
+    right: -5px;
+    min-width: 16px;
+    height: 16px;
+    padding: 0 4px;
+    font-size: 10px;
+    box-shadow: 0 0 0 2px #ffffff;
   }
   .site-mobile-menu-btn:hover,
   .site-mobile-menu-btn:active {
-    background: #dce8ff;
-    border-color: #a9c5ff;
+    background: #eef4ff;
+    border-color: #bfd4ff;
+    color: #1f5eff;
   }
   .site-mobile-menu-btn:focus:not(:focus-visible) { outline: none; }
-  .site-mobile-menu-icon { width: 15px; height: 15px; flex: none; }
+  .site-mobile-menu-icon { width: 16px; height: 16px; flex: none; }
   .site-nav {
     flex-wrap: nowrap;
     overflow-x: auto;
