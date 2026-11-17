@@ -1,4 +1,4 @@
-@import url("/assets/theme.css?v=20261117-radar10");
+@import url("/assets/theme.css?v=20261117-radar11");
 
 .activity-copy + .activity-copy {
   margin-top: 0.75em;
@@ -19,9 +19,10 @@
 
 .info-card .activity-directory {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(min(100%, 280px), 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 300px), 1fr));
   gap: 12px;
   margin: 1rem 0 0;
+  padding: 0;
   list-style: none;
 }
 
@@ -38,7 +39,186 @@
 .activity-directory a,
 .info-card > p a,
 .site-footer-bottom a {
-  color: var(--brand);
+  color: var(--brand, #1e4ed8);
   text-decoration: underline;
   text-underline-offset: 0.16em;
+}
+
+/* SEO & GEO Structured Modules */
+.detail-topbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.seo-breadcrumb {
+  font-size: 0.85rem;
+  color: #64748b;
+  line-height: 1.5;
+}
+
+.seo-breadcrumb a {
+  color: #334155;
+  text-decoration: none;
+}
+
+.seo-breadcrumb a:hover {
+  color: #1e4ed8;
+  text-decoration: underline;
+}
+
+.seo-topic-pills {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-bottom: 10px;
+}
+
+.seo-topic-pill {
+  display: inline-flex;
+  align-items: center;
+  padding: 3px 10px;
+  border-radius: 999px;
+  background: #eff6ff;
+  border: 1px solid #bfdbfe;
+  color: #1d4ed8;
+  font-size: 0.78rem;
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.seo-topic-pill:hover {
+  background: #dbeafe;
+}
+
+.seo-ai-summary {
+  background: linear-gradient(180deg, #f8fbff 0%, #f1f5f9 100%);
+  border: 1px solid #cbd5e1;
+  border-left: 4px solid #1e4ed8;
+  border-radius: 12px;
+  padding: 14px 16px;
+  margin: 0.75rem 0 1rem;
+}
+
+.seo-bullet-list {
+  margin: 0.6rem 0 0;
+  padding-inline-start: 1.2rem;
+  color: #1e293b;
+  font-size: 0.92rem;
+  line-height: 1.65;
+}
+
+.seo-bullet-list li + li {
+  margin-top: 4px;
+}
+
+.seo-faq-list,
+.seo-topic-faq {
+  display: grid;
+  gap: 10px;
+  margin-top: 0.75rem;
+}
+
+.seo-faq-item {
+  padding: 12px 14px;
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 10px;
+}
+
+.seo-faq-item h3 {
+  margin: 0 0 6px;
+  font-size: 0.95rem;
+  color: #0f172a;
+  line-height: 1.45;
+}
+
+.seo-faq-item p {
+  margin: 0;
+  font-size: 0.9rem;
+  color: #334155;
+  line-height: 1.6;
+}
+
+.seo-related-list {
+  list-style: none;
+  margin: 0.5rem 0 0;
+  padding: 0;
+  display: grid;
+  gap: 8px;
+}
+
+.seo-related-list li {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 6px;
+  padding: 8px 12px;
+  border-radius: 8px;
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+}
+
+.seo-related-list a {
+  color: #1e4ed8;
+  font-weight: 600;
+  text-decoration: none;
+  font-size: 0.92rem;
+}
+
+.seo-related-list a:hover {
+  text-decoration: underline;
+}
+
+.seo-rel-meta,
+.seo-card-meta {
+  font-size: 0.82rem;
+  color: #64748b;
+}
+
+.seo-card-path {
+  font-size: 0.84rem;
+  color: #475569;
+}
+
+.seo-hub-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 0.75rem 0 1.25rem;
+}
+
+.seo-hub-chip {
+  display: inline-flex;
+  align-items: center;
+  padding: 5px 12px;
+  border-radius: 999px;
+  border: 1px solid #cbd5e1;
+  background: #ffffff;
+  color: #1e293b;
+  font-size: 0.84rem;
+  font-weight: 500;
+  text-decoration: none !important;
+}
+
+.seo-hub-chip:hover,
+.seo-hub-chip.is-active {
+  background: #1e4ed8;
+  border-color: #1e4ed8;
+  color: #ffffff !important;
+}
+
+.seo-ended-sub {
+  margin-top: 1.75rem;
+  padding-top: 1rem;
+  border-top: 1px solid #e2e8f0;
+}
+
+.seo-ended-sub ul {
+  padding-inline-start: 1.2rem;
+  color: #475569;
+  line-height: 1.7;
 }

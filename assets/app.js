@@ -277,11 +277,11 @@ function setMeta(selector, value) {
 function setHomeMeta() {
   const isCredit = state.view === 'credit';
   const title = isCredit
-    ? '信用卡活动专区 | 信用卡返现 | 好羊毛银行活动站'
-    : '银行立减金活动网站 | 微信立减金 | 信用卡返现 | 好羊毛银行活动站';
+    ? '2026信用卡活动专区：信用卡返现、刷卡金与首绑立减汇总 | 好羊毛银行活动站'
+    : '2026银行优惠与微信立减金汇总：信用卡返现/云闪付满减/数币红包 | 好羊毛银行活动站';
   const description = isCredit
-    ? '查看信用卡返现、刷卡优惠、现金红包和信用卡活动，支持按银行、标签和时间快速筛选。'
-    : '薅羊毛·银行/微信立减金/信用卡返现网站，实时更新微信立减金、返现、信用卡返现、信用卡活动、现金红包等信息。';
+    ? '好羊毛银行活动站（羊毛助手Pro）实时汇总全国银行信用卡返现、刷卡金、首绑立减与港卡境外消费返现活动，支持按银行、卡组织、支付方式与场景筛选并查看领取路径。'
+    : '好羊毛银行活动站（羊毛助手Pro）每日实时核验更新全国银行微信立减金、云闪付满减、支付宝红包、数币红包、信用卡返现与港卡境外优惠，附详细领取入口与参与步骤。';
 
   document.title = title;
   setMeta('meta[name="description"]', description);
@@ -424,7 +424,8 @@ function compareCampaign(a, b) {
 }
 
 function setLoadingState({ loading = false, error = false, empty = false } = {}) {
-  if (els.loading) els.loading.classList.toggle('hidden', !loading);
+  const hasPrerendered = !!(els.grid && els.grid.children.length > 0);
+  if (els.loading) els.loading.classList.toggle('hidden', !(loading && !hasPrerendered));
   if (els.error) els.error.classList.toggle('hidden', !error);
   if (els.empty) els.empty.classList.toggle('hidden', !empty);
 }
