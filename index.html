@@ -29,8 +29,8 @@
   <link rel="alternate" type="application/json" href="https://bank.vooqqqm.com/activities/feed.json" title="银行优惠活动结构化数据">
   <link rel="preconnect" href="https://mini.vooqqqm.com" crossorigin>
   <link rel="stylesheet" href="./assets/styles.css">
-  <link rel="stylesheet" href="./assets/theme.css?v=20261118-contactqr1">
-  <link rel="stylesheet" href="./assets/radar.css?v=20261118-allsecondary1">
+  <link rel="stylesheet" href="./assets/theme.css?v=20261118-mobileopt1">
+  <link rel="stylesheet" href="./assets/radar.css?v=20261118-mobileopt1">
   <script type="application/ld+json">
   {
     "@context": "https://schema.org",
@@ -147,6 +147,20 @@
         <button type="button" class="radar-close-btn" data-close-sidebar="true">完成</button>
       </div>
 
+      <nav class="radar-mobile-site-nav" aria-label="手机端站点导航">
+        <div class="radar-group-label">站点导航</div>
+        <div class="radar-mobile-site-grid">
+          <a class="radar-mobile-site-link" href="./index.html" data-nav-view="all">首页</a>
+          <a class="radar-mobile-site-link" href="./index.html?view=credit" data-nav-view="credit">信用卡活动</a>
+          <a class="radar-mobile-site-link" href="./activities/topics/">优惠专题</a>
+          <div class="site-nav-qr radar-mobile-site-qr">
+            <button type="button" class="radar-mobile-site-link site-nav-qr-btn" aria-haspopup="dialog" aria-expanded="false">微信小程序</button>
+          </div>
+          <a class="radar-mobile-site-link" href="./contact.html">联系方式</a>
+          <a class="radar-mobile-site-link" href="https://t.me/yangmaozhushou" target="_blank" rel="noopener noreferrer">Telegram 社群</a>
+        </div>
+      </nav>
+
       <label class="radar-search">
         <span class="sr-only">搜索活动</span>
         <svg class="radar-search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true">
@@ -160,7 +174,7 @@
       <nav class="radar-nav-group" aria-label="快捷视图">
         <div class="radar-group-label">快捷视图</div>
         <button type="button" class="radar-nav-item is-active" data-quick="all" aria-pressed="true">
-          <span class="radar-nav-label"><i class="radar-dot is-all" aria-hidden="true"></i>全部活动</span>
+          <span class="radar-nav-label"><i class="radar-dot is-all" aria-hidden="true"></i>当前有效</span>
           <span class="radar-nav-count" data-quick-count="all">—</span>
         </button>
         <button type="button" class="radar-nav-item" data-quick="today" aria-pressed="false">
@@ -183,7 +197,7 @@
           <button id="sidebarResetBtn" class="radar-text-reset hidden" type="button">重置</button>
         </div>
 
-        <details class="radar-l1" id="bankCategoryDetails" open>
+        <details class="radar-l1" id="bankCategoryDetails">
           <summary>
             <span class="radar-l1-title">银行分类</span>
             <span id="activeBankBadge" class="radar-l1-badge"></span>
@@ -253,6 +267,13 @@
           <span aria-hidden="true">›</span>
         </a>
       </nav>
+
+      <div class="radar-sidebar-mobile-actions" aria-label="手机端筛选操作">
+        <button id="mobileResetFiltersBtn" class="radar-mobile-clear-btn" type="button" disabled>清除筛选</button>
+        <button id="mobileApplyFiltersBtn" class="radar-mobile-apply-btn" type="button">
+          查看 <span id="mobileResultCount">—</span> 个结果
+        </button>
+      </div>
     </aside>
 
     <div class="radar-main">
@@ -277,7 +298,7 @@
 
         <div class="radar-mobile-quick" role="group" aria-label="快捷视图">
           <button type="button" class="radar-mq-btn is-active" data-quick="all" aria-pressed="true">
-            <span>全部</span>
+            <span>有效</span>
             <span class="radar-mq-count" data-quick-count="all">—</span>
           </button>
           <button type="button" class="radar-mq-btn" data-quick="today" aria-pressed="false">
@@ -300,7 +321,8 @@
         <div class="radar-strip-meta">
           <span id="activeFilterSummary" class="radar-filter-summary"></span>
           <button id="resetFiltersBtn" class="radar-reset-btn hidden" type="button">✕ 清除筛选</button>
-          <span id="resultSummary" class="radar-result-count">加载中...</span>
+          <span id="resultSummary" class="radar-result-count">正在加载...</span>
+          <a id="archiveSummaryLink" class="radar-archive-count" href="./activities/archive.html">历史归档 — 条</a>
           <button id="refreshBtn" class="radar-icon-btn" type="button" title="刷新活动数据" aria-label="刷新活动数据">↻</button>
         </div>
         <div id="secondaryFilterBar" class="radar-secondary-tabs hidden" role="group" aria-label="二级分类筛选"></div>
@@ -438,7 +460,7 @@
     </div>
   </div>
 
-  <script async src="./assets/app.js?v=20261118-contactqr1"></script>
+  <script async src="./assets/app.js?v=20261118-mobileopt1"></script>
   <noscript><p class="state-card">请启用 JavaScript 以使用实时筛选；也可直接浏览静态归档目录：<a href="./activities/">当前银行优惠活动目录</a> · <a href="./activities/archive.html">历史活动资料归档</a> · <a href="./sitemap.xml">站点地图</a>。</p></noscript>
 </body>
 </html>

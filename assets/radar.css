@@ -46,7 +46,9 @@ body.radar-page {
 
 /* ---------- 左侧栏：搜索 -> 快捷视图 -> 筛选区 -> 社群入口 ---------- */
 .radar-sidebar-backdrop,
-.radar-sidebar-mobile-head {
+.radar-sidebar-mobile-head,
+.radar-mobile-site-nav,
+.radar-sidebar-mobile-actions {
   display: none;
 }
 
@@ -674,6 +676,17 @@ body.radar-page {
 
 .radar-result-count {
   white-space: nowrap;
+}
+
+.radar-archive-count {
+  color: #64748b;
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+.radar-archive-count:hover {
+  color: #1f5eff;
+  text-decoration: underline;
 }
 
 .radar-icon-btn {
@@ -1387,6 +1400,27 @@ body.radar-page {
 
   .radar-page .site-header-inner {
     width: calc(100% - 24px);
+    margin: 0 auto;
+  }
+
+  /* 手机首屏仅保留品牌和菜单入口；完整导航收进左侧菜单。 */
+  .radar-page .site-nav {
+    display: none;
+  }
+
+  .radar-page .site-brand-bar {
+    min-height: 52px;
+    padding: 6px 0;
+  }
+
+  .radar-page .site-mobile-menu-btn {
+    width: 40px;
+    height: 40px;
+  }
+
+  .radar-page .site-brand-mark {
+    width: 34px;
+    height: 34px;
   }
 
   .radar-shell {
@@ -1417,7 +1451,7 @@ body.radar-page {
     box-shadow: 16px 0 40px rgba(15, 27, 45, 0.18);
     transform: translateX(-105%);
     transition: transform 0.2s ease;
-    padding: 0 14px calc(24px + env(safe-area-inset-bottom, 0px));
+    padding: 0 14px calc(104px + env(safe-area-inset-bottom, 0px));
     -webkit-overflow-scrolling: touch;
   }
 
@@ -1446,8 +1480,8 @@ body.radar-page {
   }
 
   .radar-close-btn {
-    height: 30px;
-    padding: 0 12px;
+    min-height: 44px;
+    padding: 0 16px;
     border-radius: 8px;
     border: 0;
     background: #1f5eff;
@@ -1455,6 +1489,107 @@ body.radar-page {
     font-size: 13px;
     font-weight: 600;
     cursor: pointer;
+  }
+
+  .radar-mobile-site-nav {
+    display: block;
+    padding-top: 2px;
+  }
+
+  .radar-mobile-site-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 7px;
+  }
+
+  .radar-mobile-site-qr {
+    display: block;
+  }
+
+  .radar-mobile-site-link {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    min-height: 44px;
+    padding: 0 8px;
+    border: 1px solid #e2e8f0;
+    border-radius: 10px;
+    background: #f8fafc;
+    color: #334155;
+    font: inherit;
+    font-size: 12.5px;
+    font-weight: 700;
+    text-align: center;
+    text-decoration: none;
+    cursor: pointer;
+  }
+
+  .radar-mobile-site-link.is-active {
+    border-color: #bfdbfe;
+    background: #eaf1ff;
+    color: #1f5eff;
+  }
+
+  .radar-sidebar-mobile-actions {
+    position: fixed;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 8;
+    display: grid;
+    grid-template-columns: minmax(0, 0.88fr) minmax(0, 1.4fr);
+    gap: 8px;
+    padding: 10px 14px calc(10px + env(safe-area-inset-bottom, 0px));
+    border-top: 1px solid #e2e8f0;
+    background: rgba(255, 255, 255, 0.98);
+    box-shadow: 0 -8px 24px rgba(15, 27, 45, 0.08);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+  }
+
+  .radar-mobile-clear-btn,
+  .radar-mobile-apply-btn {
+    min-height: 46px;
+    border-radius: 12px;
+    font: inherit;
+    font-size: 14px;
+    font-weight: 800;
+    cursor: pointer;
+  }
+
+  .radar-mobile-clear-btn {
+    border: 1px solid #dbe3ef;
+    background: #ffffff;
+    color: #475569;
+  }
+
+  .radar-mobile-clear-btn:disabled {
+    color: #a8b1c0;
+    background: #f8fafc;
+    cursor: default;
+  }
+
+  .radar-mobile-apply-btn {
+    border: 1px solid #1f5eff;
+    background: #1f5eff;
+    color: #ffffff;
+  }
+
+  .radar-sidebar .radar-nav-item,
+  .radar-sidebar .radar-nav-link,
+  .radar-l1 > summary,
+  .radar-l2 > summary {
+    min-height: 44px;
+    height: auto;
+  }
+
+  .radar-sidebar .radar-search input[type="search"],
+  .radar-mini-chip,
+  .radar-bank-all,
+  .radar-seg3 button {
+    min-height: 40px;
+    height: 40px;
   }
 
   .radar-sidebar .radar-kbd {
@@ -1468,8 +1603,8 @@ body.radar-page {
   /* 手机端搜索 + 筛选按钮 + 快捷标签 */
   .radar-mobile-bar {
     display: grid;
-    gap: 8px;
-    padding: 10px 14px;
+    gap: 6px;
+    padding: 8px 12px;
     background: #fbfcfe;
     border-bottom: 1px solid #eef1f6;
   }
@@ -1487,7 +1622,7 @@ body.radar-page {
   }
 
   .radar-mobile-search input[type="search"] {
-    height: 38px;
+    height: 42px;
     padding-right: 12px;
     font-size: 16px;
   }
@@ -1497,7 +1632,7 @@ body.radar-page {
     display: inline-flex;
     align-items: center;
     gap: 5px;
-    height: 38px;
+    height: 42px;
     padding: 0 13px;
     border: 1px solid #e2e8f0;
     border-radius: 10px;
@@ -1534,7 +1669,7 @@ body.radar-page {
     justify-content: center;
     gap: 3px;
     min-width: 0;
-    height: 32px;
+    height: 40px;
     padding: 0 4px;
     border: 1px solid #e2e8f0;
     border-radius: 8px;
@@ -1566,8 +1701,8 @@ body.radar-page {
   /* 手机端顶部场景条：横向平滑滑动 */
   .radar-topstrip {
     position: static;
-    padding: 8px 14px;
-    gap: 6px;
+    padding: 6px 12px 7px;
+    gap: 4px;
   }
 
   .radar-cat-tabs {
@@ -1576,13 +1711,18 @@ body.radar-page {
     overflow-x: auto;
     scrollbar-width: none;
     -webkit-overflow-scrolling: touch;
-    padding-bottom: 2px;
+    padding-bottom: 0;
+  }
+
+  .radar-cat-tab {
+    height: 40px;
+    padding: 0 13px;
   }
 
   .radar-secondary-tabs {
     display: grid;
     grid-auto-flow: column;
-    grid-template-rows: repeat(2, 30px);
+    grid-template-rows: repeat(2, 40px);
     grid-auto-columns: max-content;
     align-content: start;
     justify-content: start;
@@ -1595,7 +1735,7 @@ body.radar-page {
   }
 
   .radar-secondary-tab {
-    height: 30px;
+    height: 40px;
     padding: 0 11px;
     font-size: 12px;
     scroll-snap-align: start;
@@ -1608,10 +1748,25 @@ body.radar-page {
   .radar-strip-meta {
     width: 100%;
     margin-left: 0;
+    gap: 7px;
+    min-height: 24px;
+    font-size: 11.5px;
+  }
+
+  .radar-strip-meta .radar-reset-btn {
+    display: none;
+  }
+
+  .radar-filter-summary {
+    max-width: 112px;
   }
 
   .radar-result-count {
     margin-left: auto;
+  }
+
+  .radar-archive-count {
+    color: #64748b;
   }
 
   .radar-row {

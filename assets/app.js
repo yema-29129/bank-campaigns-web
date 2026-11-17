@@ -348,6 +348,7 @@ const els = {
   empty: document.getElementById('emptyState'),
   grid: document.getElementById('cardGrid'),
   resultSummary: document.getElementById('resultSummary'),
+  archiveSummaryLink: document.getElementById('archiveSummaryLink'),
   activeFilterSummary: document.getElementById('activeFilterSummary'),
   searchInput: document.getElementById('searchInput'),
   mobileSearchInput: document.getElementById('mobileSearchInput'),
@@ -356,9 +357,13 @@ const els = {
   loadErrorMessage: document.getElementById('loadErrorMessage'),
   resetFiltersBtn: document.getElementById('resetFiltersBtn'),
   sidebarResetBtn: document.getElementById('sidebarResetBtn'),
+  mobileResetFiltersBtn: document.getElementById('mobileResetFiltersBtn'),
+  mobileApplyFiltersBtn: document.getElementById('mobileApplyFiltersBtn'),
+  mobileResultCount: document.getElementById('mobileResultCount'),
   viewTabs: document.getElementById('viewTabs'),
   cardOrgFilters: document.getElementById('cardOrgFilters'),
   bankGroupRoot: document.getElementById('bankGroupRoot'),
+  bankCategoryDetails: document.getElementById('bankCategoryDetails'),
   payFilters: document.getElementById('payFilters'),
   regionFilters: document.getElementById('regionFilters'),
   sceneFilters: document.getElementById('sceneFilters'),
@@ -708,6 +713,12 @@ function resetFilters() {
   if (els.mobileSearchInput) els.mobileSearchInput.value = '';
 }
 
+function syncBankCategoryDisclosure() {
+  if (!els.bankCategoryDetails) return;
+  const isMobile = window.matchMedia('(max-width: 860px)').matches;
+  els.bankCategoryDetails.open = !isMobile;
+}
+
 function mountTopCategories() {
   if (!els.topCategoryBar) return;
   els.topCategoryBar.innerHTML = '';
@@ -902,9 +913,10 @@ function syncFilterControls() {
   }
 
   // Top site nav highlight
-  document.querySelectorAll('.site-nav [data-nav-view]').forEach((link) => {
+  document.querySelectorAll('.site-nav [data-nav-view], .radar-mobile-site-nav [data-nav-view]').forEach((link) => {
     const target = link.dataset.navView;
-    link.classList.toggle('is-active', target === 'credit' && state.view === 'credit');
+    const isActive = target === 'credit' ? state.view === 'credit' : target === 'all' && state.view !== 'credit';
+    link.classList.toggle('is-active', isActive);
   });
   const homeNavLink = document.querySelector('.site-nav a[href="./index.html"]');
   if (homeNavLink) homeNavLink.classList.toggle('is-active', state.view !== 'credit');
@@ -958,6 +970,7 @@ function syncFilterControls() {
   const isDefault = hasDefaultFilters();
   if (els.resetFiltersBtn) els.resetFiltersBtn.classList.toggle('hidden', isDefault);
   if (els.sidebarResetBtn) els.sidebarResetBtn.classList.toggle('hidden', isDefault);
+  if (els.mobileResetFiltersBtn) els.mobileResetFiltersBtn.disabled = isDefault;
 
   const extraCount = countActiveExtraFilters();
   if (els.mobileFilterCount) {
@@ -1193,12 +1206,16 @@ function applyFilters() {
   const result = state.campaigns.filter((item) => matchesAll(item));
   state.filtered = result;
 
+  const activeCount = result.filter((item) => !item.isExpired).length;
+  const archivedTotal = state.campaigns.filter((item) => item.isExpired).length;
+
   if (els.resultSummary) {
-    const expiredCount = result.filter(item => item.isExpired).length;
-    els.resultSummary.textContent = expiredCount
-      ? `共 ${result.length} 条 · 含 ${expiredCount} 条已过期`
-      : `共 ${result.length} 条`;
+    els.resultSummary.textContent = hasDefaultFilters()
+      ? `当前有效 ${activeCount} 条`
+      : `符合条件 ${activeCount} 条`;
   }
+  if (els.archiveSummaryLink) els.archiveSummaryLink.textContent = `历史归档 ${archivedTotal} 条`;
+  if (els.mobileResultCount) els.mobileResultCount.textContent = String(activeCount);
 
   setHomeMeta();
   setLoadingState({ loading: false, error: false, empty: !result.length });
@@ -1694,10 +1711,13 @@ function bindEvents() {
 
   const doReset = () => {
     resetFilters();
+    syncBankCategoryDisclosure();
     applyFilters();
   };
   if (els.resetFiltersBtn) els.resetFiltersBtn.addEventListener('click', doReset);
   if (els.sidebarResetBtn) els.sidebarResetBtn.addEventListener('click', doReset);
+  if (els.mobileResetFiltersBtn) els.mobileResetFiltersBtn.addEventListener('click', doReset);
+  if (els.mobileApplyFiltersBtn) els.mobileApplyFiltersBtn.addEventListener('click', closeMobileSidebar);
 
   if (els.viewTabs) {
     els.viewTabs.addEventListener('click', (event) => {
@@ -1844,6 +1864,7 @@ function bindEvents() {
         resetFilters();
         state.view = targetView;
         applyFilters();
+        if (window.matchMedia('(max-width: 860px)').matches) closeMobileSidebar();
       }
       return;
     }
@@ -1907,6 +1928,8 @@ async function fetchCampaigns() {
   if (!hadData) {
     state.loadStatus = 'loading';
     if (els.resultSummary) els.resultSummary.textContent = '正在加载…';
+    if (els.archiveSummaryLink) els.archiveSummaryLink.textContent = '历史归档 — 条';
+    if (els.mobileResultCount) els.mobileResultCount.textContent = '—';
     setLoadingState({ loading: true });
   }
 
@@ -1931,6 +1954,8 @@ async function fetchCampaigns() {
     if (!hadData) {
       state.loadStatus = 'error';
       if (els.resultSummary) els.resultSummary.textContent = '暂未载入';
+      if (els.archiveSummaryLink) els.archiveSummaryLink.textContent = '历史归档 — 条';
+      if (els.mobileResultCount) els.mobileResultCount.textContent = '—';
       if (els.loadErrorMessage) els.loadErrorMessage.textContent = `${message}，请重试。`;
       setLoadingState({ error: true });
     }
@@ -1968,7 +1993,16 @@ function initializeCampaignPage() {
   mountMiniChips(els.payFilters, PAY_OPTIONS, 'pay');
   mountMiniChips(els.regionFilters, REGION_OPTIONS, 'regionGroup');
   mountMiniChips(els.sceneFilters, SCENE_OPTIONS, 'scene');
+  syncBankCategoryDisclosure();
   bindEvents();
+
+  const mobileDisclosureQuery = window.matchMedia('(max-width: 860px)');
+  const handleDisclosureModeChange = () => syncBankCategoryDisclosure();
+  if (mobileDisclosureQuery.addEventListener) {
+    mobileDisclosureQuery.addEventListener('change', handleDisclosureModeChange);
+  } else if (mobileDisclosureQuery.addListener) {
+    mobileDisclosureQuery.addListener(handleDisclosureModeChange);
+  }
 
   const params = new URLSearchParams(window.location.search);
   const query = params.get('q');
