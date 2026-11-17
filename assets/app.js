@@ -2,6 +2,7 @@ const API_BASE = 'https://mini.vooqqqm.com/api';
 const CAMPAIGN_LOAD_TIMEOUT = 12000;
 const EXPIRING_SOON_DAYS = 20;
 const GROUP_QR_URL = 'https://github.com/yema-29129/bank-campaigns-web/blob/main/assets/group-wechat-qr.png?raw=true';
+const WECHAT_CONTACT_QR_URL = './assets/wechat-contact-qr.jpg';
 
 const POSTER_FIELDS = [
   'posterUrl', 'posterPath', 'poster',
@@ -1596,6 +1597,44 @@ function closeMpQrModal() {
   modal.setAttribute('aria-hidden', 'true');
 }
 
+function openWechatContactQrModal() {
+  let modal = document.getElementById('wechatContactQrModal');
+  if (!modal) {
+    modal = document.createElement('div');
+    modal.id = 'wechatContactQrModal';
+    modal.className = 'mp-qr-modal hidden';
+    modal.setAttribute('aria-hidden', 'true');
+    modal.innerHTML = `
+      <div class="mp-qr-backdrop" data-close-contact-qr="true"></div>
+      <div class="mp-qr-dialog is-contact-qr" role="dialog" aria-modal="true" aria-labelledby="wechatContactQrTitle">
+        <img src="${escapeAttribute(WECHAT_CONTACT_QR_URL)}" alt="HAIMA_Johnny 微信二维码" width="1126" height="1610">
+        <p class="mp-qr-title" id="wechatContactQrTitle">添加微信好友</p>
+        <p class="mp-qr-hint">微信扫一扫，手机端可长按二维码识别</p>
+        <button type="button" class="mp-qr-close" data-close-contact-qr="true">关闭</button>
+      </div>
+    `;
+    document.body.appendChild(modal);
+  }
+  closeMobileSidebar();
+  document.querySelectorAll('[data-open-contact-qr]').forEach((trigger) => {
+    trigger.setAttribute('aria-expanded', 'true');
+  });
+  modal.classList.remove('hidden');
+  modal.setAttribute('aria-hidden', 'false');
+  const closeButton = modal.querySelector('[data-close-contact-qr="true"]');
+  if (closeButton) requestAnimationFrame(() => closeButton.focus());
+}
+
+function closeWechatContactQrModal() {
+  const modal = document.getElementById('wechatContactQrModal');
+  if (!modal) return;
+  modal.classList.add('hidden');
+  modal.setAttribute('aria-hidden', 'true');
+  document.querySelectorAll('[data-open-contact-qr]').forEach((trigger) => {
+    trigger.setAttribute('aria-expanded', 'false');
+  });
+}
+
 function openShareSheet() {
   if (!els.shareSheet || !currentDrawerActivity) return;
   if (els.sharePreview) els.sharePreview.textContent = buildShareText(currentDrawerActivity);
@@ -1743,6 +1782,16 @@ function bindEvents() {
   }
 
   document.addEventListener('click', (event) => {
+    const contactQrTrigger = event.target.closest('[data-open-contact-qr]');
+    if (contactQrTrigger) {
+      event.preventDefault();
+      openWechatContactQrModal();
+      return;
+    }
+    if (event.target.closest('[data-close-contact-qr="true"]')) {
+      closeWechatContactQrModal();
+      return;
+    }
     if (event.target.closest('[data-close-mp-qr="true"]')) {
       closeMpQrModal();
       return;
@@ -1772,6 +1821,7 @@ function bindEvents() {
       !event.target.closest('.radar-row') &&
       !event.target.closest('#shareSheet') &&
       !event.target.closest('#imageLightbox') &&
+      !event.target.closest('#wechatContactQrModal') &&
       !event.target.closest('#mpQrModal')
     ) {
       closeDetailDrawer();
@@ -1822,6 +1872,8 @@ function bindEvents() {
 
   document.addEventListener('keydown', (event) => {
     if (event.key === 'Escape') {
+      const contactQrModal = document.getElementById('wechatContactQrModal');
+      if (contactQrModal && !contactQrModal.classList.contains('hidden')) return closeWechatContactQrModal();
       const mpModal = document.getElementById('mpQrModal');
       if (mpModal && !mpModal.classList.contains('hidden')) return closeMpQrModal();
       document.querySelectorAll('.site-nav-qr.is-open').forEach((el) => {

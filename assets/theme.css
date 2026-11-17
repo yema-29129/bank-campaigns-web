@@ -1621,6 +1621,19 @@ html, body { overflow-x: clip; }
   border-radius: 12px;
 }
 
+.mp-qr-dialog.is-contact-qr {
+  width: min(360px, calc(100vw - 32px));
+  padding: 12px 12px 14px;
+}
+
+.mp-qr-dialog.is-contact-qr img {
+  width: 100%;
+  max-height: min(68dvh, 640px);
+  object-fit: contain;
+  border: 1px solid #eef1f6;
+  border-radius: 16px;
+}
+
 .mp-qr-title {
   margin: 12px 0 4px;
   font-size: 15px;
