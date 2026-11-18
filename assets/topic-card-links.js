@@ -6,10 +6,20 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const href = primaryLink.getAttribute('href');
     if (!href) return;
+    const detailHref = card.matches('[data-website-only]') && /^[a-z0-9-]+$/.test(card.id)
+      ? `/detail.html?web=${encodeURIComponent(card.id)}`
+      : href;
+
+    card.querySelectorAll('a[href]').forEach((link) => {
+      link.target = '_blank';
+      link.rel = 'noopener noreferrer';
+    });
 
     if (!title.querySelector('a')) {
       const titleLink = document.createElement('a');
-      titleLink.href = href;
+      titleLink.href = detailHref;
+      titleLink.target = '_blank';
+      titleLink.rel = 'noopener noreferrer';
       titleLink.textContent = title.textContent.trim();
       title.replaceChildren(titleLink);
     }
@@ -20,7 +30,7 @@ document.addEventListener('DOMContentLoaded', () => {
     card.setAttribute('aria-label', `打开活动：${title.textContent.trim()}`);
 
     const openPrimaryLink = () => {
-      window.location.assign(href);
+      window.open(detailHref, '_blank', 'noopener,noreferrer');
     };
 
     card.addEventListener('click', (event) => {

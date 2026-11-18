@@ -1,5 +1,5 @@
-const STATIC_CACHE = 'yangmao-assistant-static-v28';
-const RUNTIME_CACHE = 'yangmao-assistant-runtime-v28';
+const STATIC_CACHE = 'yangmao-assistant-static-v29';
+const RUNTIME_CACHE = 'yangmao-assistant-runtime-v29';
 const STATIC_ASSETS = [
   '/',
   '/index.html',
@@ -18,14 +18,14 @@ const STATIC_ASSETS = [
   '/assets/theme.css?v=20261118-contactfix1',
   '/assets/radar.css?v=20261118-mobileopt5',
   '/assets/detail-v2.css?v=20261117-radar10',
-  '/assets/app.js?v=20261118-blackfriday4',
-  '/assets/detail.js?v=20261118-seo1',
+  '/assets/app.js?v=20261118-blackfriday5',
+  '/assets/detail.js?v=20261118-webdetail1',
   '/assets/privacy-consent.js?v=20261118-consent1',
   '/assets/privacy-consent.css?v=20261118-consent1',
   '/assets/mobile-back.js?v=20261118-back1',
   '/assets/mobile-back.css?v=20261118-back1',
   '/assets/contact.js?v=20261118-contactfix1',
-  '/assets/topic-card-links.js?v=20261118-blackfriday1',
+  '/assets/topic-card-links.js?v=20261118-blackfriday2',
   '/assets/group-wechat-qr.webp?v=20261118-contactfix1',
   '/assets/miniprogram-qr.jpg',
   '/assets/wechat-contact-qr.jpg',

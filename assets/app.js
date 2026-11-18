@@ -2150,20 +2150,40 @@ async function fetchWebsiteBlackFriday(signal) {
     const { id } = offer;
     const { merchant, market, validFrom, validTo } = offer.dataset;
     const title = offer.querySelector('h2')?.textContent.trim();
-    const desc = offer.querySelector('p + p')?.textContent.trim() || '';
+    const paragraphs = [...offer.querySelectorAll(':scope > p')];
+    const schedule = paragraphs[0]?.textContent.trim() || '';
+    const desc = paragraphs[1]?.textContent.trim() || '';
+    const sourceLinks = [...offer.querySelectorAll('a[href]')];
+    const pathUrl = sourceLinks[0]?.getAttribute('href') || '';
     if (!/^[a-z0-9-]+$/.test(id) || !merchant || !market || !title ||
         !/^\d{4}-\d{2}-\d{2}$/.test(validFrom) || !/^\d{4}-\d{2}-\d{2}$/.test(validTo) ||
-        !parseDate(validFrom) || !parseDate(validTo) || validFrom > validTo) continue;
+        !parseDate(validFrom) || !parseDate(validTo) || validFrom > validTo || !pathUrl) continue;
+
+    const sourceLines = sourceLinks.flatMap((link) => [
+      link.textContent.trim() || '官方来源',
+      link.getAttribute('href') || ''
+    ]).filter(Boolean);
+
     offers.push({
       id: `web-black-friday-${id}`,
-      websiteDetailPath: `${WEBSITE_BLACK_FRIDAY_PATH}#${id}`,
+      websiteOfferId: id,
+      websiteDetailPath: `./detail.html?web=${encodeURIComponent(id)}`,
+      websiteTopicPath: `${WEBSITE_BLACK_FRIDAY_PATH}#${id}`,
       bankName: merchant,
       region: market,
       title,
       desc,
       validFrom,
       validTo,
-      tags: ['黑五']
+      channel: /门店/.test(schedule) ? '官网/门店' : '官网',
+      pathUrl,
+      pathDesc: `打开${merchant}官方活动页面 → 核对商品、日期、地区与结账条件 → 按页面提示参与`,
+      awardDesc: [
+        '【活动时间与范围】', schedule,
+        '【活动说明】', desc,
+        '【官方来源】', ...sourceLines
+      ].filter(Boolean).join('\n'),
+      tags: ['黑五', '网站专题']
     });
   }
   return offers;
@@ -2241,6 +2261,11 @@ function escapeAttribute(value) {
 
 function initializeCampaignPage() {
   if (!isListPage()) return;
+
+  document.querySelectorAll('a[href^="./activities/topics"], a[href^="/activities/topics"]').forEach((link) => {
+    link.target = '_blank';
+    link.rel = 'noopener noreferrer';
+  });
 
   mountTopCategories();
   mountSecondaryFilters();

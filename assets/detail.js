@@ -1,4 +1,5 @@
 const API_BASE = 'https://mini.vooqqqm.com/api';
+const WEBSITE_BLACK_FRIDAY_PATH = './activities/topics/black-friday-2026.html';
 const DETAIL_LOAD_TIMEOUT = 12000;
 const GROUP_QR_URL = 'https://github.com/yema-29129/bank-campaigns-web/blob/main/assets/group-wechat-qr.png?raw=true';
 
@@ -27,6 +28,7 @@ const POSTER_FIELDS = [
 
 const params = new URLSearchParams(window.location.search);
 const campaignId = params.get('id');
+const websiteOfferId = params.get('web');
 
 const els = {
   root: document.getElementById('detailRoot'),
@@ -185,6 +187,10 @@ function buildDiscountText(activity) {
 }
 
 function getDetailUrl() {
+  const webId = String(websiteOfferId || '').trim();
+  if (/^[a-z0-9-]+$/.test(webId)) {
+    return `https://bank.vooqqqm.com/detail.html?web=${encodeURIComponent(webId)}`;
+  }
   const id = String(campaignId || '').trim();
   return /^\d+$/.test(id)
     ? `https://bank.vooqqqm.com/activities/${encodeURIComponent(id)}.html`
@@ -490,6 +496,7 @@ function renderDetail(activity) {
 
   const posterUrl = resolvePosterUrl(activity);
   const pathUrl = String(activity.pathUrl || '').trim();
+  const topicUrl = String(activity.websiteTopicPath || '').trim();
   const isPathUrlLink = /^https?:\/\//i.test(pathUrl);
   const status = dxGetStatus(activity);
 
@@ -545,11 +552,12 @@ function renderDetail(activity) {
           </dl>
         ` : ''}
 
-        ${(pathUrl || posterUrl) ? `
+        ${(pathUrl || posterUrl || topicUrl) ? `
           <div class="dx-clean-actions">
             ${isPathUrlLink ? `<a class="dx-clean-btn is-primary" href="${escapeAttribute(pathUrl)}" target="_blank" rel="noopener noreferrer">直达活动入口 ↗</a>` : ''}
             ${pathUrl ? `<button class="dx-clean-btn" type="button" id="copyPathBtn">复制${isPathUrlLink ? '链接' : '路径'}</button>` : ''}
             ${posterUrl ? `<button class="dx-clean-btn" type="button" id="viewPosterBtn">查看活动图片 / 二维码</button>` : ''}
+            ${topicUrl ? `<a class="dx-clean-btn" href="${escapeAttribute(topicUrl)}" target="_blank" rel="noopener noreferrer">查看黑五专题 ↗</a>` : ''}
           </div>
           ${(!isPathUrlLink && pathUrl) ? `<div class="dx-clean-path-box">${escapeHtml(pathUrl)}</div>` : ''}
         ` : ''}
@@ -770,9 +778,59 @@ function unwrapDetailPayload(payload) {
   return null;
 }
 
+async function fetchWebsiteBlackFridayDetail(id, signal) {
+  if (!/^[a-z0-9-]+$/.test(id)) throw new Error('invalid_website_offer_id');
+
+  const response = await fetch(WEBSITE_BLACK_FRIDAY_PATH, { signal, cache: 'no-cache' });
+  if (!response.ok) throw new Error(`HTTP ${response.status}`);
+
+  const page = new DOMParser().parseFromString(await response.text(), 'text/html');
+  const offer = page.getElementById(id);
+  if (!offer || !offer.matches('[data-campaign][data-website-only]')) throw new Error('not_found');
+
+  const { merchant, market, validFrom, validTo } = offer.dataset;
+  const title = offer.querySelector('h2')?.textContent.trim();
+  const paragraphs = [...offer.querySelectorAll(':scope > p')];
+  const schedule = paragraphs[0]?.textContent.trim() || '';
+  const desc = paragraphs[1]?.textContent.trim() || '';
+  const sourceLinks = [...offer.querySelectorAll('a[href]')];
+  const pathUrl = sourceLinks[0]?.getAttribute('href') || '';
+
+  if (!merchant || !market || !title || !/^\d{4}-\d{2}-\d{2}$/.test(validFrom) ||
+      !/^\d{4}-\d{2}-\d{2}$/.test(validTo) || !pathUrl) {
+    throw new Error('invalid_website_offer');
+  }
+
+  const sourceLines = sourceLinks.flatMap((link) => [
+    link.textContent.trim() || '官方来源',
+    link.getAttribute('href') || ''
+  ]).filter(Boolean);
+
+  return {
+    id: `web-black-friday-${id}`,
+    websiteOfferId: id,
+    websiteTopicPath: `${WEBSITE_BLACK_FRIDAY_PATH}#${id}`,
+    bankName: merchant,
+    region: market,
+    title,
+    desc,
+    validFrom,
+    validTo,
+    channel: /门店/.test(schedule) ? '官网/门店' : '官网',
+    pathUrl,
+    pathDesc: `打开${merchant}官方活动页面 → 核对商品、日期、地区与结账条件 → 按页面提示参与`,
+    awardDesc: [
+      '【活动时间与范围】', schedule,
+      '【活动说明】', desc,
+      '【官方来源】', ...sourceLines
+    ].filter(Boolean).join('\n'),
+    tags: ['黑五', '网站专题']
+  };
+}
+
 async function fetchDetail() {
   if (detailRequestPending) return;
-  if (!campaignId) {
+  if (!campaignId && !websiteOfferId) {
     if (els.loading) els.loading.classList.add('hidden');
     if (els.error) els.error.classList.remove('hidden');
     if (els.errorMessage) els.errorMessage.textContent = '此链接缺少活动编号，请返回列表选择活动。';
@@ -786,18 +844,23 @@ async function fetchDetail() {
   const controller = new AbortController();
   const timeout = setTimeout(() => controller.abort(), DETAIL_LOAD_TIMEOUT);
   try {
-    const response = await fetch(`${API_BASE}/campaign_detail.php?id=${encodeURIComponent(campaignId)}`, {
-      credentials: 'omit',
-      signal: controller.signal
-    });
+    let data;
+    if (websiteOfferId) {
+      data = await fetchWebsiteBlackFridayDetail(websiteOfferId, controller.signal);
+    } else {
+      const response = await fetch(`${API_BASE}/campaign_detail.php?id=${encodeURIComponent(campaignId)}`, {
+        credentials: 'omit',
+        signal: controller.signal
+      });
 
-    if (!response.ok) throw new Error(`HTTP ${response.status}`);
+      if (!response.ok) throw new Error(`HTTP ${response.status}`);
 
-    const payload = await response.json();
-    const data = unwrapDetailPayload(payload);
+      const payload = await response.json();
+      data = unwrapDetailPayload(payload);
 
-    if (!data) {
-      throw new Error(payload && payload.message ? payload.message : 'not_found');
+      if (!data) {
+        throw new Error(payload && payload.message ? payload.message : 'not_found');
+      }
     }
 
     data.tags = normalizeTags(data.tags);
