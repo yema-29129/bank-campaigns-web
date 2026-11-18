@@ -48,7 +48,7 @@ class WorkbenchTest(unittest.TestCase):
                                   stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True).stdout
 
         git("init", "--bare", "--initial-branch=main", str(origin))
-        git("clone", str(origin), str(self.repo))
+        git("clone", origin.as_uri(), str(self.repo))
         path = self.repo / server.TOPIC
         path.parent.mkdir(parents=True)
         path.write_text(FIXTURE, encoding="utf-8")

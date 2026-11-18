@@ -26,6 +26,7 @@ ORIGIN = os.environ.get("WEBOPS_ORIGIN", "https://haoyangmao.tmhzz.com")
 AUTH_URL = os.environ.get("WEBOPS_AUTH_URL", "http://127.0.0.1:3210/api/auth/session")
 SITE_URL = os.environ.get("WEBOPS_SITE_URL", "https://bank.vooqqqm.com")
 BRANCH = os.environ.get("WEBOPS_BRANCH", "main")
+GIT_EMAIL = os.environ.get("WEBOPS_GIT_EMAIL", "web-workbench@vooqqqm.com")
 WRITES_ENABLED = os.environ.get("WEBOPS_WRITES_ENABLED") == "1"
 GIT_LOCK = Lock()
 GIT_ENV = {**os.environ, "GIT_TERMINAL_PROMPT": "0"}
@@ -162,7 +163,10 @@ def published_html():
         "User-Agent": "YangmaoWebWorkbench/1.0", "Cache-Control": "no-cache",
     })
     with urlopen(request, timeout=8) as response:
-        return response.read(2_000_000).decode("utf-8")
+        html = response.read(2_000_000).decode("utf-8")
+    if f'<link rel="canonical" href="{SITE_URL}/{TOPIC}">' not in html:
+        raise Problem(502, "暂时无法确认网页专题已部署。")
+    return html
 
 
 def delete_offer(offer_id, revision):
@@ -178,7 +182,7 @@ def delete_offer(offer_id, revision):
         if git("diff", "--cached", "--name-only").stdout.splitlines() != [TOPIC]:
             raise ValueError("Refusing a commit outside the website catalogue")
         git("-c", "user.name=羊毛助手网页工作台",
-            "-c", "user.email=web-workbench@vooqqqm.com",
+            "-c", f"user.email={GIT_EMAIL}",
             "commit", "-m", f"Remove website offer {offer_id}", "--", TOPIC)
         commit = git("rev-parse", "HEAD").stdout.strip()
         try:

@@ -1,0 +1,27 @@
+[Unit]
+Description=Yangmao website activity workbench
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=webops
+Group=webops
+WorkingDirectory=/opt/yangmao-web-workbench
+ExecStart=/usr/bin/python3 /opt/yangmao-web-workbench/server.py
+Environment=PYTHONDONTWRITEBYTECODE=1
+Environment=WEBOPS_WRITES_ENABLED=1
+Environment=WEBOPS_GIT_EMAIL=67180306+yema-29129@users.noreply.github.com
+Environment="GIT_SSH_COMMAND=/usr/bin/ssh -F /dev/null -o BatchMode=yes -o IdentitiesOnly=yes -o StrictHostKeyChecking=yes -o UserKnownHostsFile=/var/lib/yangmao-webops/ssh/known_hosts -i /var/lib/yangmao-webops/ssh/deploy"
+StateDirectory=yangmao-webops
+StateDirectoryMode=0700
+UMask=0077
+NoNewPrivileges=yes
+PrivateTmp=yes
+ProtectSystem=strict
+ProtectHome=yes
+CapabilityBoundingSet=
+Restart=on-failure
+
+[Install]
+WantedBy=multi-user.target
