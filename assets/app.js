@@ -177,7 +177,7 @@ const KNOWN_OVERSEAS_DESTINATION_RE = /中国香港|香港|中国澳门|澳门|�
 
 // Destination filters are coverage filters, not literal keyword filters. A campaign
 // that applies to all overseas spending also applies in Japan, the US, Europe, etc.
-const BROAD_OVERSEAS_SCOPE_RE = /境外|海外|国外|全球|全世界|世界各地|全球范围|国际(?:消费|签账|交易|支付|商户)|外币(?:消费|签账|交易|支付)/i;
+const BROAD_OVERSEAS_SCOPE_RE = /境外|海外|国外|出境|跨境|全球|全世界|世界各地|全球范围|国际(?:消费|签账|交易|支付|商户)|外币(?:消费|签账|交易|支付)/i;
 const OVERSEAS_REGIONAL_SCOPE_RE = /港澳台|大湾区|亚洲|亚太|东亚|东南亚|北美|南美|美洲|欧洲|欧盟|大洋洲|中东|西亚/;
 const OVERSEAS_DESTINATION_SCOPE = {
   '中国香港': { explicit: /中国香港|香港/, regional: /港澳台|大湾区/ },
@@ -198,7 +198,13 @@ const DESTINATION_EXCLUSION_WORDS = '不含|不包括|不适用|不支持|不覆
 function stripIssuerOnlyPhrases(text) {
   return String(text || '')
     .replace(/(?:中国香港|香港|中国澳门|澳门|中国台湾|台湾|日本|韩国|泰国|美国|英国|法国|德国|澳大利亚|澳洲|新西兰|境外|海外|国外)(?:地区)?(?:发行|发卡|银行卡|信用卡|银联卡|卡片|账户|客户)/g, '')
+    .replace(/(?:中国香港|香港|中国澳门|澳门|中国台湾|台湾|日本|韩国|泰国|美国|英国|法国|德国|澳大利亚|澳洲|新西兰)(?:地区)?(?:出发|始发|起飞)/g, '')
     .replace(/(?:发卡|发行|持卡|账户)地区[^。；;，,\n]{0,24}/g, '');
+}
+
+function overseasTitleScope(title) {
+  const parts = String(title || '').split('·');
+  return parts.length > 1 ? parts.slice(1).join('·') : parts[0];
 }
 
 function hasDestinationExclusion(text, destinationPattern) {
@@ -215,27 +221,57 @@ function isRestrictedToAnotherDestination(text, destinationPattern) {
   ));
 }
 
+function hasNamedDestinationRestriction(text) {
+  const restrictions = String(text || '').match(/(?:仅限|只限|限于|仅适用于|只适用于)[^。；;，,\n]{1,40}/g) || [];
+  return restrictions.some((segment) => KNOWN_OVERSEAS_DESTINATION_RE.test(segment));
+}
+
 function matchesOverseasDestination(item, selected) {
   if (!selected || selected === '全部') return true;
   const regionText = stripIssuerOnlyPhrases(item.overseasRegionText || '');
   const campaignText = stripIssuerOnlyPhrases(item.overseasCampaignText || item.overseasDestinationText || '');
+  const scopeText = stripIssuerOnlyPhrases(item.overseasScopeText || campaignText);
   const text = `${regionText} ${campaignText}`.trim();
   const option = OVERSEAS_DESTINATION_OPTIONS.find((entry) => entry.key === selected);
-  if (selected === '其他境外') return option ? option.test(text) : true;
+  const regionIsBroad = BROAD_OVERSEAS_SCOPE_RE.test(regionText);
+  const campaignIsBroad = BROAD_OVERSEAS_SCOPE_RE.test(scopeText);
+  const fullCampaignIsBroad = BROAD_OVERSEAS_SCOPE_RE.test(campaignText);
+  const regionHasSpecificScope = KNOWN_OVERSEAS_DESTINATION_RE.test(regionText) || OVERSEAS_REGIONAL_SCOPE_RE.test(regionText);
+  const campaignHasSpecificScope = KNOWN_OVERSEAS_DESTINATION_RE.test(scopeText) || OVERSEAS_REGIONAL_SCOPE_RE.test(scopeText);
+
+  if (selected === '其他境外') {
+    if (hasNamedDestinationRestriction(text)) return false;
+    if (regionHasSpecificScope && !regionIsBroad) return false;
+    if (campaignHasSpecificScope && !campaignIsBroad) return false;
+    if (regionIsBroad || campaignIsBroad || fullCampaignIsBroad) return true;
+    return !regionHasSpecificScope && !campaignHasSpecificScope;
+  }
 
   const scope = OVERSEAS_DESTINATION_SCOPE[selected];
   if (!scope) return option ? option.test(text) : true;
   if (hasDestinationExclusion(text, scope.explicit)) return false;
-  if (scope.explicit.test(text)) return true;
   if (isRestrictedToAnotherDestination(text, scope.explicit)) return false;
+
+  const selectedRegionMatches = !!(scope.regional && scope.regional.test(regionText));
+  const selectedCampaignMatches = scope.explicit.test(scopeText) || !!(scope.regional && scope.regional.test(scopeText));
+
+  // A broad region such as "境外" covers every destination, unless the actual
+  // offer title narrows it to Japan, Europe, another country, or a region.
+  // The issuer prefix before "·" and generic tags are excluded from scopeText,
+  // so "香港某银行信用卡·日本指定商户" is treated as Japan-only.
+  if (regionIsBroad) {
+    if (campaignHasSpecificScope && !campaignIsBroad) return selectedCampaignMatches;
+    return true;
+  }
 
   // A specific region field is authoritative. Do not let a generic tag such as
   // "境外返现" turn a Macau-only or Europe-only campaign into a Japan result.
-  const regionHasSpecificScope = KNOWN_OVERSEAS_DESTINATION_RE.test(regionText) || OVERSEAS_REGIONAL_SCOPE_RE.test(regionText);
-  const selectedRegionMatches = !!(scope.regional && scope.regional.test(regionText));
-  if (regionHasSpecificScope && !BROAD_OVERSEAS_SCOPE_RE.test(regionText) && !selectedRegionMatches) return false;
+  if (regionHasSpecificScope) return selectedRegionMatches || scope.explicit.test(regionText);
 
-  return BROAD_OVERSEAS_SCOPE_RE.test(text) || !!(scope.regional && scope.regional.test(text));
+  if (selectedCampaignMatches) return true;
+  if (campaignHasSpecificScope && !campaignIsBroad && !selectedCampaignMatches) return false;
+
+  return campaignIsBroad || fullCampaignIsBroad || (!regionHasSpecificScope && !campaignHasSpecificScope);
 }
 
 const OVERSEAS_DESTINATION_OPTIONS = [
@@ -642,8 +678,11 @@ function normalizeCampaign(item) {
     ].filter(Boolean).join(' '),
     overseasRegionText: overseasDestination(normalized.region),
     overseasCampaignText: [
-      normalized.title, normalized.desc,
+      overseasTitleScope(normalized.title), normalized.desc,
       normalized.consumeChannel, normalized.channel, ...normalizedTags
+    ].filter(Boolean).join(' '),
+    overseasScopeText: [
+      overseasTitleScope(normalized.title)
     ].filter(Boolean).join(' '),
     overseasDestinationText: [
       overseasDestination(normalized.region), normalized.title, normalized.desc,

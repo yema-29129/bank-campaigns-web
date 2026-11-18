@@ -12,8 +12,11 @@ vm.runInNewContext(`${appSource.slice(0, stateStart)}\nglobalThis.filterTestApi 
       ...item,
       overseasRegionText: overseasDestination(item.region),
       overseasCampaignText: [
-        item.title, item.desc, item.consumeChannel, item.channel,
+        overseasTitleScope(item.title), item.desc, item.consumeChannel, item.channel,
         ...(Array.isArray(item.tags) ? item.tags : [])
+      ].filter(Boolean).join(' '),
+      overseasScopeText: [
+        overseasTitleScope(item.title)
       ].filter(Boolean).join(' '),
       overseasDestinationText: [
         overseasDestination(item.region), item.title, item.desc,
@@ -40,7 +43,13 @@ const cases = [
   ['Macau-only campaign stays out of Japan', { title: '中国澳门消费返现', region: '中国澳门', tags: ['境外返现'] }, '日本', false],
   ['UK-France campaign stays out of Japan', { title: '英法指定商户返现', region: '英国、法国', tags: ['境外返现'] }, '日本', false],
   ['generic overseas covers the US', { title: '信用卡境外线下消费返现', region: '境外' }, '美国', true],
-  ['Europe scope does not cover the US', { title: '欧洲指定商户返现', region: '欧洲' }, '美国', false]
+  ['Europe scope does not cover the US', { title: '欧洲指定商户返现', region: '欧洲' }, '美国', false],
+  ['generic overseas with examples still covers other destinations', { title: '信用卡境外消费返现', region: '境外（含中国香港、中国澳门、中国台湾）' }, '其他境外', true],
+  ['generic region does not widen Japan-only title to the US', { title: '中国银行信用卡·日本指定商户返现', region: '境外', tags: ['境外返现'] }, '美国', false],
+  ['generic region keeps Japan-only title in Japan', { title: '中国银行信用卡·日本指定商户返现', region: '境外', tags: ['境外返现'] }, '日本', true],
+  ['generic region does not widen Japan-only title to other destinations', { title: '中国银行信用卡·日本指定商户返现', region: '境外', tags: ['境外返现'] }, '其他境外', false],
+  ['issuer location does not override Japan-only destination', { title: '香港某银行信用卡·日本指定商户返现', region: '境外', tags: ['境外返现'] }, '中国香港', false],
+  ['issuer location keeps Japan-only destination in Japan', { title: '香港某银行信用卡·日本指定商户返现', region: '境外', tags: ['境外返现'] }, '日本', true]
 ];
 
 let failures = 0;
@@ -52,8 +61,23 @@ for (const [name, item, destination, expected] of cases) {
   }
 }
 
+const genericChinaIssuedCard = {
+  title: '中国建设银行信用卡境外线下消费返现',
+  bankName: '中国建设银行',
+  region: '境外'
+};
+const destinationKeys = [
+  '中国香港', '中国澳门', '中国台湾', '日本', '韩国', '泰国',
+  '东南亚', '美国', '欧洲', '澳新', '中东', '其他境外'
+];
+const missingGenericDestinations = destinationKeys.filter((destination) => !match(genericChinaIssuedCard, destination));
+if (missingGenericDestinations.length) {
+  failures += 1;
+  console.error(`FAIL generic China-issued overseas card missing: ${missingGenericDestinations.join(', ')}`);
+}
+
 if (failures) process.exitCode = 1;
-else console.log(`PASS ${cases.length} destination coverage cases`);
+else console.log(`PASS ${cases.length + 1} destination coverage cases`);
 
 const dataPath = process.argv[2];
 if (dataPath) {
