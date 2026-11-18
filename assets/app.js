@@ -1346,8 +1346,6 @@ function buildRow(item, index) {
     </div>
   `;
 
-  if (item.websiteDetailPath) return row;
-
   row.addEventListener('click', (event) => {
     if (event.metaKey || event.ctrlKey || event.shiftKey || event.altKey || event.button !== 0) {
       return;
@@ -1704,7 +1702,7 @@ async function openDetailDrawer(listItem, { syncHistory = true } = {}) {
     `;
   }
   if (els.drawerOpenPage) {
-    els.drawerOpenPage.href = `./detail.html?id=${encodeURIComponent(id)}`;
+    els.drawerOpenPage.href = listItem.websiteDetailPath || `./detail.html?id=${encodeURIComponent(id)}`;
   }
 
   els.detailDrawer.classList.remove('hidden');
@@ -1712,6 +1710,15 @@ async function openDetailDrawer(listItem, { syncHistory = true } = {}) {
   requestAnimationFrame(() => els.detailDrawer.classList.add('is-open'));
   if (els.drawerBackdrop) els.drawerBackdrop.classList.remove('hidden');
   document.body.classList.add('drawer-open');
+
+  if (listItem.websiteOfferId) {
+    detailCache.set(id, listItem);
+    currentDrawerActivity = listItem;
+    els.drawerBody.innerHTML = renderCleanDetailBody(listItem);
+    els.drawerBody.scrollTop = 0;
+    bindDrawerBodyActions(listItem);
+    return;
+  }
 
   if (detailCache.has(id)) {
     const cached = detailCache.get(id);

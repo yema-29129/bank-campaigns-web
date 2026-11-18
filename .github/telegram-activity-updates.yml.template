@@ -1,0 +1,55 @@
+name: Telegram activity updates
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - activities/feed.json
+      - activities/topics/black-friday-2026.html
+  workflow_dispatch:
+    inputs:
+      dry_run:
+        description: 只预览消息，不发送到 Telegram
+        required: true
+        type: boolean
+        default: true
+
+permissions:
+  contents: read
+
+concurrency:
+  group: telegram-activity-updates
+  cancel-in-progress: false
+
+jobs:
+  notify:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 2
+
+      - name: Check Telegram configuration
+        id: telegram
+        env:
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+        run: |
+          if [ -n "$TELEGRAM_BOT_TOKEN" ] && [ -n "$TELEGRAM_CHAT_ID" ]; then
+            echo "ready=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "ready=false" >> "$GITHUB_OUTPUT"
+            echo "::warning::Telegram secrets are not configured; no message will be sent."
+          fi
+
+      - name: Notify Telegram group
+        if: >-
+          (github.event_name == 'push' && steps.telegram.outputs.ready == 'true') ||
+          (github.event_name == 'workflow_dispatch' && (inputs.dry_run || steps.telegram.outputs.ready == 'true'))
+        env:
+          BEFORE_SHA: ${{ github.event.before || 'HEAD^' }}
+          AFTER_SHA: ${{ github.sha }}
+          DRY_RUN: ${{ github.event_name == 'workflow_dispatch' && inputs.dry_run }}
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+        run: node tools/notify-telegram-activity-updates.mjs

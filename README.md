@@ -20,6 +20,17 @@
 3. 在 `campaigns.posterUrl` 写入图片 URL。
 4. 网站和小程序都会同步显示。
 
+## Telegram 活动更新通知
+
+仓库内置通知脚本和 `.github/telegram-activity-updates.yml.template` 工作流模板。取得 GitHub `workflow` 授权后，将模板启用为 `.github/workflows/telegram-activity-updates.yml`；此后当 `activities/feed.json` 或黑五专题活动发生新增、实质更新或下线并推送到 `main`，工作流会对比推送前后的活动数据，并把每项变化发送到 Telegram；只改页面样式或生成时间不会发消息。
+
+在 GitHub 仓库的 Actions secrets 中配置以下两项后自动生效：
+
+- `TELEGRAM_BOT_TOKEN`：Telegram BotFather 创建的机器人令牌。
+- `TELEGRAM_CHAT_ID`：目标群或频道 ID；机器人必须已加入并具备发消息权限。
+
+未配置密钥时工作流只给出警告并安全跳过，不会误发。首次启用时应先通过 `workflow_dispatch` 保持 `dry_run=true` 预览消息；确认目标群和文案无误后，再进行一次受监督的真实发送测试。
+
 ## 更新公开活动详情与站点地图
 
 首页的筛选列表实时读取接口。`activities/` 下的当前活动目录、已结束活动历史目录和详情，以及 `sitemap.xml`、`llms.txt`、`llms-full.txt` 与 `activities/feed.json`，由同一份公开活动数据生成。当前及已结束的完整公开活动都会进入 sitemap 和 AI 数据入口；历史页会醒目标注“已结束”。仅已从公开数据源消失、无法继续核实的旧页面会保留为 `noindex`。发布新一批活动或活动到期后，在网站仓库根目录运行：
