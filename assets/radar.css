@@ -599,7 +599,7 @@ body.radar-page {
 .radar-secondary-tabs {
   flex: 1 0 100%;
   display: flex;
-  flex-wrap: wrap;
+  flex-wrap: nowrap;
   align-items: center;
   gap: 7px;
   padding: 8px 10px;
@@ -1742,12 +1742,9 @@ body.radar-page {
   }
 
   .radar-secondary-tabs {
-    display: grid;
-    grid-auto-flow: column;
-    grid-template-rows: repeat(2, 40px);
-    grid-auto-columns: max-content;
-    align-content: start;
-    justify-content: start;
+    display: flex;
+    flex-wrap: nowrap;
+    align-items: center;
     margin-top: 2px;
     margin-left: -2px;
     margin-right: -2px;
