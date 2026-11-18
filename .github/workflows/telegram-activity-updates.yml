@@ -13,6 +13,11 @@ on:
         required: true
         type: boolean
         default: true
+      send_test_message:
+        description: 发送一条明确标注的连接测试消息
+        required: true
+        type: boolean
+        default: false
 
 permissions:
   contents: read
@@ -48,6 +53,13 @@ jobs:
           TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
           TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
         run: node tools/verify-telegram-configuration.mjs
+
+      - name: Send Telegram connection test
+        if: github.event_name == 'workflow_dispatch' && inputs.send_test_message && steps.telegram.outputs.ready == 'true'
+        env:
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+        run: node tools/send-telegram-test-message.mjs
 
       - name: Notify Telegram group
         if: >-
