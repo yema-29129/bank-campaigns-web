@@ -111,7 +111,27 @@ const REGION_OPTIONS = [
   { key: '指定省市', label: '指定省市', test: (r) => !!r && !/^(全国|中国大陆|中国内地)/.test(r) && !/香港|澳门|台湾|境外|海外/.test(r) }
 ];
 
-const SCENE_OPTIONS = ['全部', '吃喝', '购物', '出行', '境外游', '生活', '会员权益', '通用优惠'];
+const INVOICE_PRIZE_RE = /有奖发票|发票(?:抽奖|摇奖|兑奖|开奖)|(?:消费|数电|电子)?发票[^。；;，,\n]{0,18}(?:抽|奖|红包|消费券)/;
+const PUBLIC_BENEFIT_EXPLICIT_RE = /惠民|普惠促消费|政府消费券|消费补贴|促消费(?:活动|券)|文旅惠民|惠享消费/;
+const PUBLIC_AGENCY_RE = /人民政府|商务局|商务厅|商务委|商务委员会|文化和旅游|文旅厅|文旅局|体育局|财政局|工业和信息化|经济技术开发区|管委会/;
+const PUBLIC_BENEFIT_RE = /消费券|补贴|红包|促消费|满\d+(?:\.\d+)?(?:元)?减|\d+(?:\.\d+)?折|立减|优惠券|文旅券|餐饮券|零售券|购车|家电|数码|体育惠民|成品油券|加油券|票根当钱花/;
+
+function classifyPublicBenefitType(activity = {}) {
+  const tags = Array.isArray(activity.tags) ? activity.tags : [];
+  const text = [
+    activity.title, activity.desc, activity.awardDesc, activity.pathDesc,
+    activity.channel, activity.consumeChannel, activity.region, ...tags
+  ].filter(Boolean).join(' ');
+  if (INVOICE_PRIZE_RE.test(text)) return '发票有奖';
+  if (PUBLIC_BENEFIT_EXPLICIT_RE.test(text)) return '惠民活动';
+
+  const organizer = [activity.bankName, activity.title].filter(Boolean).join(' ');
+  return PUBLIC_AGENCY_RE.test(organizer) && PUBLIC_BENEFIT_RE.test(text)
+    ? '惠民活动'
+    : '';
+}
+
+const SCENE_OPTIONS = ['全部', '吃喝', '购物', '出行', '境外游', '生活', '发票有奖', '会员权益', '通用优惠'];
 
 const TOP_CATEGORIES = [
   { key: 'all', label: '全部', scene: '全部', cashback: false },
@@ -121,6 +141,7 @@ const TOP_CATEGORIES = [
   { key: 'overseas', label: '境外游', scene: '境外游', cashback: false },
   { key: 'cashback', label: '返现', scene: '全部', cashback: true },
   { key: 'life', label: '生活', scene: '生活', cashback: false },
+  { key: 'invoice-benefit', label: '发票有奖', scene: '发票有奖', cashback: false },
   { key: 'vip', label: '会员权益', scene: '会员权益', cashback: false },
   { key: 'general', label: '通用优惠', scene: '通用优惠', cashback: false }
 ];
@@ -309,6 +330,11 @@ const GENERAL_DISCOUNT_OPTIONS = [
   { key: '其他通用', label: '其他通用', test: (text) => !KNOWN_GENERAL_DISCOUNT_RE.test(text) }
 ];
 
+const PUBLIC_BENEFIT_OPTIONS = [
+  { key: '发票有奖', label: '发票有奖' },
+  { key: '惠民活动', label: '惠民活动' }
+];
+
 const SECONDARY_FILTER_GROUPS = {
   '吃喝': { key: 'food', ariaLabel: '吃喝类型筛选', options: FOOD_TYPE_OPTIONS },
   '购物': { key: 'shopping', ariaLabel: '购物类型筛选', options: SHOPPING_TYPE_OPTIONS },
@@ -316,6 +342,7 @@ const SECONDARY_FILTER_GROUPS = {
   '境外游': { key: 'overseas', ariaLabel: '境外游目的地筛选', options: OVERSEAS_DESTINATION_OPTIONS, textField: 'overseasDestinationText' },
   '返现': { key: 'cashback', ariaLabel: '返现类型筛选', options: CASHBACK_TYPE_OPTIONS },
   '生活': { key: 'life', ariaLabel: '生活类型筛选', options: LIFE_TYPE_OPTIONS },
+  '发票有奖': { key: 'public-benefit', ariaLabel: '发票有奖与惠民活动筛选', options: PUBLIC_BENEFIT_OPTIONS },
   '会员权益': { key: 'member', ariaLabel: '会员权益类型筛选', options: MEMBER_BENEFIT_OPTIONS },
   '通用优惠': { key: 'general', ariaLabel: '通用优惠类型筛选', options: GENERAL_DISCOUNT_OPTIONS }
 };
@@ -348,10 +375,14 @@ function isOverseasTravel(activity, tags) {
 }
 
 function classifyScenes(activity = {}) {
+  const publicBenefitType = classifyPublicBenefitType(activity);
   const explicit = activity.scenes || activity.scene || activity.sceneCategory;
   const values = Array.isArray(explicit) ? explicit : String(explicit || '').split(/[,，、|]/);
   const known = values.map(v => String(v).trim()).filter(v => SCENE_OPTIONS.includes(v) && v !== '全部');
-  if (known.length) return [...new Set(known)];
+  if (known.length) {
+    if (publicBenefitType) known.push('发票有奖');
+    return [...new Set(known)];
+  }
   const tags = Array.isArray(activity.tags) ? activity.tags : [];
   const text = [activity.title, activity.channel, activity.consumeChannel, ...tags].join(' ');
   const rules = [
@@ -365,7 +396,8 @@ function classifyScenes(activity = {}) {
   // Preserve all previous categories, including the generic-discount fallback.
   if (!matched.length && /通用优惠|通用立减金|全渠道|任意消费|不限商户/.test(text)) matched.push('通用优惠');
   if (isOverseasTravel(activity, tags)) matched.push('境外游');
-  return matched;
+  if (publicBenefitType) matched.push('发票有奖');
+  return [...new Set(matched)];
 }
 
 function classifyBank(bankName) {
@@ -617,6 +649,7 @@ function normalizeCampaign(item) {
       overseasDestination(normalized.region), normalized.title, normalized.desc,
       normalized.consumeChannel, normalized.channel, ...normalizedTags
     ].filter(Boolean).join(' '),
+    publicBenefitType: classifyPublicBenefitType(normalized),
     isCredit: hasCreditTag(normalized),
     hasCashback: hasCashbackEvidence(normalized),
     sceneLabels: classifyScenes(normalized),
@@ -704,6 +737,7 @@ function matchesSecondaryFilter(
   const group = getSecondaryFilterGroup(scene, cashback);
   if (!group || !selected || selected === '全部') return true;
   if (group.key === 'overseas') return matchesOverseasDestination(item, selected);
+  if (group.key === 'public-benefit') return item.publicBenefitType === selected;
   const rule = group.options.find((opt) => opt.key === selected);
   const text = group.textField ? item[group.textField] : item.secondaryText;
   return rule ? rule.test(text || '') : true;
