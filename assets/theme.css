@@ -953,6 +953,7 @@ details:not([open]) .filter-collapse { display: none; }
   background: var(--t-soft);
   border: 1px solid var(--t-line);
 }
+.contact-qr-link picture { display: block; }
 .contact-qr-image {
   display: block;
   width: 100%;
@@ -992,6 +993,8 @@ details:not([open]) .filter-collapse { display: none; }
 .contact-business-copy h2 { margin: 14px 0 8px; }
 .contact-business-action,
 .contact-panel .contact-business-action {
+  position: relative;
+  z-index: 2;
   flex: none;
   min-height: 48px;
   padding: 0 22px;
@@ -1000,6 +1003,8 @@ details:not([open]) .filter-collapse { display: none; }
   background: linear-gradient(135deg, #0f2a6b, #1f5eff);
   box-shadow: 0 8px 20px rgba(31, 94, 255, .2);
   white-space: nowrap;
+  pointer-events: auto;
+  touch-action: manipulation;
 }
 
 .cooperation-hero { margin-bottom: 0; }
@@ -1085,6 +1090,17 @@ details:not([open]) .filter-collapse { display: none; }
   justify-self: start;
   color: var(--t-brand);
   font-weight: 800;
+}
+
+body.has-open-contact-qr { overflow: hidden; }
+.contact-group-qr-dialog picture { display: block; }
+.contact-group-qr-dialog .mp-qr-title { margin-top: 10px; }
+.contact-qr-original-link {
+  display: inline-flex;
+  margin: 0 0 12px;
+  color: var(--t-brand);
+  font-size: 12px;
+  font-weight: 700;
 }
 
 /* =========================================================
@@ -1497,7 +1513,13 @@ details:not([open]) .filter-collapse { display: none; }
   .contact-hero h1 { font-size: 28px; }
   .contact-panel { padding: 22px; }
   .contact-wechat-card { grid-template-columns: 1fr; }
-  .contact-qr-link { max-width: 220px; }
+  .contact-wechat-copy { text-align: center; }
+  .contact-qr-link {
+    justify-self: center;
+    width: min(100%, 320px);
+    max-width: 320px;
+    padding: 8px;
+  }
   .cooperation-intro,
   .cooperation-mail,
   .cooperation-boundary { padding: 22px; border-radius: 20px; }
