@@ -551,10 +551,9 @@ body.radar-page {
   position: sticky;
   top: 65px;
   z-index: 25;
-  display: flex;
-  flex-wrap: wrap;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
   align-items: center;
-  justify-content: space-between;
   gap: 8px 12px;
   padding: 10px 20px;
   background: rgba(255, 255, 255, 0.95);
@@ -566,10 +565,17 @@ body.radar-page {
 
 .radar-cat-tabs {
   display: flex;
-  flex-wrap: wrap;
+  flex-wrap: nowrap;
   align-items: center;
   gap: 4px;
   min-width: 0;
+  overflow-x: auto;
+  scrollbar-width: none;
+  -webkit-overflow-scrolling: touch;
+}
+
+.radar-cat-tabs::-webkit-scrollbar {
+  display: none;
 }
 
 .radar-cat-tab {
@@ -597,6 +603,7 @@ body.radar-page {
 }
 
 .radar-secondary-tabs {
+  grid-column: 1 / -1;
   flex: 1 0 100%;
   display: flex;
   flex-wrap: nowrap;
@@ -641,26 +648,14 @@ body.radar-page {
 }
 
 .radar-strip-meta {
+  grid-column: 2;
+  grid-row: 1;
   display: flex;
   align-items: center;
   gap: 8px;
-  margin-left: auto;
   font-size: 12.5px;
   color: #64748b;
   font-variant-numeric: tabular-nums;
-}
-
-.radar-filter-summary {
-  color: #1f5eff;
-  font-weight: 600;
-  max-width: 240px;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-.radar-filter-summary:empty {
-  display: none;
 }
 
 .radar-reset-btn {
@@ -698,6 +693,7 @@ body.radar-page {
 }
 
 #blackFridayTopicLink {
+  grid-column: 1 / -1;
   font-size: 12.5px;
   line-height: 1.4;
   font-weight: 700;
@@ -1728,7 +1724,7 @@ body.radar-page {
   }
 
   .radar-cat-tabs {
-    width: 100%;
+    width: auto;
     flex-wrap: nowrap;
     overflow-x: auto;
     scrollbar-width: none;
@@ -1765,7 +1761,9 @@ body.radar-page {
   }
 
   .radar-strip-meta {
-    width: 100%;
+    grid-column: 2;
+    grid-row: 1;
+    width: auto;
     margin-left: 0;
     gap: 7px;
     min-height: 24px;
@@ -1776,12 +1774,8 @@ body.radar-page {
     display: none;
   }
 
-  .radar-filter-summary {
-    max-width: 112px;
-  }
-
   .radar-result-count {
-    margin-left: auto;
+    margin-left: 0;
   }
 
   .radar-archive-count {

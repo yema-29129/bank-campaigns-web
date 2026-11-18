@@ -526,8 +526,6 @@ const els = {
   empty: document.getElementById('emptyState'),
   grid: document.getElementById('cardGrid'),
   resultSummary: document.getElementById('resultSummary'),
-  archiveSummaryLink: document.getElementById('archiveSummaryLink'),
-  activeFilterSummary: document.getElementById('activeFilterSummary'),
   searchInput: document.getElementById('searchInput'),
   mobileSearchInput: document.getElementById('mobileSearchInput'),
   refreshBtn: document.getElementById('refreshBtn'),
@@ -1177,23 +1175,6 @@ function syncFilterControls() {
     els.topMobileMenuBadge.classList.toggle('hidden', extraCount === 0);
   }
 
-  if (els.activeFilterSummary) {
-    const parts = [];
-    if (state.view === 'credit') parts.push('信用卡');
-    if (state.view === 'debit') parts.push('储蓄卡');
-    if (cardOrgLabel) parts.push(cardOrgLabel);
-    if (bankLabel) parts.push(bankLabel);
-    if (state.pay !== '全部') parts.push(state.pay);
-    if (state.regionGroup !== '全部') parts.push(state.regionGroup);
-    if (state.cashback) parts.push('返现');
-    else if (state.scene !== '全部') parts.push(state.scene);
-    if (state.secondaryFilter !== '全部') parts.push(state.secondaryFilter);
-    if (state.quick === 'today') parts.push('今日新增');
-    if (state.quick === 'expiring') parts.push('快到期');
-    if (state.quick === 'recurring') parts.push('循环活动');
-    if (state.keyword.trim()) parts.push(`“${state.keyword.trim()}”`);
-    els.activeFilterSummary.textContent = parts.join(' · ');
-  }
 }
 
 function updateSidebarCounts() {
@@ -1405,14 +1386,11 @@ function applyFilters() {
   state.filtered = result;
 
   const activeCount = result.filter((item) => !item.isExpired).length;
-  const archivedTotal = state.campaigns.filter((item) => item.isExpired && !item.websiteDetailPath).length;
-
   if (els.resultSummary) {
     els.resultSummary.textContent = hasDefaultFilters()
       ? `当前有效 ${activeCount} 条`
       : `符合条件 ${activeCount} 条`;
   }
-  if (els.archiveSummaryLink) els.archiveSummaryLink.textContent = `历史归档 ${archivedTotal} 条`;
   if (els.mobileResultCount) els.mobileResultCount.textContent = String(activeCount);
 
   setHomeMeta();
@@ -2248,7 +2226,6 @@ async function fetchCampaigns() {
   if (!hadData) {
     state.loadStatus = 'loading';
     if (els.resultSummary) els.resultSummary.textContent = '正在加载…';
-    if (els.archiveSummaryLink) els.archiveSummaryLink.textContent = '历史归档 — 条';
     if (els.mobileResultCount) els.mobileResultCount.textContent = '—';
     setLoadingState({ loading: true });
   }
@@ -2279,7 +2256,6 @@ async function fetchCampaigns() {
     if (!hadData) {
       state.loadStatus = 'error';
       if (els.resultSummary) els.resultSummary.textContent = '暂未载入';
-      if (els.archiveSummaryLink) els.archiveSummaryLink.textContent = '历史归档 — 条';
       if (els.mobileResultCount) els.mobileResultCount.textContent = '—';
       if (els.loadErrorMessage) els.loadErrorMessage.textContent = `${message}，请重试。`;
       setLoadingState({ error: true });
