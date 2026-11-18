@@ -512,6 +512,7 @@ const els = {
   regionFilters: document.getElementById('regionFilters'),
   sceneFilters: document.getElementById('sceneFilters'),
   topCategoryBar: document.getElementById('topCategoryBar'),
+  blackFridayTopicLink: document.getElementById('blackFridayTopicLink'),
   secondaryFilterBar: document.getElementById('secondaryFilterBar'),
   activeViewBadge: document.getElementById('activeViewBadge'),
   activeCardOrgBadge: document.getElementById('activeCardOrgBadge'),
@@ -1024,6 +1025,9 @@ function mountMiniChips(container, options, stateKey) {
 }
 
 function syncFilterControls() {
+  if (els.blackFridayTopicLink) {
+    els.blackFridayTopicLink.hidden = state.scene !== '黑五优惠' || state.cashback;
+  }
   // Top category strip
   if (els.topCategoryBar) {
     els.topCategoryBar.querySelectorAll('[data-top-cat]').forEach((btn) => {
