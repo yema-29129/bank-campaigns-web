@@ -1,5 +1,5 @@
-const STATIC_CACHE = 'yangmao-assistant-static-v26';
-const RUNTIME_CACHE = 'yangmao-assistant-runtime-v26';
+const STATIC_CACHE = 'yangmao-assistant-static-v27';
+const RUNTIME_CACHE = 'yangmao-assistant-runtime-v27';
 const STATIC_ASSETS = [
   '/',
   '/index.html',
@@ -18,7 +18,7 @@ const STATIC_ASSETS = [
   '/assets/theme.css?v=20261118-contactfix1',
   '/assets/radar.css?v=20261118-mobileopt5',
   '/assets/detail-v2.css?v=20261117-radar10',
-  '/assets/app.js?v=20261118-blackfriday1',
+  '/assets/app.js?v=20261118-blackfriday3',
   '/assets/detail.js?v=20261118-seo1',
   '/assets/privacy-consent.js?v=20261118-consent1',
   '/assets/privacy-consent.css?v=20261118-consent1',
@@ -56,17 +56,20 @@ self.addEventListener('fetch', (event) => {
   const url = new URL(request.url);
   if (url.origin !== self.location.origin) return;
 
-  if (request.mode === 'navigate') {
+  const isBlackFridayTopic = url.pathname === '/activities/topics/black-friday-2026.html';
+  if (request.mode === 'navigate' || isBlackFridayTopic) {
     event.respondWith(
       fetch(request)
         .then((response) => {
-          const cloned = response.clone();
-          caches.open(RUNTIME_CACHE).then((cache) => cache.put(request, cloned));
+          if (response.ok) {
+            const cloned = response.clone();
+            caches.open(RUNTIME_CACHE).then((cache) => cache.put(request, cloned));
+          }
           return response;
         })
         .catch(async () => {
           const cached = await caches.match(request);
-          return cached || caches.match('/index.html');
+          return cached || (request.mode === 'navigate' ? caches.match('/index.html') : Response.error());
         })
     );
     return;

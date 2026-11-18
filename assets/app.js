@@ -1,4 +1,5 @@
 const API_BASE = 'https://mini.vooqqqm.com/api';
+const WEBSITE_BLACK_FRIDAY_PATH = './activities/topics/black-friday-2026.html';
 const CAMPAIGN_LOAD_TIMEOUT = 12000;
 const EXPIRING_SOON_DAYS = 20;
 const GROUP_QR_URL = 'https://github.com/yema-29129/bank-campaigns-web/blob/main/assets/group-wechat-qr.png?raw=true';
@@ -512,7 +513,6 @@ const els = {
   regionFilters: document.getElementById('regionFilters'),
   sceneFilters: document.getElementById('sceneFilters'),
   topCategoryBar: document.getElementById('topCategoryBar'),
-  blackFridayTopicLink: document.getElementById('blackFridayTopicLink'),
   secondaryFilterBar: document.getElementById('secondaryFilterBar'),
   activeViewBadge: document.getElementById('activeViewBadge'),
   activeCardOrgBadge: document.getElementById('activeCardOrgBadge'),
@@ -772,6 +772,7 @@ function matchesRegion(item, regionKey = state.regionGroup) {
 }
 
 function matchesSceneOrCashback(item, scene = state.scene, cashback = state.cashback) {
+  if (item.websiteDetailPath) return scene === '黑五优惠' && !cashback;
   if (cashback && !item.hasCashback) return false;
   return scene === '全部' || item.sceneLabels.includes(scene);
 }
@@ -1025,9 +1026,6 @@ function mountMiniChips(container, options, stateKey) {
 }
 
 function syncFilterControls() {
-  if (els.blackFridayTopicLink) {
-    els.blackFridayTopicLink.hidden = state.scene !== '黑五优惠' || state.cashback;
-  }
   // Top category strip
   if (els.topCategoryBar) {
     els.topCategoryBar.querySelectorAll('[data-top-cat]').forEach((btn) => {
@@ -1296,13 +1294,16 @@ function buildRow(item, index) {
   const isSelected = selectedId && String(item.id) === String(selectedId);
   row.className = `radar-row${statusCls ? ` ${statusCls}` : ''}${isSelected ? ' is-selected' : ''}`;
   row.dataset.id = String(item.id);
-  row.href = `./detail.html?id=${encodeURIComponent(item.id)}`;
+  row.href = item.websiteDetailPath || `./detail.html?id=${encodeURIComponent(item.id)}`;
 
   const tags = [];
   if (item.isExpired) {
     tags.push('<span class="radar-tag is-expired">已过期</span>');
   } else {
     if (item.isTodayAdded) tags.push('<span class="radar-tag is-new">今日新增</span>');
+    if (item.websiteDetailPath && parseDate(item.validFrom) > new Date()) {
+      tags.push('<span class="radar-tag is-new">未开始</span>');
+    }
     if (item.isSoon) {
       const end = parseDate(item.validTo);
       const days = end ? Math.max(0, Math.ceil((end.getTime() - Date.now()) / 86400000)) : null;
@@ -1340,6 +1341,8 @@ function buildRow(item, index) {
     </div>
   `;
 
+  if (item.websiteDetailPath) return row;
+
   row.addEventListener('click', (event) => {
     if (event.metaKey || event.ctrlKey || event.shiftKey || event.altKey || event.button !== 0) {
       return;
@@ -1366,7 +1369,7 @@ function applyFilters() {
   state.filtered = result;
 
   const activeCount = result.filter((item) => !item.isExpired).length;
-  const archivedTotal = state.campaigns.filter((item) => item.isExpired).length;
+  const archivedTotal = state.campaigns.filter((item) => item.isExpired && !item.websiteDetailPath).length;
 
   if (els.resultSummary) {
     els.resultSummary.textContent = hasDefaultFilters()
@@ -2132,6 +2135,35 @@ function bindEvents() {
   });
 }
 
+async function fetchWebsiteBlackFriday(signal) {
+  const response = await fetch(WEBSITE_BLACK_FRIDAY_PATH, { signal, cache: 'no-cache' });
+  if (!response.ok) throw new Error(`HTTP ${response.status}`);
+
+  const page = new DOMParser().parseFromString(await response.text(), 'text/html');
+  const offers = [];
+  for (const offer of page.querySelectorAll('[data-campaign][data-website-only]')) {
+    const { id } = offer;
+    const { merchant, market, validFrom, validTo } = offer.dataset;
+    const title = offer.querySelector('h2')?.textContent.trim();
+    const desc = offer.querySelector('p + p')?.textContent.trim() || '';
+    if (!/^[a-z0-9-]+$/.test(id) || !merchant || !market || !title ||
+        !/^\d{4}-\d{2}-\d{2}$/.test(validFrom) || !/^\d{4}-\d{2}-\d{2}$/.test(validTo) ||
+        !parseDate(validFrom) || !parseDate(validTo) || validFrom > validTo) continue;
+    offers.push({
+      id: `web-black-friday-${id}`,
+      websiteDetailPath: `${WEBSITE_BLACK_FRIDAY_PATH}#${id}`,
+      bankName: merchant,
+      region: market,
+      title,
+      desc,
+      validFrom,
+      validTo,
+      tags: ['黑五']
+    });
+  }
+  return offers;
+}
+
 async function fetchCampaigns() {
   if (!isListPage() || state.requestPending) return;
   state.requestPending = true;
@@ -2148,6 +2180,10 @@ async function fetchCampaigns() {
   }
 
   try {
+    const websiteOffers = fetchWebsiteBlackFriday(controller.signal).catch((error) => {
+      console.warn('网页黑五活动暂未载入', error);
+      return state.campaigns.filter((item) => item.websiteDetailPath);
+    });
     const response = await fetch(`${API_BASE}/campaigns.php?view=web-list`, {
       credentials: 'omit',
       signal: controller.signal
@@ -2159,7 +2195,8 @@ async function fetchCampaigns() {
       throw new Error((payload && payload.message) || '接口返回异常');
     }
 
-    state.campaigns = payload.data.filter(item => item && item.id != null)
+    const sharedOffers = payload.data.filter(item => item && item.id != null);
+    state.campaigns = [...sharedOffers, ...await websiteOffers]
       .map(normalizeCampaign).sort(compareCampaign);
     state.loadStatus = 'ready';
     applyFilters();
