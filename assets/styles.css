@@ -18,6 +18,155 @@
   --font-body: "Noto Sans SC", "PingFang SC", "Microsoft YaHei", sans-serif;
 }
 
+/* Black Friday foreign-price conversion and mainland comparison */
+.bf-price-card {
+  margin: 22px 0;
+  padding: 20px;
+  border: 1px solid #dbe7f5;
+  border-radius: 20px;
+  background: linear-gradient(145deg, #f8fbff 0%, #fffaf3 100%);
+  box-shadow: 0 12px 30px rgba(15, 23, 42, 0.06);
+}
+
+.bf-price-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.bf-price-kicker {
+  margin: 0 0 4px;
+  color: #2563eb;
+  font-size: 13px;
+  font-weight: 750;
+}
+
+.bf-price-head h3 {
+  margin: 0;
+  color: #0f172a;
+  font-size: 20px;
+  line-height: 1.35;
+}
+
+.bf-price-live {
+  flex: 0 0 auto;
+  padding: 6px 10px;
+  border-radius: 999px;
+  background: #e8f7ef;
+  color: #087a50;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.bf-price-product {
+  margin: 12px 0 0;
+  color: #475569;
+  font-size: 14px;
+  line-height: 1.6;
+}
+
+.bf-price-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+  margin-top: 16px;
+}
+
+.bf-price-grid > div {
+  min-width: 0;
+  padding: 14px 15px;
+  border: 1px solid #e2e8f0;
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.9);
+}
+
+.bf-price-grid span,
+.bf-price-grid strong {
+  display: block;
+}
+
+.bf-price-grid span {
+  margin-bottom: 5px;
+  color: #64748b;
+  font-size: 12px;
+}
+
+.bf-price-grid strong {
+  color: #0f172a;
+  font-size: 18px;
+  line-height: 1.35;
+  overflow-wrap: anywhere;
+}
+
+.bf-price-grid .bf-price-diff {
+  border-color: #bbf7d0;
+  background: #f0fdf4;
+}
+
+.bf-price-grid .bf-price-diff strong {
+  color: #087a50;
+}
+
+.bf-price-status {
+  margin-top: 13px;
+  color: #64748b;
+  font-size: 12px;
+  line-height: 1.7;
+}
+
+.bf-price-sources {
+  display: inline-block;
+  margin-left: 4px;
+  white-space: nowrap;
+}
+
+.bf-price-sources a {
+  color: #2563eb;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+@media (max-width: 640px) {
+  .bf-price-card {
+    margin: 18px 0;
+    padding: 16px;
+    border-radius: 17px;
+  }
+
+  .bf-price-head {
+    gap: 10px;
+  }
+
+  .bf-price-head h3 {
+    font-size: 18px;
+  }
+
+  .bf-price-live {
+    padding: 5px 8px;
+    font-size: 11px;
+  }
+
+  .bf-price-grid {
+    grid-template-columns: 1fr;
+    gap: 9px;
+  }
+
+  .bf-price-grid > div {
+    padding: 12px 13px;
+  }
+
+  .bf-price-grid strong {
+    font-size: 17px;
+  }
+
+  .bf-price-sources {
+    display: block;
+    margin: 4px 0 0;
+    white-space: normal;
+  }
+}
+
 * {
   box-sizing: border-box;
 }

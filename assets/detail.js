@@ -552,6 +552,8 @@ function renderDetail(activity) {
           </dl>
         ` : ''}
 
+        ${window.BlackFridayPricing ? window.BlackFridayPricing.render(activity.pricing) : ''}
+
         ${(pathUrl || posterUrl || topicUrl) ? `
           <div class="dx-clean-actions">
             ${isPathUrlLink ? `<a class="dx-clean-btn is-primary" href="${escapeAttribute(pathUrl)}" target="_blank" rel="noopener noreferrer">直达活动入口 ↗</a>` : ''}
@@ -591,6 +593,9 @@ function renderDetail(activity) {
 
   els.root.innerHTML = html;
   document.body.classList.add('dx-clean-page');
+  if (window.BlackFridayPricing) {
+    void window.BlackFridayPricing.hydrate(els.root, activity.pricing);
+  }
 
   const copyBtn = document.getElementById('copyPathBtn');
   if (copyBtn && activity.pathUrl) {
@@ -819,6 +824,7 @@ async function fetchWebsiteBlackFridayDetail(id, signal) {
     channel: /门店/.test(schedule) ? '官网/门店' : '官网',
     pathUrl,
     pathDesc: `打开${merchant}官方活动页面 → 核对商品、日期、地区与结账条件 → 按页面提示参与`,
+    pricing: window.BlackFridayPricing ? window.BlackFridayPricing.fromDataset(offer.dataset) : null,
     awardDesc: [
       '【活动时间与范围】', schedule,
       '【活动说明】', desc,
