@@ -31,6 +31,8 @@
 
 未配置密钥时工作流只给出警告并安全跳过，不会误发。首次启用时应先通过 `workflow_dispatch` 保持 `dry_run=true` 预览消息；确认目标群和文案无误后，再进行一次受监督的真实发送测试。
 
+手动运行 `workflow_dispatch` 时还会调用 `getMe`、`getChat` 和 `getChatMember` 只读核验机器人身份、目标群及成员权限；该步骤不会发送 Telegram 消息。
+
 ## 更新公开活动详情与站点地图
 
 首页的筛选列表实时读取接口。`activities/` 下的当前活动目录、已结束活动历史目录和详情，以及 `sitemap.xml`、`llms.txt`、`llms-full.txt` 与 `activities/feed.json`，由同一份公开活动数据生成。当前及已结束的完整公开活动都会进入 sitemap 和 AI 数据入口；历史页会醒目标注“已结束”。仅已从公开数据源消失、无法继续核实的旧页面会保留为 `noindex`。发布新一批活动或活动到期后，在网站仓库根目录运行：

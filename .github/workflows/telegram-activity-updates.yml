@@ -42,6 +42,13 @@ jobs:
             echo "::warning::Telegram secrets are not configured; no message will be sent."
           fi
 
+      - name: Verify Telegram bot and target
+        if: github.event_name == 'workflow_dispatch' && steps.telegram.outputs.ready == 'true'
+        env:
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+        run: node tools/verify-telegram-configuration.mjs
+
       - name: Notify Telegram group
         if: >-
           (github.event_name == 'push' && steps.telegram.outputs.ready == 'true') ||
