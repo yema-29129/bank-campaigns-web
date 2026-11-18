@@ -22,7 +22,7 @@
 
 ## Telegram 活动更新通知
 
-仓库内置通知脚本和 `.github/telegram-activity-updates.yml.template` 工作流模板。取得 GitHub `workflow` 授权后，将模板启用为 `.github/workflows/telegram-activity-updates.yml`；此后当 `activities/feed.json` 或黑五专题活动发生新增、实质更新或下线并推送到 `main`，工作流会对比推送前后的活动数据，并把每项变化发送到 Telegram；只改页面样式或生成时间不会发消息。
+仓库内置通知脚本和 `.github/workflows/telegram-activity-updates.yml` 工作流。当 `activities/feed.json` 或黑五专题活动发生新增、实质更新或下线并推送到 `main` 后，工作流会对比推送前后的活动数据，并把每项变化发送到 Telegram；只改页面样式或生成时间不会发消息。
 
 在 GitHub 仓库的 Actions secrets 中配置以下两项后自动生效：
 
