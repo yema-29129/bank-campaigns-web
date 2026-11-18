@@ -76,8 +76,19 @@ if (missingGenericDestinations.length) {
   console.error(`FAIL generic China-issued overseas card missing: ${missingGenericDestinations.join(', ')}`);
 }
 
+const japanOnlyBenefit = {
+  title: 'JCB白金信用卡·199日元月享日本优惠',
+  desc: '中国大陆发行卡可使用六类日本服务',
+  region: '日本·中国大陆发行JCB白金信用卡',
+  tags: ['JCB']
+};
+if (!isOverseas(japanOnlyBenefit) || !match(japanOnlyBenefit, '日本') || match(japanOnlyBenefit, '美国')) {
+  failures += 1;
+  console.error('FAIL Japan-only benefit must appear in overseas/Japan and stay out of the US');
+}
+
 if (failures) process.exitCode = 1;
-else console.log(`PASS ${cases.length + 1} destination coverage cases`);
+else console.log(`PASS ${cases.length + 2} destination coverage cases`);
 
 const dataPath = process.argv[2];
 if (dataPath) {

@@ -395,7 +395,7 @@ function isOverseasTravel(activity, tags) {
   const text = [activity.title, activity.desc, tags.join(' ')].join(' ');
   const destination = overseasDestination(activity.region);
   const abroad = /境外|海外|国外|出境|香港|澳门|台湾|日本|韩国|泰国|新加坡|马来西亚|越南|印尼|印度尼西亚|菲律宾|柬埔寨|老挝|欧洲|英国|法国|德国|意大利|西班牙|瑞士|北美|美国|加拿大|澳大利亚|澳洲|新西兰|阿联酋|迪拜/;
-  const travelUse = /旅游|旅行|度假|机票|航空|航班|酒店|订房|住宿|交通|公交|地铁|的士|出租车|打车|租车|机场|贵宾厅|休息室|景点|门票|乐园|游轮|邮轮|八达通|西瓜卡|餐饮|餐厅|茶饮|外卖|咖啡|购物|商场|商户|门市|零售|便利店|超市|购机|消费|签账|流量|漫游|上网卡|eSIM|Apple Pay|手机Pay|SOGO|Klook|Agoda|Trip\.com/i;
+  const travelUse = /旅游|旅行|度假|机票|航空|航班|酒店|订房|住宿|交通|公交|地铁|的士|出租车|打车|租车|机场|贵宾厅|休息室|景点|门票|乐园|游轮|邮轮|八达通|西瓜卡|餐饮|餐厅|茶饮|外卖|咖啡|购物|商场|商户|门市|零售|便利店|超市|购机|消费|签账|流量|漫游|上网卡|优惠|权益|服务|回赠|返现|折扣|eSIM|Apple Pay|手机Pay|SOGO|Klook|Agoda|Trip\.com/i;
   const explicitTravel = /境外游|出境游|出国游|海外游|国际机票|国际航班|全球(?:指定)?酒店/;
   if (explicitTravel.test(text + ' ' + destination)) return true;
 
