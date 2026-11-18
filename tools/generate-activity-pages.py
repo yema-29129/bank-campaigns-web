@@ -1335,6 +1335,7 @@ def sitemap_xml(entries, topic_stats, generated_on):
         ("/privacy.html", None),
         ("/disclaimer.html", None),
         ("/contact.html", None),
+        ("/cooperation.html", None),
     )
     for path, lmod in core_paths:
         u = ET.SubElement(root, "url")
@@ -1413,6 +1414,7 @@ def llms_index(current, ended, topic_stats, generated_on):
 
 - [关于我们]({SITE}/about.html): 数据整理准则与每日更新机制。
 - [免责声明]({SITE}/disclaimer.html): 活动名额、参与资格和细则以所属银行或支付机构最新官方公告为准。
+- [商务合作]({SITE}/cooperation.html): 活动信息合作、专题共建、合规广告展示与资料校正的邮件联系入口。
 """
 
 

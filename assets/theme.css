@@ -978,6 +978,115 @@ details:not([open]) .filter-collapse { display: none; }
 }
 .contact-feedback p { margin: 0; color: #8a5a00; font-size: 14px; }
 
+.contact-business-card {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 24px;
+  margin-top: 20px;
+  border-color: #dbe5f5;
+  background:
+    radial-gradient(45% 120% at 100% 0%, rgba(255, 138, 61, .13), transparent 70%),
+    #fff;
+}
+.contact-business-copy h2 { margin: 14px 0 8px; }
+.contact-business-action,
+.contact-panel .contact-business-action {
+  flex: none;
+  min-height: 48px;
+  padding: 0 22px;
+  border-radius: 14px;
+  color: #fff;
+  background: linear-gradient(135deg, #0f2a6b, #1f5eff);
+  box-shadow: 0 8px 20px rgba(31, 94, 255, .2);
+  white-space: nowrap;
+}
+
+.cooperation-hero { margin-bottom: 0; }
+.cooperation-hero-kicker {
+  display: block;
+  margin-bottom: 12px;
+  color: rgba(255, 255, 255, .72);
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+}
+.cooperation-intro,
+.cooperation-mail,
+.cooperation-boundary {
+  padding: 30px;
+  border: 1px solid var(--t-line);
+  border-radius: 24px;
+  background: #fff;
+  box-shadow: var(--t-shadow);
+}
+.cooperation-intro h2,
+.cooperation-mail h2,
+.cooperation-boundary h2 {
+  margin: 14px 0 8px;
+  font-size: 24px;
+  color: var(--t-ink);
+}
+.cooperation-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px;
+  margin-top: 22px;
+}
+.cooperation-item {
+  padding: 20px;
+  border: 1px solid #e3eaf4;
+  border-radius: 18px;
+  background: #f7f9fd;
+}
+.cooperation-item strong {
+  display: block;
+  margin-bottom: 6px;
+  color: var(--t-ink);
+  font-size: 16px;
+}
+.cooperation-item p { font-size: 14px; }
+.cooperation-mail {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 26px;
+  border-color: #cfe0ff;
+  background: linear-gradient(135deg, #f6f9ff, #fff);
+}
+.cooperation-email-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 8px 16px;
+  margin-top: 18px;
+}
+.cooperation-email-row span { color: var(--t-muted); font-size: 13px; font-weight: 700; }
+.cooperation-email-row a { color: var(--t-brand); font-weight: 800; overflow-wrap: anywhere; }
+.cooperation-mail-action {
+  min-height: 50px;
+  padding: 0 24px;
+  border-radius: 14px;
+  white-space: nowrap;
+}
+.cooperation-boundary ul {
+  margin: 14px 0 0;
+  padding-left: 22px;
+  color: var(--t-ink-2);
+}
+.cooperation-boundary li { margin-top: 8px; line-height: 1.75; }
+.contact-page .cooperation-privacy-note {
+  padding: 0 4px;
+  color: var(--t-muted);
+  font-size: 13px;
+}
+.cooperation-back-link {
+  justify-self: start;
+  color: var(--t-brand);
+  font-weight: 800;
+}
+
 /* =========================================================
    静态活动页（/activities/xxx.html，使用旧 detail-* 结构）
    ========================================================= */
@@ -1247,6 +1356,10 @@ details:not([open]) .filter-collapse { display: none; }
 @media (max-width: 900px) {
   .directory-intro { grid-template-columns: 1fr; padding: 32px 28px; gap: 24px; }
   .contact-grid { grid-template-columns: 1fr; }
+  .contact-business-card,
+  .cooperation-mail { grid-template-columns: 1fr; }
+  .contact-business-action,
+  .cooperation-mail-action { justify-self: start; }
   .detail-card .detail-layout-content { grid-template-columns: 1fr; }
   .detail-card .detail-side { position: static; }
   .site-footer-inner { grid-template-columns: 1fr 1fr; }
@@ -1385,6 +1498,12 @@ details:not([open]) .filter-collapse { display: none; }
   .contact-panel { padding: 22px; }
   .contact-wechat-card { grid-template-columns: 1fr; }
   .contact-qr-link { max-width: 220px; }
+  .cooperation-intro,
+  .cooperation-mail,
+  .cooperation-boundary { padding: 22px; border-radius: 20px; }
+  .cooperation-grid { grid-template-columns: 1fr; }
+  .contact-business-action,
+  .cooperation-mail-action { width: 100%; justify-content: center; white-space: normal; text-align: center; }
 
   .detail-card > .detail-hero { padding: 22px 18px; }
   .detail-card .detail-section,
