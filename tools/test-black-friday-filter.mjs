@@ -10,10 +10,11 @@ vm.runInNewContext(`${appSource.slice(0, stateStart)}\nglobalThis.blackFridayTes
   match: isBlackFridayCampaign,
   scenes: classifyScenes,
   sceneOptions: SCENE_OPTIONS,
-  topCategory: TOP_CATEGORIES.find((item) => item.key === 'black-friday')
+  topCategory: TOP_CATEGORIES.find((item) => item.key === 'black-friday'),
+  secondaryGroup: SECONDARY_FILTER_GROUPS['黑五优惠']
 };`, context);
 
-const { match, scenes, sceneOptions, topCategory } = context.blackFridayTestApi;
+const { match, scenes, sceneOptions, topCategory, secondaryGroup } = context.blackFridayTestApi;
 const cases = [
   ['Chinese Black Friday', { title: '浦发信用卡·黑五海淘季380元消费券包' }, true],
   ['full Chinese name', { title: '黑色星期五指定商户8折' }, true],
@@ -53,6 +54,36 @@ if (!sceneOptions.includes('黑五优惠') || sceneOptions.indexOf('黑五优惠
   console.error(`FAIL mobile scene filter configuration: ${JSON.stringify(sceneOptions)}`);
 }
 
+const secondaryCases = [
+  ['VPS/云服务', 'Hostinger 人民币站黑五 VPS 最高减 70%'],
+  ['数码家电', 'Best Buy 美国黑五 iPhone 17 Pro 系列减 100 美元'],
+  ['海淘电商', '日本乐天黑五跨店购物最高 10 倍积分'],
+  ['旅行出行', '国泰航空日本站黑五往返机票最高减 15%'],
+  ['酒店住宿', 'Trip.com 英国黑五指定酒店券满 400 英镑减 120 英镑'],
+  ['软件订阅', 'Adobe 美区黑五 Creative Cloud Pro 个人版首年减 57%'],
+  ['游戏娱乐', 'Nintendo 任天堂黑五 Switch 游戏限时折扣'],
+  ['支付/信用卡', '中信 Visa 信用卡黑五境外消费返现'],
+  ['其他黑五', '黑五限定餐厅双人套餐 7 折']
+];
+
+if (!secondaryGroup || secondaryGroup.key !== 'black-friday') {
+  failures += 1;
+  console.error(`FAIL Black Friday secondary group configuration: ${JSON.stringify(secondaryGroup)}`);
+} else {
+  const labels = secondaryGroup.options.map((option) => option.label);
+  if (labels[0] !== '全部黑五') {
+    failures += 1;
+    console.error(`FAIL Black Friday all option should be first: ${JSON.stringify(labels)}`);
+  }
+  for (const [key, sample] of secondaryCases) {
+    const option = secondaryGroup.options.find((entry) => entry.key === key);
+    if (!option || !option.test(sample)) {
+      failures += 1;
+      console.error(`FAIL secondary category ${key} did not match: ${sample}`);
+    }
+  }
+}
+
 const dataPath = process.argv[2];
 if (dataPath) {
   const payload = JSON.parse(fs.readFileSync(dataPath, 'utf8'));
@@ -72,4 +103,4 @@ if (dataPath) {
 }
 
 if (failures) process.exitCode = 1;
-else console.log(`PASS ${cases.length + 3} Black Friday filter cases`);
+else console.log(`PASS ${cases.length + secondaryCases.length + 5} Black Friday filter cases`);

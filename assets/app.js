@@ -148,6 +148,38 @@ const TOP_CATEGORIES = [
   { key: 'general', label: '通用优惠', scene: '通用优惠', cashback: false }
 ];
 
+const BLACK_FRIDAY_VPS_RE = /VPS|云主机|云服务器|云服务|独立服务器|虚拟主机|网站托管|主机托管|域名|Hostinger|OVHcloud|Cloudways|Namecheap|Porkbun|ScalaHosting|web\s*hosting/i;
+const BLACK_FRIDAY_DIGITAL_RE = /数码|家电|手机|iPhone|MacBook|Mac\s*mini|AirPods|Apple\s*Watch|电脑|电视|相机|耳机|智能手表|配件|打印机|Dyson|MediaMarkt|Samsung|三星|PB\s*Tech|Best\s*Buy|Currys/i;
+const BLACK_FRIDAY_ECOMMERCE_RE = /海淘|跨境电商|电商|网购|购物|百货|商城|商场|超市|日用品|美妆|护肤|服饰|运动鞋|礼卡|Amazon|亚马逊|Walmart|Target|Bloomingdale|Kohl|LEGO|乐高|Rakuten|乐天|伊藤洋华堂|Green\s*Beans|MUSINSA|Nike|OLIVE\s*YOUNG|Coupang|Costco|Magalu/i;
+const BLACK_FRIDAY_TRAVEL_RE = /旅行|旅游|机票|航空|航班|邮轮|游轮|船票|eSIM|漫游|流量|Airalo|Ubigi|租车|交通|中华航空|国泰航空|皇家加勒比/i;
+const BLACK_FRIDAY_HOTEL_RE = /酒店|住宿|订房|房型|房晚|套房|度假村|Trip\.com|Marriott|万豪|Hilton|希尔顿|Hyatt|凯悦|IHG|洲际|Accor|雅高/i;
+const BLACK_FRIDAY_SOFTWARE_RE = /软件|SaaS|订阅|许可证|license|Creative\s*Cloud|Adobe|Microsoft\s*365|Canva|Notion|Dropbox|云盘/i;
+const BLACK_FRIDAY_GAMING_RE = /游戏|Nintendo|任天堂|Switch|Xbox|PlayStation|PSN|PS\s*Plus|主机游戏|游戏机|手柄/i;
+const BLACK_FRIDAY_PAYMENT_RE = /信用卡|银行卡|卡组织|Visa|万事达|Mastercard|运通|American\s*Express|银联|Apple\s*Pay|支付|返现|刷卡金|账单金|银行/i;
+const KNOWN_BLACK_FRIDAY_TYPE_RE = new RegExp([
+  BLACK_FRIDAY_VPS_RE.source,
+  BLACK_FRIDAY_DIGITAL_RE.source,
+  BLACK_FRIDAY_ECOMMERCE_RE.source,
+  BLACK_FRIDAY_TRAVEL_RE.source,
+  BLACK_FRIDAY_HOTEL_RE.source,
+  BLACK_FRIDAY_SOFTWARE_RE.source,
+  BLACK_FRIDAY_GAMING_RE.source,
+  BLACK_FRIDAY_PAYMENT_RE.source
+].join('|'), 'i');
+
+const BLACK_FRIDAY_TYPE_OPTIONS = [
+  { key: '全部', label: '全部黑五', test: () => true },
+  { key: 'VPS/云服务', label: 'VPS/云服务', test: (text) => BLACK_FRIDAY_VPS_RE.test(text) },
+  { key: '数码家电', label: '数码家电', test: (text) => BLACK_FRIDAY_DIGITAL_RE.test(text) },
+  { key: '海淘电商', label: '海淘电商', test: (text) => BLACK_FRIDAY_ECOMMERCE_RE.test(text) },
+  { key: '旅行出行', label: '旅行出行', test: (text) => BLACK_FRIDAY_TRAVEL_RE.test(text) },
+  { key: '酒店住宿', label: '酒店住宿', test: (text) => BLACK_FRIDAY_HOTEL_RE.test(text) },
+  { key: '软件订阅', label: '软件订阅', test: (text) => BLACK_FRIDAY_SOFTWARE_RE.test(text) },
+  { key: '游戏娱乐', label: '游戏娱乐', test: (text) => BLACK_FRIDAY_GAMING_RE.test(text) },
+  { key: '支付/信用卡', label: '支付/信用卡', test: (text) => BLACK_FRIDAY_PAYMENT_RE.test(text) },
+  { key: '其他黑五', label: '其他黑五', test: (text) => !KNOWN_BLACK_FRIDAY_TYPE_RE.test(text) }
+];
+
 const KNOWN_FOOD_TYPE_RE = /餐饮|餐厅|饭店|酒楼|中餐|西餐|火锅|烤肉|日料|料理|咖啡|星巴克|瑞幸|茶饮|奶茶|喜茶|奈雪|茶百道|霸王茶姬|库迪|Manner|麦当劳|肯德基|汉堡|快餐|小吃|必胜客|汉堡王|达美乐|德克士|外卖|饿了么|美团外卖|到家|配送|烘焙|蛋糕|甜品|面包|糕点|冰淇淋|冰激凌|酒吧|夜宵|啤酒|清吧|烧烤/i;
 
 const FOOD_TYPE_OPTIONS = [
@@ -374,6 +406,7 @@ const PUBLIC_BENEFIT_OPTIONS = [
 ];
 
 const SECONDARY_FILTER_GROUPS = {
+  '黑五优惠': { key: 'black-friday', ariaLabel: '黑五优惠类型筛选', options: BLACK_FRIDAY_TYPE_OPTIONS },
   '吃喝': { key: 'food', ariaLabel: '吃喝类型筛选', options: FOOD_TYPE_OPTIONS },
   '购物': { key: 'shopping', ariaLabel: '购物类型筛选', options: SHOPPING_TYPE_OPTIONS },
   '出行': { key: 'travel', ariaLabel: '出行方式筛选', options: TRAVEL_MODE_OPTIONS },
