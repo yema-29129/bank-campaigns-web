@@ -2165,6 +2165,9 @@ async function fetchWebsiteBlackFriday(signal) {
     const paragraphs = [...offer.querySelectorAll(':scope > p')];
     const schedule = paragraphs[0]?.textContent.trim() || '';
     const desc = paragraphs[1]?.textContent.trim() || '';
+    const detailLines = paragraphs.slice(1)
+      .filter((paragraph) => !paragraph.querySelector('a[href]'))
+      .map((paragraph) => paragraph.textContent.trim());
     const sourceLinks = [...offer.querySelectorAll('a[href]')];
     const pathUrl = sourceLinks[0]?.getAttribute('href') || '';
     if (!/^[a-z0-9-]+$/.test(id) || !merchant || !market || !title ||
@@ -2193,7 +2196,7 @@ async function fetchWebsiteBlackFriday(signal) {
       pricing: window.BlackFridayPricing ? window.BlackFridayPricing.fromDataset(offer.dataset) : null,
       awardDesc: [
         '【活动时间与范围】', schedule,
-        '【活动说明】', desc,
+        '【活动说明】', ...detailLines,
         '【官方来源】', ...sourceLines
       ].filter(Boolean).join('\n'),
       tags: ['黑五', '网站专题']
