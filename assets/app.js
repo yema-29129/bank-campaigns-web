@@ -135,6 +135,7 @@ const SCENE_OPTIONS = ['全部', '吃喝', '购物', '出行', '境外游', '生
 
 const TOP_CATEGORIES = [
   { key: 'all', label: '全部', scene: '全部', cashback: false },
+  { key: 'black-friday', label: '黑五优惠', scene: '黑五优惠', cashback: false },
   { key: 'food', label: '吃喝', scene: '吃喝', cashback: false },
   { key: 'shopping', label: '购物', scene: '购物', cashback: false },
   { key: 'travel', label: '出行', scene: '出行', cashback: false },
@@ -410,13 +411,24 @@ function isOverseasTravel(activity, tags) {
   return destinationService.test(serviceText);
 }
 
+function isBlackFridayCampaign(activity = {}) {
+  const tags = Array.isArray(activity.tags) ? activity.tags : [];
+  const text = [
+    activity.title, activity.desc, activity.awardDesc, activity.pathDesc,
+    activity.channel, activity.consumeChannel, ...tags
+  ].filter(Boolean).join(' ');
+  return /黑五|黑色星期五|Black\s*Friday|BlackFriday|Cyber\s*Monday|网络星期一|网一(?:大促|优惠|活动|促销|折扣|海淘|消费)/i.test(text);
+}
+
 function classifyScenes(activity = {}) {
   const publicBenefitType = classifyPublicBenefitType(activity);
+  const isBlackFriday = isBlackFridayCampaign(activity);
   const explicit = activity.scenes || activity.scene || activity.sceneCategory;
   const values = Array.isArray(explicit) ? explicit : String(explicit || '').split(/[,，、|]/);
   const known = values.map(v => String(v).trim()).filter(v => SCENE_OPTIONS.includes(v) && v !== '全部');
   if (known.length) {
     if (publicBenefitType) known.push('发票有奖');
+    if (isBlackFriday) known.push('黑五优惠');
     return [...new Set(known)];
   }
   const tags = Array.isArray(activity.tags) ? activity.tags : [];
@@ -433,6 +445,7 @@ function classifyScenes(activity = {}) {
   if (!matched.length && /通用优惠|通用立减金|全渠道|任意消费|不限商户/.test(text)) matched.push('通用优惠');
   if (isOverseasTravel(activity, tags)) matched.push('境外游');
   if (publicBenefitType) matched.push('发票有奖');
+  if (isBlackFriday) matched.push('黑五优惠');
   return [...new Set(matched)];
 }
 
