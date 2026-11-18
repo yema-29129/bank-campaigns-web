@@ -1,0 +1,51 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="noindex, nofollow">
+  <title>网页活动工作台 · 羊毛助手 Pro</title>
+  <link rel="stylesheet" href="workbench.css">
+  <script src="workbench.js" defer></script>
+</head>
+<body>
+  <header class="header">
+    <div><p class="brand">羊毛助手 Pro</p><h1>网页活动工作台</h1></div>
+    <button id="logout" class="subtle" type="button" hidden>退出</button>
+  </header>
+  <main>
+    <p id="status" class="status" role="status" aria-live="polite">正在检查登录状态…</p>
+    <section id="login-panel" class="panel" hidden>
+      <form id="login-form" method="post" action="/api/auth/login">
+        <p>使用现有好羊毛工作台的管理账号登录。</p>
+        <label for="username">管理账号</label>
+        <input id="username" name="username" autocomplete="username" required>
+        <label for="password">登录密码</label>
+        <input id="password" name="password" type="password" autocomplete="current-password" required>
+        <button class="primary" type="submit">登录</button>
+      </form>
+    </section>
+    <section id="catalogue" hidden>
+      <div class="search-row">
+        <label class="visually-hidden" for="search">搜索网页活动</label>
+        <input id="search" type="search" placeholder="搜索活动标题、商家或编号" autocomplete="off">
+        <button id="refresh" class="subtle" type="button">刷新</button>
+      </div>
+      <p id="count" class="muted"></p>
+      <ul id="offers" class="offers"></ul>
+    </section>
+    <button id="retry" class="subtle" type="button" hidden>重试</button>
+  </main>
+  <dialog id="confirm-dialog" aria-labelledby="confirm-title">
+    <form method="dialog">
+      <h2 id="confirm-title">删除这条网页活动？</h2>
+      <p id="confirm-offer" class="target"></p>
+      <p class="muted">确认后提交网页下架。网站部署完成后，活动会从分类和专题移除。</p>
+      <div class="actions">
+        <button type="submit" value="cancel" class="subtle" autofocus>取消</button>
+        <button type="submit" value="delete" class="danger">确认删除</button>
+      </div>
+    </form>
+  </dialog>
+</body>
+</html>
