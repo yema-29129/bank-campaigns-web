@@ -1,12 +1,15 @@
 #!/usr/bin/env python3
-"""Push public URLs from sitemap.xml to IndexNow (Bing/AI search) and Baidu API.
+"""Push public URLs to IndexNow (Bing/AI search) and Baidu API.
 
 Usage:
   python3 tools/push-seo-urls.py
+  python3 tools/push-seo-urls.py --published-on 2026-11-18 --baidu-limit 200
 """
 
+import argparse
 import json
 from pathlib import Path
+import urllib.error
 import urllib.request
 import xml.etree.ElementTree as ET
 
@@ -23,6 +26,23 @@ def load_sitemap_urls(sitemap_path: Path):
         if extra not in urls:
             urls.append(extra)
     return urls
+
+
+def load_published_urls(feed_path: Path, published_on: str):
+    payload = json.loads(feed_path.read_text(encoding="utf-8"))
+    urls = [
+        item["url"] for item in payload.get("activities", [])
+        if item.get("datePublished") == published_on and item.get("url", "").startswith(f"{SITE}/activities/")
+    ]
+    discovery_urls = (
+        f"{SITE}/activities/",
+        f"{SITE}/activities/topics/",
+        f"{SITE}/sitemap.xml",
+        f"{SITE}/llms.txt",
+        f"{SITE}/llms-full.txt",
+        f"{SITE}/activities/feed.json",
+    )
+    return list(dict.fromkeys(urls + list(discovery_urls)))
 
 
 def push_indexnow(urls):
@@ -44,6 +64,9 @@ def push_indexnow(urls):
 
 def push_baidu(urls, limit=10):
     batch = [u for u in urls if not u.endswith((".txt", ".json"))][:limit]
+    if not batch:
+        print("[Baidu API] No eligible URLs to push")
+        return
     body = "\n".join(batch).encode("utf-8")
     req = urllib.request.Request(
         f"http://data.zz.baidu.com/urls?site={SITE}&token={BAIDU_TOKEN}",
@@ -59,13 +82,23 @@ def push_baidu(urls, limit=10):
 
 
 def main():
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("--published-on", help="Only submit activities first published on YYYY-MM-DD")
+    parser.add_argument("--baidu-limit", type=int, default=10, help="Maximum URLs sent to Baidu (default: 10)")
+    args = parser.parse_args()
+
     root_dir = Path(__file__).resolve().parents[1]
     sitemap = root_dir / "sitemap.xml"
     if not sitemap.exists():
         sitemap = root_dir / "site" / "sitemap.xml"
-    urls = load_sitemap_urls(sitemap)
+    if args.published_on:
+        feed = root_dir / "activities" / "feed.json"
+        urls = load_published_urls(feed, args.published_on)
+    else:
+        urls = load_sitemap_urls(sitemap)
+    print(f"Selected {len(urls)} URLs for submission")
     push_indexnow(urls)
-    push_baidu(urls)
+    push_baidu(urls, limit=args.baidu_limit)
 
 
 if __name__ == "__main__":

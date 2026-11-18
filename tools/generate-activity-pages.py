@@ -363,23 +363,36 @@ def preferred_search_name(bank_name):
 def build_search_title(entry, bank_short, bank_aliases, primary_benefit):
     """Create a natural query-shaped title without keyword-stuffed boilerplate."""
     raw_title = clean_line(entry["title"])
-    title = re.sub(r"\s*[·•・]\s*", "", raw_title)
+    is_current_seo_batch = entry.get("datePublished") == SEO_REVISION_DATE.isoformat()
+    separator = "：" if is_current_seo_batch else ""
+    title = re.sub(r"\s*[·•・]\s*", separator, raw_title, count=1)
+    title = re.sub(r"\s*[·•・]\s*", "", title)
     for pattern, replacement in TITLE_PREFIX_EXPANSIONS:
         if pattern.search(title):
             title = pattern.sub(replacement, title, count=1)
             break
 
     preferred_name = preferred_search_name(entry["bankName"])
+    institution_core = re.sub(r"(?:银行|信用卡|银行卡|卡组织|卡)$", "", preferred_name)
+    institution_parts = [
+        part for part in re.split(r"[/／×&与·•・\s]+", preferred_name)
+        if len(part) >= 2
+    ]
+    latin_tokens = re.findall(r"[A-Za-z][A-Za-z0-9]{1,}", preferred_name)
     title_institution_tokens = re.findall(r"[\u4e00-\u9fffA-Za-z]{2,10}银行", raw_title)
     mentions_institution = (
         entry["bankName"] in raw_title
         or preferred_name in title
         or (len(preferred_name.replace("银行", "")) >= 2 and preferred_name.replace("银行", "") in raw_title)
+        or (len(institution_core) >= 2 and institution_core in raw_title)
+        or any(part in raw_title for part in institution_parts)
+        or any(token.lower() in raw_title.lower() for token in latin_tokens)
         or any(entry["bankName"].endswith(token) for token in title_institution_tokens)
         or bank_short in raw_title
         or any(alias in raw_title for alias in bank_aliases)
     )
-    if not mentions_institution and preferred_name and len(preferred_name) <= 14:
+    generic_institution = is_current_seo_batch and bank_name_is_generic(entry["bankName"])
+    if not mentions_institution and not generic_institution and preferred_name and len(preferred_name) <= 14:
         title = f"{preferred_name}：{title}"
 
     if "卡组织返现" in title:
@@ -389,13 +402,17 @@ def build_search_title(entry, bank_short, bank_aliases, primary_benefit):
         spend_scope = "境外消费" if re.search(r"境外|海外|香港|澳门|台湾", scope) else "消费"
         title = title.replace("卡组织返现", f"{card_org}{spend_scope}返现")
 
-    title = re.sub(r"满(\d+(?:\.\d+)?)元?减(\d+(?:\.\d+)?)(?![\d%元])", r"满\1减\2元", title)
+    title = re.sub(
+        r"满(\d+(?:\.\d+)?)元?减(\d+(?:\.\d+)?)(?!(?:[\d%元]|美元|港币|澳门元|日元|英镑|欧元))",
+        r"满\1减\2元",
+        title,
+    )
     title = re.sub(r"银行银行", "银行", title)
     title = re.sub(r"信用卡信用卡", "信用卡", title)
     title = clean_line(title).strip("：:|- ")
 
     has_offer_language = bool(re.search(
-        r"活动|优惠|優惠|立减|满减|减|減|返现|返現|返|回赠|回贈|红包|消费券|刷卡金|积分|抽奖|抽獎|折扣|免费|免|送|領|领|赠|贈|券|礼|禮",
+        r"活动|优惠|優惠|立减|满减|减|減|返现|返現|返|回赠|回贈|红包|消费券|刷卡金|积分|抽|赢|折扣|低至|折|半价|特卖|特价|免费|免|送|領|领|赠|贈|券|礼|禮",
         title,
     ))
     if not has_offer_language:
@@ -407,6 +424,14 @@ def build_search_title(entry, bank_short, bank_aliases, primary_benefit):
     elif len(title) < 14 and not title.endswith("活动"):
         title = f"{title}活动"
     return title
+
+
+def bank_name_is_generic(bank_name):
+    """Categories such as government coupons must not be prepended as an issuer."""
+    return bool(re.fullmatch(
+        r"政府消费券|消费券|优惠活动|有奖发票|惠民活动|境外优惠|黑五优惠|其他",
+        clean_line(bank_name),
+    ))
 
 
 def build_seo_title(entry, search_title):
@@ -428,6 +453,23 @@ def build_seo_description(entry, search_title):
 
 
 def build_discount_phrase(entry):
+    title = clean_line(entry["title"])
+    title_patterns = (
+        r"满\d+(?:\.\d+)?(?:元|美元|港币|澳门元|日元|英镑|欧元)?减\d+(?:\.\d+)?(?:元|美元|港币|澳门元|日元|英镑|欧元)",
+        r"(?:随机|最高|笔笔)?返\d+(?:\.\d+)?%",
+        r"(?:最高)?减\d+(?:\.\d+)?%",
+        r"低至\d+(?:\.\d+)?折",
+        r"最高\d+(?:\.\d+)?折",
+        r"住\S{0,3}免\S{0,3}",
+        r"满\d+(?:\.\d+)?(?:元)?抽\d+(?:\.\d+)?元(?:京东E卡|礼品卡|红包|立减金)",
+        r"抽\d+(?:\.\d+)?元(?:京东E卡|礼品卡|红包|立减金)",
+        r"\d+(?:\.\d+)?元(?:微信|支付宝)?立减金",
+    )
+    if entry.get("datePublished") == SEO_REVISION_DATE.isoformat():
+        for pattern in title_patterns:
+            if match := re.search(pattern, title):
+                return match.group(0)
+
     rate = entry.get("cashbackRate") or ""
     d_amt = entry.get("discountAmount") or ""
     d_max = entry.get("discountMax") or ""
@@ -443,8 +485,54 @@ def build_discount_phrase(entry):
         return f"最高立减{d_max}元"
     if rate:
         return f"返现{rate}" if "%" in rate else f"返现{rate}%"
-    m = re.search(r"(满\d+(?:\.\d+)?减\d+(?:\.\d+)?元?|立减\d+(?:\.\d+)?元|最高\d+元|返现\d+%?|\d+元(?:微信)?立减金)", entry["title"])
+    m = re.search(r"(满\d+(?:\.\d+)?减\d+(?:\.\d+)?元?|立减\d+(?:\.\d+)?元|最高\d+元|返现\d+%?|\d+元(?:微信)?立减金)", title)
     return m.group(1) if m else "专属优惠权益"
+
+
+def build_search_intent_keywords(entry, combined, bank_short, card_label, benefit_tags, discount_phrase):
+    """Return natural long-tail phrases people may actually search for."""
+    phrases = []
+
+    def add(value):
+        value = clean_line(value).strip("，,、/：:|- ")
+        if value and value not in phrases:
+            phrases.append(value)
+
+    for pattern, values in (
+        (r"黑五|Black\s*Friday|网一", ("黑五优惠", "2026黑五优惠", "Black Friday优惠")),
+        (r"海淘", ("海淘优惠", "信用卡海淘返现")),
+        (r"境外|海外|出境", ("境外消费返现", "出境游信用卡优惠")),
+        (r"Apple\s*Pay", ("Apple Pay优惠", "Apple Pay返现")),
+        (r"酒店|住宿|房型|客房", ("酒店优惠", "酒店预订优惠")),
+        (r"充电|新能源", ("新能源充电优惠", "信用卡充电满减")),
+        (r"有奖发票", ("有奖发票活动", "发票抽奖红包")),
+        (r"消费券", ("政府消费券", "消费券领取")),
+        (r"Visa", ("Visa信用卡优惠", "Visa境外返现")),
+        (r"万事达|Mastercard", ("万事达信用卡优惠", "万事达境外返现")),
+        (r"运通|American\s*Express", ("美国运通信用卡优惠", "运通卡返现")),
+        (r"租车", ("境外租车优惠", "租车优惠券")),
+        (r"交通|机票|高铁|火车|地铁|公交", ("出行优惠", "交通优惠")),
+        (r"PlayStation|PS\s*Plus|PSN", ("PlayStation黑五优惠", "PS Plus会员优惠")),
+        (r"手机|平板|电脑|数码|Apple|iPhone|MacBook|三星", ("数码产品优惠", "手机电脑优惠")),
+        (r"外卖|美团|饿了么", ("外卖满减", "银行卡外卖优惠")),
+    ):
+        if re.search(pattern, combined, re.I):
+            for value in values:
+                add(value)
+
+    if discount_phrase != "专属优惠权益":
+        add(f"{bank_short}{discount_phrase}")
+    if benefit_tags:
+        add(f"{bank_short}{benefit_tags[0]}")
+    add(f"{bank_short}优惠活动" if card_label == "不限卡种" else f"{bank_short}{card_label}优惠")
+
+    region_tokens = [
+        token for token in re.split(r"[-,，、/（）()\s]+", entry["region"] or "")
+        if 2 <= len(token) <= 8 and token not in {"全国", "境外", "线上", "线下"}
+    ]
+    if region_tokens and benefit_tags:
+        add(f"{region_tokens[-1]}{benefit_tags[0]}")
+    return phrases
 
 
 def extract_seo_meta(entry):
@@ -455,10 +543,18 @@ def extract_seo_meta(entry):
     year = entry["validTo"][:4] if entry.get("validTo") else "2026"
 
     is_credit = bool(entry.get("isCredit") or "信用卡" in combined)
-    card_label = "信用卡" if is_credit else ("储蓄卡" if re.search(r"储蓄卡|借记卡", combined) else "银行卡")
+    is_financial_offer = bool(re.search(
+        r"银行|信用卡|储蓄卡|借记卡|银行卡|银联|Visa|万事达|Mastercard|运通|JCB",
+        f'{bank_name} {entry["cardOrg"]} {combined}',
+        re.I,
+    ))
+    card_label = "信用卡" if is_credit else (
+        "储蓄卡" if re.search(r"储蓄卡|借记卡", combined)
+        else "银行卡" if is_financial_offer else "不限卡种"
+    )
 
-    benefit_tags = []
-    for pat, label in (
+    is_current_seo_batch = entry.get("datePublished") == SEO_REVISION_DATE.isoformat()
+    base_benefit_specs = (
         (r"微信立减金|微信.*立减", "微信立减金"),
         (r"数币|数字人民币", "数币红包"),
         (r"云闪付", "云闪付满减"),
@@ -470,23 +566,51 @@ def extract_seo_meta(entry):
         (r"京东", "京东支付立减"),
         (r"抖音", "抖音支付立减"),
         (r"美团", "美团支付立减"),
-    ):
+    )
+    current_batch_benefit_specs = (
+        (r"黑五|Black\s*Friday|网一", "黑五优惠"),
+        (r"海淘", "海淘返现"),
+        (r"境外|海外|出境", "境外消费优惠"),
+        (r"酒店|住宿|房型|客房", "酒店优惠"),
+        (r"充电|新能源", "充电优惠"),
+        (r"有奖发票", "有奖发票"),
+        (r"Apple\s*Pay", "Apple Pay优惠"),
+        (r"租车", "租车优惠"),
+        (r"交通|机票|高铁|火车|地铁|公交", "出行优惠"),
+        (r"PlayStation|PS\s*Plus|PSN", "PlayStation优惠"),
+    )
+    benefit_tags = []
+    benefit_specs = base_benefit_specs + (current_batch_benefit_specs if is_current_seo_batch else ())
+    for pat, label in benefit_specs:
+        if (
+            is_current_seo_batch and label == "京东支付立减"
+            and "京东E卡" in combined and "京东支付" not in combined
+        ):
+            continue
         if re.search(pat, combined):
             benefit_tags.append(label)
-    primary_benefit = benefit_tags[0] if benefit_tags else f"{card_label}优惠"
+    primary_benefit = benefit_tags[0] if benefit_tags else (
+        "专属优惠" if card_label == "不限卡种" else f"{card_label}优惠"
+    )
 
     search_title = build_search_title(entry, bank_short, bank_aliases, primary_benefit)
     seo_title = build_seo_title(entry, search_title)
     seo_desc = build_seo_description(entry, search_title)
+    discount_phrase = build_discount_phrase(entry)
+    intent_keywords = build_search_intent_keywords(
+        entry, combined, bank_short, card_label, benefit_tags, discount_phrase,
+    ) if is_current_seo_batch else []
 
     # Build deduplicated per-page <meta name="keywords">
+    card_keyword = f"{bank_short}优惠活动" if card_label == "不限卡种" else f"{bank_short}{card_label}优惠"
     kw_pool = [
         search_title,
         title,
         bank_name,
+        *intent_keywords,
         *bank_aliases,
         f"{bank_short}优惠活动",
-        f"{bank_short}{card_label}优惠",
+        card_keyword,
         primary_benefit,
         *benefit_tags[:3],
     ]
@@ -504,7 +628,7 @@ def extract_seo_meta(entry):
         if kw and kw not in seen_kw:
             seen_kw.add(kw)
             keywords.append(kw)
-        if len(keywords) >= 10:
+        if len(keywords) >= (14 if is_current_seo_batch else 10):
             break
 
     return {
@@ -512,7 +636,7 @@ def extract_seo_meta(entry):
         "bank_topic": bank_topic,
         "card_label": card_label,
         "primary_benefit": primary_benefit,
-        "discount_phrase": build_discount_phrase(entry),
+        "discount_phrase": discount_phrase,
         "search_title": search_title,
         "seo_title": seo_title,
         "seo_desc": seo_desc,
@@ -567,8 +691,9 @@ def disambiguate_search_titles(entries):
 def parse_entry(activity_id, row, as_of):
     start = date.fromisoformat(row["validFrom"])
     end = date.fromisoformat(row["validTo"])
+    published_on = date.fromisoformat(row["createdAt"][:10])
     lastmod = date.fromisoformat((row.get("updatedAtRaw") or row.get("updatedAt") or row["createdAt"])[:10])
-    if start > end or lastmod > as_of:
+    if start > end or published_on > as_of or lastmod > as_of:
         raise ValueError("Inconsistent activity dates.")
 
     entry = {key: normalize_brand(str(row.get(key) or "").strip()) for key in TEXT_FIELDS}
@@ -591,6 +716,7 @@ def parse_entry(activity_id, row, as_of):
         id=activity_id,
         validFrom=start.isoformat(),
         validTo=end.isoformat(),
+        datePublished=published_on.isoformat(),
         sourceLastmod=lastmod.isoformat(),
         lastmod=page_lastmod.isoformat(),
         sources=sources,
@@ -625,7 +751,7 @@ def select_activities(feed, as_of):
     return selected, rejected
 
 
-def document(page_title, summary, url, kind, body, lastmod=None, indexable=True, keywords="", extra_graph=None, canonical_url=None):
+def document(page_title, summary, url, kind, body, lastmod=None, date_published=None, indexable=True, keywords="", extra_graph=None, canonical_url=None):
     canonical_url = canonical_url or url
     base_node = {
         "@type": kind,
@@ -644,6 +770,8 @@ def document(page_title, summary, url, kind, body, lastmod=None, indexable=True,
         base_node["keywords"] = keywords
     if lastmod:
         base_node["dateModified"] = lastmod
+    if date_published:
+        base_node["datePublished"] = date_published
 
     graph = [base_node]
     if extra_graph:
@@ -655,6 +783,8 @@ def document(page_title, summary, url, kind, body, lastmod=None, indexable=True,
     robots = INDEX_ROBOTS if indexable else ARCHIVE_ROBOTS
     styles = "/assets/styles.css?v=20261118-brandlogo1"
     kw_tag = f'\n  <meta name="keywords" content="{escape(keywords)}">' if keywords else ""
+    published_tag = f'\n  <meta property="article:published_time" content="{date_published}">' if date_published else ""
+    modified_tag = f'\n  <meta property="article:modified_time" content="{lastmod}">' if date_published and lastmod else ""
 
     return f"""<!doctype html>
 <html lang="zh-CN">
@@ -671,7 +801,7 @@ def document(page_title, summary, url, kind, body, lastmod=None, indexable=True,
   <meta property="og:site_name" content="{BRAND_MAIN}">
   <meta property="og:title" content="{escape(page_title)}">
   <meta property="og:description" content="{escape(summary)}">
-  <meta property="og:url" content="{canonical_url}">
+  <meta property="og:url" content="{canonical_url}">{published_tag}{modified_tag}
   <meta name="twitter:card" content="summary">
   <meta name="twitter:title" content="{escape(page_title)}">
   <meta name="twitter:description" content="{escape(summary)}">
@@ -916,6 +1046,13 @@ def detail(entry, active_entries):
 
     status = entry["status"]
     status_badge = "当前有效" if status == "current" else ("即将开始" if status == "upcoming" else "已结束")
+    publication_meta_html = ""
+    if entry["datePublished"] == SEO_REVISION_DATE.isoformat():
+        publication_meta_html = (
+            '                <p class="seo-card-meta">页面首次发布：'
+            f'{time_element(entry["datePublished"])} · 最近复核：{time_element(entry["lastmod"])}'
+            '</p>\n'
+        )
 
     # Topic hub pills & breadcrumbs
     entry_topics = matching_topics_for_entry(entry)
@@ -1065,7 +1202,7 @@ def detail(entry, active_entries):
 {sources}
                 </ul>
                 <p class="detail-section-copy">本站按公开活动信息核验整理，最近更新于 {time_element(entry["lastmod"])}。活动资格、名额和领取入口以所属机构最新规则为准。</p>
-                <p class="seo-card-meta">编辑与复核：羊毛助手编辑组 · <a class="detail-link" href="/editorial-policy.html">查看核验、更正与发布规范</a></p>
+{publication_meta_html}                <p class="seo-card-meta">编辑与复核：羊毛助手编辑组 · <a class="detail-link" href="/editorial-policy.html">查看核验、更正与发布规范</a></p>
                 <a class="detail-link" href="/detail.html?id={activity_id}">打开交互式详情与活动海报图片</a>
               </section>
               <aside class="telegram-subscribe detail-telegram-reminder" id="telegram-reminder" aria-label="订阅优惠更新">
@@ -1087,6 +1224,7 @@ def detail(entry, active_entries):
         "WebPage",
         body,
         lastmod=entry["lastmod"],
+        date_published=entry["datePublished"] if entry["datePublished"] == SEO_REVISION_DATE.isoformat() else None,
         indexable=not bool(duplicate_of),
         keywords=seo["keywords"],
         extra_graph=[breadcrumb_schema, faq_schema],
@@ -1368,7 +1506,8 @@ def ai_feed(entries, generated_on):
         "activities": [{
             "id": entry["id"],
             "title": entry["title"],
-        "searchTitle": entry["seo"]["search_title"],
+            "searchTitle": entry["seo"]["search_title"],
+            "searchKeywords": entry["seo"]["keywords"].split(","),
             "summary": entry["desc"],
             "discount": entry["seo"]["discount_phrase"],
             "institution": entry["bankName"],
@@ -1377,6 +1516,8 @@ def ai_feed(entries, generated_on):
             "cardType": entry["seo"]["card_label"],
             "validFrom": entry["validFrom"],
             "validTo": entry["validTo"],
+            "datePublished": entry["datePublished"],
+            "dateModified": entry["lastmod"],
             "status": entry["status"],
             "offer": entry["awardDesc"],
             "participation": entry["pathDesc"],
@@ -1434,6 +1575,7 @@ def llms_full(entries, generated_on):
             f'- 状态：{"当前有效" if entry["status"] == "current" else "尚未开始" if entry["status"] == "upcoming" else "已结束"}',
             f'- 活动机构：{clean_line(entry["bankName"])}（{entry["seo"]["card_label"]}）',
             f'- 核心优惠：{entry["seo"]["discount_phrase"]}',
+            f'- 搜索关键词：{entry["seo"]["keywords"]}',
             f'- 适用地区：{clean_line(entry["region"] or "全国")}',
             f'- 支付渠道：{clean_line(entry["channel"] or entry["consumeChannel"] or "官方渠道")}',
             f'- 有效期：{entry["validFrom"]} 至 {entry["validTo"]}',
