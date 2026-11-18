@@ -132,7 +132,7 @@ function classifyPublicBenefitType(activity = {}) {
     : '';
 }
 
-const SCENE_OPTIONS = ['全部', '吃喝', '购物', '出行', '境外游', '生活', '发票有奖', '会员权益', '通用优惠'];
+const SCENE_OPTIONS = ['全部', '黑五优惠', '吃喝', '购物', '出行', '境外游', '生活', '发票有奖', '会员权益', '通用优惠'];
 
 const TOP_CATEGORIES = [
   { key: 'all', label: '全部', scene: '全部', cashback: false },
@@ -513,6 +513,7 @@ const els = {
   regionFilters: document.getElementById('regionFilters'),
   sceneFilters: document.getElementById('sceneFilters'),
   topCategoryBar: document.getElementById('topCategoryBar'),
+  blackFridayTopicLink: document.getElementById('blackFridayTopicLink'),
   secondaryFilterBar: document.getElementById('secondaryFilterBar'),
   activeViewBadge: document.getElementById('activeViewBadge'),
   activeCardOrgBadge: document.getElementById('activeCardOrgBadge'),
@@ -1026,6 +1027,10 @@ function mountMiniChips(container, options, stateKey) {
 }
 
 function syncFilterControls() {
+  if (els.blackFridayTopicLink) {
+    els.blackFridayTopicLink.hidden = state.scene !== '黑五优惠' || state.cashback;
+  }
+
   // Top category strip
   if (els.topCategoryBar) {
     els.topCategoryBar.querySelectorAll('[data-top-cat]').forEach((btn) => {

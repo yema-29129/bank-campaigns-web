@@ -25,6 +25,7 @@ const STATIC_ASSETS = [
   '/assets/mobile-back.js?v=20261118-back1',
   '/assets/mobile-back.css?v=20261118-back1',
   '/assets/contact.js?v=20261118-contactfix1',
+  '/assets/topic-card-links.js?v=20261118-blackfriday1',
   '/assets/group-wechat-qr.webp?v=20261118-contactfix1',
   '/assets/miniprogram-qr.jpg',
   '/assets/wechat-contact-qr.jpg',

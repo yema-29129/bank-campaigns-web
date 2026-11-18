@@ -93,6 +93,31 @@
   background: #dbeafe;
 }
 
+.activity-directory [data-campaign].is-card-link {
+  cursor: pointer;
+  transition: transform 0.18s ease, border-color 0.18s ease, box-shadow 0.18s ease;
+}
+
+.activity-directory [data-campaign].is-card-link:hover,
+.activity-directory [data-campaign].is-card-link:focus-visible {
+  transform: translateY(-2px);
+  border-color: #93c5fd;
+  box-shadow: 0 12px 28px rgba(30, 78, 216, 0.12);
+  outline: none;
+}
+
+.activity-directory [data-campaign].is-card-link > h2 a {
+  display: inline;
+  color: #0f172a;
+  text-decoration: none;
+}
+
+.activity-directory [data-campaign].is-card-link > h2 a::after {
+  content: " ↗";
+  color: var(--brand, #1e4ed8);
+  font-size: 0.82em;
+}
+
 .seo-ai-summary {
   background: linear-gradient(180deg, #f8fbff 0%, #f1f5f9 100%);
   border: 1px solid #cbd5e1;

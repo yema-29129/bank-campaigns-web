@@ -9,10 +9,11 @@ const context = {};
 vm.runInNewContext(`${appSource.slice(0, stateStart)}\nglobalThis.blackFridayTestApi = {
   match: isBlackFridayCampaign,
   scenes: classifyScenes,
+  sceneOptions: SCENE_OPTIONS,
   topCategory: TOP_CATEGORIES.find((item) => item.key === 'black-friday')
 };`, context);
 
-const { match, scenes, topCategory } = context.blackFridayTestApi;
+const { match, scenes, sceneOptions, topCategory } = context.blackFridayTestApi;
 const cases = [
   ['Chinese Black Friday', { title: '浦发信用卡·黑五海淘季380元消费券包' }, true],
   ['full Chinese name', { title: '黑色星期五指定商户8折' }, true],
@@ -47,6 +48,11 @@ if (!topCategory || topCategory.label !== '黑五优惠' || topCategory.scene !=
   console.error(`FAIL top category configuration: ${JSON.stringify(topCategory)}`);
 }
 
+if (!sceneOptions.includes('黑五优惠') || sceneOptions.indexOf('黑五优惠') !== 1) {
+  failures += 1;
+  console.error(`FAIL mobile scene filter configuration: ${JSON.stringify(sceneOptions)}`);
+}
+
 const dataPath = process.argv[2];
 if (dataPath) {
   const payload = JSON.parse(fs.readFileSync(dataPath, 'utf8'));
@@ -66,4 +72,4 @@ if (dataPath) {
 }
 
 if (failures) process.exitCode = 1;
-else console.log(`PASS ${cases.length + 2} Black Friday filter cases`);
+else console.log(`PASS ${cases.length + 3} Black Friday filter cases`);
