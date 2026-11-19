@@ -30,6 +30,13 @@ TOPICS_OUTPUT = OUTPUT / "topics"
 
 MANUAL_TOPICS = (
     {
+        "slug": "payment-limits",
+        "h1": "银行卡支付限额与付款失败查询",
+        "desc": "查工行借记卡京东与抖音限额、邮储及农行支付宝限制，以及交通银行抖音、农行拼多多、招行美团付款失败的官方查询路径。",
+        "lastmod": "2026-11-19",
+        "group": "payment",
+    },
+    {
         "slug": "travel-card-offers",
         "h1": "海外旅行、订房与信用卡优惠",
         "desc": "汇总 Agoda、Trip.com、Klook、AEON 积分与 Apple 刷卡优惠，逐项列明发卡地区、门槛、有效期、参与步骤和官方入口。",
@@ -1387,7 +1394,7 @@ def build_topic_page(spec, active_entries, ended_entries, generated_on):
 def topics_index_page(topic_stats, active_total, generated_on):
     page_title = f"2026银行优惠专题导航：按银行与支付方式查立减金、返现与红包{TITLE_SUFFIX}"
     summary = (
-        f"羊毛助手·羊毛线报活动站优惠专题导航页，按微信立减金、云闪付、支付宝、信用卡返现、海外旅行、黑五优惠及农行、工行、建行、中行、邮储、招行等22个专题分类汇总 {active_total} 条实时有效银行活动。"
+        f"羊毛助手·羊毛线报活动站优惠专题导航页，按微信立减金、云闪付、支付宝、信用卡返现、海外旅行、黑五优惠及农行、工行、建行、中行、邮储、招行等{len(TOPIC_SPECS) + len(MANUAL_TOPICS)}个专题分类汇总 {active_total} 条实时有效银行活动。"
     )
     keywords = "银行优惠专题,微信立减金汇总,云闪付满减汇总,支付宝银行卡优惠,信用卡返现大全,农行优惠,工行优惠,建行优惠,中行优惠,港卡返现,羊毛助手·羊毛线报活动站"
 

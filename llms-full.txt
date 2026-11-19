@@ -6,7 +6,12 @@
 
 - 专题：海外旅行、订房与信用卡优惠
 - 专题网址：https://bank.vooqqqm.com/activities/topics/travel-card-offers.html
-- 专题摘要：汇总 30 项 Agoda、Trip.com、Klook、港澳线下刷卡、AEON 积分与 Apple 刷卡优惠，逐项列明发卡地区、门槛、有效期、参与步骤和官方入口。
+- 专题摘要：汇总 36 项 Agoda、Trip.com、Klook、港澳线下刷卡、AEON 积分与 Apple 刷卡优惠，逐项列明发卡地区、门槛、有效期、参与步骤和官方入口。
+- 最近核验：2026-11-19
+
+- 专题：银行卡支付限额与付款失败查询
+- 专题网址：https://bank.vooqqqm.com/activities/topics/payment-limits.html
+- 专题摘要：查工行借记卡京东与抖音限额、邮储及农行支付宝限制，以及交通银行抖音、农行拼多多、招行美团付款失败的官方查询路径。
 - 最近核验：2026-11-19
 
 - 专题：2026 海外黑五优惠大全
