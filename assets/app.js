@@ -138,12 +138,12 @@ function classifyPublicBenefitType(activity = {}) {
 const SCENE_OPTIONS = ['全部', '吃喝', '购物', '出行', '境外游', '海外优惠', '生活', '发票有奖', '会员权益', '通用优惠', '黑五优惠'];
 
 const TOP_CATEGORIES = [
+  { key: 'overseas-deals', label: '海外优惠', scene: '海外优惠', cashback: false },
   { key: 'all', label: '全部', scene: '全部', cashback: false },
   { key: 'food', label: '吃喝', scene: '吃喝', cashback: false },
   { key: 'shopping', label: '购物', scene: '购物', cashback: false },
   { key: 'travel', label: '出行', scene: '出行', cashback: false },
   { key: 'overseas', label: '境外游', scene: '境外游', cashback: false },
-  { key: 'overseas-deals', label: '海外优惠', scene: '海外优惠', cashback: false },
   { key: 'cashback', label: '返现', scene: '全部', cashback: true },
   { key: 'life', label: '生活', scene: '生活', cashback: false },
   { key: 'invoice-benefit', label: '发票有奖', scene: '发票有奖', cashback: false },
