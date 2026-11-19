@@ -35,6 +35,27 @@ OVERSEAS_TOPIC = {
     "group": "card",
 }
 
+OVERSEAS_SUBCATEGORIES = {
+    "hong-kong": (
+        ("hk-food", "餐飲與茶飲"),
+        ("hk-shopping", "超市與本地購物"),
+        ("hk-transit-bills", "八達通、交通與繳費"),
+        ("hk-payments", "港卡與電子錢包"),
+    ),
+    "shopping": (
+        ("cross-border-stores", "跨境电商与平台优惠"),
+        ("online-card-rewards", "外币网购回赠"),
+        ("cross-border-delivery", "跨境配送与转运"),
+    ),
+    "travel": (
+        ("flights", "机票与里程"),
+        ("stays", "酒店与订房"),
+        ("things-to-do", "景点与当地交通"),
+        ("travel-data", "eSIM 与境外上网"),
+        ("travel-payments", "境外刷卡、支付与取现"),
+    ),
+}
+
 MANUAL_TOPICS = (
     {
         "slug": "payment-limits",
@@ -1285,65 +1306,128 @@ def topic_hub_nav_markup(active_slug=None):
     return '<div class="seo-hub-grid">' + "\n          ".join(pills) + "</div>"
 
 
+def classify_overseas_activity(item, as_of):
+    """Classify a published website snapshot entry by the actual use of its offer."""
+    title = item["title"].strip()
+    region = item["region"].strip()
+    if not all((title, region, item["summary"].strip(), item["institution"].strip())):
+        return None
+    if not any(safe_source(source) for source in item["sources"]):
+        return None
+    today = as_of.isoformat()
+    if not item["validFrom"] <= today <= item["validTo"]:
+        return None
+    if re.search(r"黑[五伍]|黑色星期五|网一|網一|Black[ -]?Friday|Cyber[ -]?Monday|\bVPS\b|\bVPN\b|云[主服]|雲[主服]|虚拟主机|域名注册",
+                 title, re.I):
+        return None
+
+    text = f'{title} {item["summary"]}'
+    offer_title = re.split(r"[·・•]", title, maxsplit=1)[-1]
+    # Keep eligibility separate: an issuer prefix alone does not identify a local offer.
+    market = re.sub(r"(?:中国|中國)?香港(?:地區|地区)?(?:[发發]卡|[发發]行)(?=[·・:：，,;；\s]|$)[·・:：，,;；\s]*", "", region)
+    hk_local = bool(re.match(
+        r"^(?:中国|中國)?(?:香港|Hong Kong)(?![发發][行卡]|始[发發]|出[发發]|往返)", market, re.I
+    )) or bool(re.search(r"香港(?:本地|指定門店|指定门店)|(?:本地及境外|本地或境外)合[资資]格消[费費]", market))
+    cross_border = bool(re.search(
+        r"境外|海外|全球|出境|跨境|[国國]际|國際|港澳|日本|[韩韓][国國]|泰[国國]|新加坡|[台臺][湾灣]|[欧歐]洲|美[国國]|澳大利[亚亞]|[马馬][来來]西[亚亞]|英[国國]|新西[兰蘭]|澳[门門]|香港",
+        f"{market} {offer_title}",
+    ))
+
+    if re.search(r"eSIM|境外.{0,4}上[网網]|海外.{0,4}流量|漫[游遊]流量|境外[电電][话話]卡", text, re.I):
+        if cross_border and item.get("distributionScope") == "web_only":
+            return "travel", "travel-data"
+        return None
+
+    # A flight, stay or local tour keeps its travel category even when booked online.
+    if cross_border:
+        for subcategory, pattern in (
+            ("flights", r"[机機]票|[机機]酒|航班|航[线線]|里[数數程]|郵輪|邮轮"),
+            ("stays", r"酒店|住宿|[订訂]房|房型|民宿|度假村"),
+            ("things-to-do", r"景[区區]|[门門]票|当地玩乐|當地玩樂|租[车車]|[接送包][机機]|境外交通|海外交通|交通通票"),
+        ):
+            if re.search(pattern, text, re.I):
+                return "travel", subcategory
+
+    if cross_border and re.search(r"转运|轉運|跨境配送|海外直[邮郵]|国际集运|國際集運", text):
+        return "shopping", "cross-border-delivery"
+    if re.search(r"(?:外[币幣]|非港[币幣]|境外|海外).{0,12}(?:[网網][购購]|[网網]上|[线線]上)(?:消[费費]|[签簽][账賬帳]|返[现現]|回[赠贈]|[购購]物)|[网網]上非港[币幣]|海淘.{0,14}(?:返[现現]|回[赠贈]|立[减減])", text):
+        return "shopping", "online-card-rewards"
+    explicit_cross_border_shop = re.search(r"海淘|跨境[电電]商|(?:海外|境外|跨境)[网網][购購]", text)
+    overseas_retailer = (
+        re.search(r"亚马逊|亞馬遜|Amazon|iHerb", text, re.I)
+        and re.search(r"[购購]|下[单單]|商品|配送|零售|[运運][费費]", text)
+    )
+    cross_border_chinese_platform = (
+        (hk_local or re.search(r"境外(?:[发發]卡|卡)|港澳台[发發]卡", f"{market} {title}"))
+        and re.search(r"淘宝|淘寶|天猫|天貓|拼多多|乐天市场|樂天市場", text)
+    )
+    if explicit_cross_border_shop or overseas_retailer or cross_border_chinese_platform:
+        return "shopping", "cross-border-stores"
+
+    if hk_local:
+        hk_text = f"{text} {market}"
+        for subcategory, pattern in (
+            ("hk-food", r"餐[饮飲厅廳]|美食|外[卖賣]|茶[饮飲]|聚餐|咖啡|OpenRice|[订訂]座|必[胜勝]客|美心"),
+            ("hk-transit-bills", r"八[达達]通|港[铁鐵]|[车車][费費]|乘[车車]|公交|巴士|的士|公共交通|[缴繳][费費]|水[电電]|[话話][费費]"),
+            ("hk-shopping", r"超市|商[场場超]|百[货貨]|便利店|[购購]物|万[宁寧]|萬寧|友和|百老[汇匯]|SOGO|[丰豐][泽澤]|惠康"),
+            ("hk-payments", r"信用卡|[电電]子[钱錢]包|AlipayHK|PayMe|BoC Pay|Apple\s*Pay|拍卡"),
+        ):
+            if re.search(pattern, hk_text, re.I):
+                return "hong-kong", subcategory
+
+    if (cross_border and not hk_local and not re.search(r"留[学學]|[学學][费費]|租房|[汇匯]款", text)
+            and re.search(r"信用卡|借[记記]卡|刷卡|[签簽][账賬帳]|[银銀][联聯]|八[达達]通|[扫掃]码|Pay|ATM|取[现現]", text, re.I)):
+        return "travel", "travel-payments"
+    return None
+
+
 def overseas_hub_page(activities, as_of):
     url = f'{TOPICS_URL}{OVERSEAS_TOPIC["slug"]}.html'
     today = as_of.isoformat()
-    eligible = [
-        item for item in activities
-        if item["sources"] and item["validFrom"] <= today <= item["validTo"]
-        and not re.search(r"黑[五伍]|黑色星期五|网一|Black[ -]?Friday|Cyber[ -]?Monday", item["title"], re.I)
-    ]
-
-    def hong_kong(item):
-        return (
-            re.search(r"香港|Hong Kong", item["region"], re.I)
-            and not re.search(r"香港(?:[发發]卡|[始出][发發]|往返)", item["region"])
-            and re.search(r"餐[饮飲]|超市|商[场場]|商超|百[货貨]|八[达達]通|便利店|港[铁鐵]|茶[饮飲]|OpenRice",
-                          f'{item["title"]} {item["summary"]}', re.I)
-        )
-
-    def shopping(item):
-        return re.search(
-            r"海[淘购購]|跨境[电電]商|(?:海外|境外|跨境)[网網][购購]|亚马逊|亞馬遜|Amazon|iHerb|[网網]上非港[币幣]",
-            f'{item["title"]} {item["summary"]} {item["region"]}', re.I,
-        )
-
-    def travel(item):
-        return (
-            re.search(r"境外|海外|全球|國際|国际|香港|澳[门門]|日本|韩[国國]|泰[国國]|新加坡|欧洲|美国|澳大利亚",
-                      f'{item["region"]} {item["title"]}')
-            and re.search(r"[机機]票|航班|酒店|[订訂]房|旅[游遊]|景[区區][门門]票|租[车車]|上[网網]卡|eSIM|[机機][场場]|境外交通",
-                          f'{item["title"]} {item["summary"]}', re.I)
-        )
+    classified = {}
+    for item in activities:
+        category = classify_overseas_activity(item, as_of)
+        if category:
+            classified.setdefault(category, []).append(item)
 
     sections = (
         ("hong-kong", "香港本地優惠",
          "搵香港餐飲、超市、商場、八達通同信用卡回贈。參加前先睇發卡地區、指定商戶，以及是否要先登記或綁定電子錢包。",
-         "zh-Hant-HK", hong_kong,
+         "zh-Hant-HK",
          (("查香港及澳門線下刷卡優惠", "travel-card-offers.html#hong-kong-daily"),
           ("查港卡及境外消費回贈", "hk-overseas.html"))),
         ("shopping", "海淘购物",
          "查跨境网购和外币线上消费优惠。比较到手价时，把运费、税费、汇率及外币交易费一起计入，再确认发卡地区、指定商户与返现封顶。",
-         "zh-CN", shopping,
+         "zh-CN",
          (("搜索海淘优惠", "/index.html?q=海淘"), ("浏览境外刷卡与返现", "hk-overseas.html"))),
         ("travel", "出境旅行",
          "查机票、酒店、景点门票、租车和出行优惠。预订前区分下单与入住或出发日期，核对适用目的地、付款卡种、税费及退改条件。",
-         "zh-CN", travel,
+         "zh-CN",
          (("查 Agoda、Klook 等订房优惠", "travel-card-offers.html#hotels"),
           ("查 Trip.com 机票与酒店优惠", "travel-card-offers.html#travel"))),
     )
 
     section_links = "\n".join(
         f'        <a href="#{slug}" lang="{lang}">{title}</a>'
-        for slug, title, _, lang, _, _ in sections
+        for slug, title, _, lang, _ in sections
     )
     section_html = []
-    for slug, title, description, lang, match, links in sections:
-        featured = [item for item in eligible if match(item)][:6]
-        cards = []
-        for item in featured:
-            region = f'{item["institution"]} · {item["region"]}'
-            cards.append(f"""          <li class="detail-section topic-activity-card">
+    for slug, title, description, lang, links in sections:
+        subcategory_links = []
+        subcategory_html = []
+        for subcategory, label in OVERSEAS_SUBCATEGORIES[slug]:
+            items = classified.get((slug, subcategory))
+            if not items:
+                continue
+            # Keep the existing recency order within each group, after straightforward offers.
+            featured = sorted(items, key=lambda item: bool(re.search(
+                r"受邀|邀[约約]|新客|首[绑綁刷]|抽[奖獎]|随[机機]|隨機|付[费費]会员", item["title"],
+            )))[:6]
+            subcategory_links.append(f'<a class="seo-topic-pill" href="#{subcategory}">{label}</a>')
+            cards = []
+            for item in featured:
+                region = f'{item["institution"]} · {item["region"]}'
+                cards.append(f"""          <li class="detail-section topic-activity-card">
             <a class="topic-activity-link" href="/activities/{escape(item["id"])}.html">
               <span class="topic-card-title">{escape(item["title"])}</span>
               <span class="topic-card-summary">{escape(item["summary"])}</span>
@@ -1351,10 +1435,15 @@ def overseas_hub_page(activities, as_of):
               <span class="topic-card-action">查看完整规则</span>
             </a>
           </li>""")
-        highlights = (
-            '<ul class="activity-directory">\n' + "\n".join(cards) + "\n        </ul>"
-            if cards else '<p>目前暂无可在这里推荐的在期活动，可通过下方入口继续查找。</p>'
-        )
+            subcategory_html.append(f"""        <section class="topic-category-section" id="{subcategory}" aria-labelledby="{subcategory}-title">
+          <h3 id="{subcategory}-title" lang="{lang}">{label}</h3>
+          <ul class="activity-directory">
+{chr(10).join(cards)}
+          </ul>
+        </section>""")
+        highlights = "\n".join(subcategory_html) or '<p>目前暂无符合收录条件的在期活动，可通过下方入口继续查找。</p>'
+        subnav = (f'<nav class="seo-topic-pills" aria-label="{title}二级分类" lang="{lang}">'
+                  + "\n".join(subcategory_links) + "</nav>") if subcategory_links else ""
         related = " · ".join(
             f'<a href="{escape(href if href.startswith("/") else "/activities/topics/" + href)}" lang="{lang}">{text}</a>'
             for text, href in links
@@ -1362,6 +1451,7 @@ def overseas_hub_page(activities, as_of):
         section_html.append(f"""      <section class="topic-category-section" id="{slug}" aria-labelledby="{slug}-title">
         <h2 id="{slug}-title" lang="{lang}">{title}</h2>
         <p lang="{lang}">{description}</p>
+        {subnav}
         {highlights}
         <p class="seo-card-meta">{related}</p>
       </section>""")
@@ -1377,6 +1467,10 @@ def overseas_hub_page(activities, as_of):
       <nav class="topic-category-nav" aria-label="海外优惠分类">
 {section_links}
       </nav>
+      <details id="selection-rules">
+        <summary>哪些优惠会收录？</summary>
+        <p>收录有官方来源、参与资格、实际优惠和有效期明确的香港本地、跨境网购及出境旅行优惠。按实际使用场景归类，发卡地区和账户资格请查看活动详情。常驻列表只展示有效期内的活动，黑五专属促销在季节专题查看。</p>
+      </details>
 {chr(10).join(section_html)}
       <section class="topic-category-section" id="seasonal" aria-labelledby="seasonal-title">
         <h2 id="seasonal-title">季节专题</h2>
