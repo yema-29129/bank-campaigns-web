@@ -34,6 +34,7 @@ class OverseasSelectionTest(unittest.TestCase):
             ("信用卡·日本簽賬回贈", "指定信用卡消費返現", "中國香港發卡·日本", ("travel", "travel-payments")),
             ("香港信用卡·上海机场专享", "指定卡在上海本地机场满减", "上海", None),
             ("信用卡·超市满减", "指定信用卡消费满减", "中国香港发卡", None),
+            ("信用卡·消费回赠", "指定信用卡合资格消费回赠", "中国内地发卡·本地及境外合资格消费", ("travel", "travel-payments")),
         ]
         for title, summary, region, expected in cases:
             with self.subTest(title=title):

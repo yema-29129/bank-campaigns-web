@@ -1325,9 +1325,11 @@ def classify_overseas_activity(item, as_of):
     offer_title = re.split(r"[·・•]", title, maxsplit=1)[-1]
     # Keep eligibility separate: an issuer prefix alone does not identify a local offer.
     market = re.sub(r"(?:中国|中國)?香港(?:地區|地区)?(?:[发發]卡|[发發]行)(?=[·・:：，,;；\s]|$)[·・:：，,;；\s]*", "", region)
-    hk_local = bool(re.match(
-        r"^(?:中国|中國)?(?:香港|Hong Kong)(?![发發][行卡]|始[发發]|出[发發]|往返)", market, re.I
-    )) or bool(re.search(r"香港(?:本地|指定門店|指定门店)|(?:本地及境外|本地或境外)合[资資]格消[费費]", market))
+    hk_local = (
+        re.match(r"^(?:中国|中國)?(?:香港|Hong Kong)(?![发發][行卡]|始[发發]|出[发發]|往返)", market, re.I)
+        or re.search(r"香港(?:本地|指定[门門]店)", market)
+        or "香港" in region and re.search(r"本地[及或]境外合[资資]格消[费費]", market)
+    )
     cross_border = bool(re.search(
         r"境外|海外|全球|出境|跨境|[国國]际|國際|港澳|日本|[韩韓][国國]|泰[国國]|新加坡|[台臺][湾灣]|[欧歐]洲|美[国國]|澳大利[亚亞]|[马馬][来來]西[亚亞]|英[国國]|新西[兰蘭]|澳[门門]|香港",
         f"{market} {offer_title}",
