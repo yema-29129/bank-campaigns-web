@@ -1372,7 +1372,10 @@ def topics_index_page(topic_stats, active_total, generated_on):
     )
     keywords = "银行优惠专题,微信立减金汇总,云闪付满减汇总,支付宝银行卡优惠,信用卡返现大全,农行优惠,工行优惠,建行优惠,中行优惠,港卡返现,羊毛助手·羊毛线报活动站"
 
-    channel_cards = []
+    channel_cards = ["""        <li class="detail-section">
+          <h2><a href="/activities/topics/travel-card-offers.html">海外旅行与信用卡优惠</a></h2>
+          <p>查看 Agoda 订房、汇丰 Trip.com、AEON 积分与 Apple 刷卡优惠的发卡资格、门槛及官方入口。</p>
+        </li>"""]
     bank_cards = []
     for spec, count, _ in topic_stats:
         card_html = f"""        <li class="detail-section">
@@ -1466,6 +1469,7 @@ def sitemap_xml(entries, topic_stats, generated_on):
         ("/", today_str),
         ("/activities/", today_str),
         ("/activities/topics/", today_str),
+        ("/activities/topics/travel-card-offers.html", None),
         ("/activities/archive.html", today_str),
         ("/about.html", None),
         ("/editorial-policy.html", None),
