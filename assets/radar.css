@@ -597,6 +597,7 @@ body.radar-page {
   display: flex;
   flex-direction: column;
   min-width: 0;
+  container: activity-list / inline-size;
   background: #ffffff;
 }
 
@@ -657,6 +658,55 @@ body.radar-page {
 .radar-cat-tab.is-active {
   background: #0f1b2d;
   color: #ffffff;
+}
+
+@media (min-width: 861px) {
+  .radar-cat-tabs {
+    gap: 3px;
+    scrollbar-width: thin;
+    scrollbar-color: #cbd5e1 transparent;
+  }
+
+  .radar-cat-tabs::-webkit-scrollbar {
+    display: block;
+    height: 4px;
+  }
+
+  .radar-cat-tab {
+    padding-inline: 8px;
+  }
+
+  @container activity-list (max-width: 1110px) {
+    .radar-cat-tabs {
+      gap: 2px;
+    }
+
+    .radar-cat-tab {
+      padding-inline: 4px;
+    }
+  }
+
+  @container activity-list (max-width: 1008px) {
+    .radar-cat-tabs {
+      grid-column: 1 / -1;
+    }
+
+    .radar-strip-meta {
+      grid-column: 1 / -1;
+      grid-row: 2;
+      justify-self: end;
+    }
+  }
+
+  @container activity-list (max-width: 680px) {
+    .radar-topstrip {
+      padding-inline: 10px;
+    }
+
+    .radar-cat-tab {
+      padding-inline: 3px;
+    }
+  }
 }
 
 .radar-secondary-tabs {
