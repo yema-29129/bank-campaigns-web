@@ -2,20 +2,24 @@ import fs from 'node:fs';
 import vm from 'node:vm';
 
 const appSource = fs.readFileSync(new URL('../assets/app.js', import.meta.url), 'utf8');
+const stateStart = appSource.indexOf('const state =');
 const start = appSource.indexOf('function parseDate');
 const end = appSource.indexOf('function setLoadingState');
-if (start < 0 || end < 0 || end <= start) throw new Error('Unable to locate sorting source');
+if (stateStart < 0 || start <= stateStart || end <= start) throw new Error('Unable to locate sorting source');
 
 const context = {};
-vm.runInNewContext(`${appSource.slice(start, end)}\nglobalThis.sortTestApi = {
+vm.runInNewContext(`${appSource.slice(0, stateStart)}\n${appSource.slice(start, end)}\nglobalThis.sortTestApi = {
   metrics: getDiscountMetrics,
-  compare: compareCampaign
+  compare: compareCampaign,
+  normalize: normalizeCampaign
 };`, context);
 
-const { metrics, compare } = context.sortTestApi;
+const { metrics, compare, normalize } = context.sortTestApi;
+let checks = 0;
 let failures = 0;
 
 function expect(name, actual, expected) {
+  checks += 1;
   if (actual !== expected) {
     failures += 1;
     console.error(`FAIL ${name}: expected ${expected}, got ${actual}`);
@@ -50,6 +54,19 @@ const item = (id, fromOffset, toOffset, discountRate = 0) => ({
   sortTime: 0
 });
 
+const additions = [
+  { ...item('older-edited-today', -2, 1), createdAt: `${iso(-5)} 19:35:00`, updatedAt: `${iso(0)} 12:00:00` },
+  { ...item('unknown-add-time', -1, 8), updatedAt: `${iso(0)} 22:00:00` },
+  { ...item('new-upcoming', 4, 9), createdAt: `${iso(-1)} 10:30:00` },
+  { ...item('new-ongoing', -4, 6), created_at: `${iso(-1)} 09:30:00` },
+  { ...item('already-expired', -4, -1), createdAt: `${iso(0)} 06:00:00` }
+].map(normalize).sort(compare);
+expect('default puts the latest addition first across start states', additions[0].id, 'new-upcoming');
+expect('default compares addition times within the same day', additions[1].id, 'new-ongoing');
+expect('edits do not change the addition order', additions[2].id, 'older-edited-today');
+expect('older undated activity follows dated entries', additions[3].id, 'unknown-add-time');
+expect('expired records stay in the separate archive group', additions[4].id, 'already-expired');
+
 const recommended = [
   item('upcoming', 2, 10, 90),
   item('later-ending', -4, 6, 20),
@@ -78,4 +95,4 @@ const merchants = [
 expect('merchant mode sorts across active and upcoming items', merchants[0].bankName, 'Alpha');
 
 if (failures) process.exitCode = 1;
-else console.log('PASS 11 campaign sorting cases');
+else console.log(`PASS ${checks} campaign sorting cases`);

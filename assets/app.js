@@ -2,7 +2,8 @@ const API_BASE = 'https://mini.vooqqqm.com/api';
 const WEBSITE_BLACK_FRIDAY_PATH = './activities/topics/black-friday-2026.html';
 const CAMPAIGN_LOAD_TIMEOUT = 12000;
 const EXPIRING_SOON_DAYS = 20;
-const SORT_MODES = new Set(['recommended', 'ending', 'starting', 'discount', 'merchant']);
+const DEFAULT_SORT_MODE = 'added';
+const SORT_MODES = new Set([DEFAULT_SORT_MODE, 'recommended', 'ending', 'starting', 'discount', 'merchant']);
 const GROUP_QR_URL = 'https://github.com/yema-29129/bank-campaigns-web/blob/main/assets/group-wechat-qr.png?raw=true';
 const WECHAT_CONTACT_QR_URL = './assets/wechat-contact-qr.jpg';
 
@@ -516,7 +517,7 @@ const state = {
   secondaryFilter: '全部', // 当前一级分类对应的二级筛选
   cashback: false,     // top tab '返现'
   keyword: '',
-  sortMode: 'recommended',
+  sortMode: DEFAULT_SORT_MODE,
   loadStatus: 'loading',
   requestPending: false,
   showExpired: false
@@ -738,8 +739,7 @@ function getCreatedDate(item) {
   return null;
 }
 
-function isTodayAdded(item) {
-  const d = getCreatedDate(item);
+function isTodayAdded(d) {
   if (!d) return false;
   const now = new Date();
   return (
@@ -790,7 +790,8 @@ function normalizeCampaign(item) {
     tags: normalizedTags
   };
 
-  const referenceDate = getCreatedDate(normalized) ||
+  const createdDate = getCreatedDate(normalized);
+  const referenceDate = createdDate ||
     parseDate(normalized.updatedAt || normalized.validFrom || normalized.validTo);
   const bankInfo = classifyBank(normalized.bankName);
   const discountMetrics = getDiscountMetrics(normalized);
@@ -827,17 +828,24 @@ function normalizeCampaign(item) {
     isRecurring: Number(normalized.isRecurring) === 1 || !!normalized.recurringText,
     isExpired: isExpired(normalized.validTo),
     isSoon: !isFixedCampaign(normalized) && !isDailyCampaign(normalized) && isSoon(normalized.validTo),
-    isTodayAdded: isTodayAdded(normalized),
+    isTodayAdded: isTodayAdded(createdDate),
+    addedTime: createdDate ? createdDate.getTime() : null,
     ...discountMetrics,
     referenceTime: referenceDate ? referenceDate.getTime() : null,
     sortTime: getSortTime(normalized)
   };
 }
 
-function compareCampaign(a, b, mode = 'recommended') {
+function compareCampaign(a, b, mode = DEFAULT_SORT_MODE) {
+  if (a.isExpired !== b.isExpired) return a.isExpired ? 1 : -1;
+  if (mode === 'added') {
+    const timeA = a.addedTime ?? -Infinity;
+    const timeB = b.addedTime ?? -Infinity;
+    return timeA === timeB ? 0 : timeB - timeA;
+  }
+
   const stageA = getCampaignStage(a);
   const stageB = getCampaignStage(b);
-  if (a.isExpired !== b.isExpired) return a.isExpired ? 1 : -1;
   if (!['discount', 'merchant'].includes(mode) && stageA !== stageB) return stageA - stageB;
 
   const startA = getDateTime(a.validFrom, -Infinity);
@@ -860,7 +868,7 @@ function compareCampaign(a, b, mode = 'recommended') {
   } else if (mode === 'ending') {
     if (endA !== endB) return stageA === 2 ? endB - endA : endA - endB;
   } else {
-    // Default: people can act now first. Ongoing offers ending sooner rise to the
+    // Recommended: people can act now first. Ongoing offers ending sooner rise to the
     // top; upcoming offers follow by nearest start date; expired items stay last.
     if (stageA === 0 && endA !== endB) return endA - endB;
     if (stageA === 1 && startA !== startB) return startA - startB;
@@ -2057,10 +2065,10 @@ function bindEvents() {
   if (els.mobileSearchInput) els.mobileSearchInput.addEventListener('input', (e) => handleSearch(e.target.value));
   if (els.sortSelect) {
     els.sortSelect.addEventListener('change', (event) => {
-      state.sortMode = SORT_MODES.has(event.target.value) ? event.target.value : 'recommended';
+      state.sortMode = SORT_MODES.has(event.target.value) ? event.target.value : DEFAULT_SORT_MODE;
       state.showExpired = false;
       const url = new URL(window.location.href);
-      if (state.sortMode === 'recommended') url.searchParams.delete('sort');
+      if (state.sortMode === DEFAULT_SORT_MODE) url.searchParams.delete('sort');
       else url.searchParams.set('sort', state.sortMode);
       window.history.replaceState(window.history.state, '', `${url.pathname}${url.search}${url.hash}`);
       applyFilters();

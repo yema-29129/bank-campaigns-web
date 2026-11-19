@@ -1,5 +1,5 @@
-const STATIC_CACHE = 'yangmao-assistant-static-v34';
-const RUNTIME_CACHE = 'yangmao-assistant-runtime-v34';
+const STATIC_CACHE = 'yangmao-assistant-static-v35';
+const RUNTIME_CACHE = 'yangmao-assistant-runtime-v35';
 const STATIC_ASSETS = [
   '/',
   '/index.html',
@@ -20,7 +20,7 @@ const STATIC_ASSETS = [
   '/assets/theme.css?v=20261118-contactfix1',
   '/assets/radar.css?v=20261118-blackfriday6',
   '/assets/detail-v2.css?v=20261117-radar10',
-  '/assets/app.js?v=20261118-offerdetails1',
+  '/assets/app.js?v=20261120-sort2',
   '/assets/detail.js?v=20261120-topicdetails1',
   '/assets/black-friday-pricing.js?v=20261118-price1',
   '/assets/privacy-consent.js?v=20261118-consent1',
