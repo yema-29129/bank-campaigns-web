@@ -56,6 +56,18 @@ class OverseasSelectionTest(unittest.TestCase):
             with self.subTest(title=title):
                 self.assertEqual(classify(self.item(title, summary, region), AS_OF), expected)
 
+    def test_macau_filters_use_actual_local_market(self):
+        cases = [
+            ("澳门餐厅满额减免", "指定餐厅用卡优惠", "中国澳门·指定餐厅", ("macau", "mo-food-shopping")),
+            ("港澳实体店刷卡回赠", "指定信用卡实体店消费返现", "香港及澳门实体店", ("macau", "mo-payments-transit")),
+            ("澳门酒店订房", "指定房型预付折扣", "中国澳门指定酒店", ("macau", "mo-stays-sights")),
+            ("信用卡·境外刷卡回赠", "指定卡线下返现", "境外（含中国香港、中国澳门、中国台湾）", ("travel", "travel-payments")),
+            ("信用卡·新加坡机票折扣", "指定卡订票减免", "澳门发卡·新加坡", ("travel", "flights")),
+        ]
+        for title, summary, region, expected in cases:
+            with self.subTest(title=title):
+                self.assertEqual(classify(self.item(title, summary, region), AS_OF), expected)
+
     def test_sources_dates_and_seasonal_exclusions(self):
         args = ("韩国酒店订房优惠", "指定卡订房满额减免", "韩国")
         for changes in (

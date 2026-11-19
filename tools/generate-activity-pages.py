@@ -10,6 +10,7 @@ From the site checkout:
 import argparse
 from datetime import date
 from html import escape
+from html.parser import HTMLParser
 import ipaddress
 import json
 from pathlib import Path
@@ -30,8 +31,8 @@ TOPICS_OUTPUT = OUTPUT / "topics"
 
 OVERSEAS_TOPIC = {
     "slug": "overseas-deals",
-    "h1": "海外优惠：香港本地、海淘购物与出境旅行",
-    "desc": "按香港本地消费、海淘购物和出境旅行查找优惠，了解港卡回赠、跨境网购、机票酒店的适用地区、用卡资格与有效期。",
+    "h1": "海外优惠：香港、澳门、海淘与出境旅行",
+    "desc": "全年查香港、澳门、海淘购物与出境旅行优惠，核对指定商户、卡种、参与条件和有效期。",
     "group": "card",
 }
 
@@ -41,6 +42,11 @@ OVERSEAS_SUBCATEGORIES = {
         ("hk-shopping", "超市與本地購物"),
         ("hk-transit-bills", "八達通、交通與繳費"),
         ("hk-payments", "港卡與電子錢包"),
+    ),
+    "macau": (
+        ("mo-food-shopping", "餐飲與購物"),
+        ("mo-stays-sights", "酒店與景點"),
+        ("mo-payments-transit", "刷卡、支付與交通"),
     ),
     "shopping": (
         ("cross-border-stores", "跨境电商与平台优惠"),
@@ -1324,7 +1330,7 @@ def classify_overseas_activity(item, as_of):
     today = as_of.isoformat()
     if not item["validFrom"] <= today <= item["validTo"]:
         return None
-    if re.search(r"黑[五伍]|黑色星期五|网一|網一|Black[ -]?Friday|Cyber[ -]?Monday|\bVPS\b|\bVPN\b|云[主服]|雲[主服]|虚拟主机|域名注册",
+    if re.search(r"黑[五伍]|黑色星期五|网一|網一|Black[ -]?Friday|Cyber[ -]?(?:Monday|Sale)|\bVPS\b|\bVPN\b|云[主服]|雲[主服]|虚拟主机|域名注册",
                  title, re.I):
         return None
 
@@ -1332,10 +1338,19 @@ def classify_overseas_activity(item, as_of):
     offer_title = re.split(r"[·・•]", title, maxsplit=1)[-1]
     # Keep eligibility separate: an issuer prefix alone does not identify a local offer.
     market = re.sub(r"(?:中国|中國)?香港(?:地區|地区)?(?:[发發]卡|[发發]行)(?=[·・:：，,;；\s]|$)[·・:：，,;；\s]*", "", region)
+    local_market = " · ".join(part.strip() for part in re.split(r"[·・]", market)
+                              if not re.search(r"[发發]卡|[发發]行|持卡人|合資格卡|信用卡|借[记記]卡", part))
     hk_local = (
-        re.match(r"^(?:中国|中國)?(?:香港|Hong Kong)(?![发發][行卡]|始[发發]|出[发發]|往返)", market, re.I)
-        or re.search(r"香港(?:本地|指定[门門]店)", market)
+        re.match(r"^(?:中国|中國)?(?:香港|Hong Kong)(?![发發][行卡]|始[发發]|出[发發]|往返)", local_market, re.I)
+        or re.search(r"香港(?:本地|指定[门門]店|[线線]下|[实實][体體]店)", local_market)
         or "香港" in region and re.search(r"本地[及或]境外合[资資]格消[费費]", market)
+    )
+    macau = r"(?:中国|中國)?(?:澳[门門]|Maca[ou])"
+    local_use = r"本地|指定|[实實][体體]|[线線]下|酒店|住宿|景[点點]|[门門]店|商[户戶]|消[费費]"
+    macau_local = (
+        re.match(rf"^{macau}(?=$|[·、，,；;\s]|{local_use})", local_market, re.I)
+        or re.search(rf"{macau}(?:{local_use})", local_market, re.I)
+        or re.fullmatch(rf"(?:中国|中國)?香港(?:、|及|或){macau}", local_market, re.I)
     )
     cross_border = bool(re.search(
         r"境外|海外|全球|出境|跨境|[国國]际|國際|港澳|日本|[韩韓][国國]|泰[国國]|新加坡|[台臺][湾灣]|[欧歐]洲|美[国國]|澳大利[亚亞]|[马馬][来來]西[亚亞]|英[国國]|新西[兰蘭]|澳[门門]|香港",
@@ -1346,6 +1361,14 @@ def classify_overseas_activity(item, as_of):
         if cross_border and item.get("distributionScope") == "web_only":
             return "travel", "travel-data"
         return None
+
+    if macau_local and not re.search(r"[机機]票|航班|航[线線]|里程|留[学學]|[学學][费費]|租房|[汇匯]款", offer_title):
+        if re.search(r"酒店|住宿|[订訂]房|景[点點区區]|[门門]票", text):
+            return "macau", "mo-stays-sights"
+        if re.search(r"餐[饮飲厅廳]|咖啡|超市|[购購]物|百[货貨]|商[场場]|零售", text):
+            return "macau", "mo-food-shopping"
+        if re.search(r"[银銀]行卡|信用卡|借[记記]卡|刷卡|[签簽][账賬帳]|[银銀][联聯]|付[款費费]|支付|交通|巴士|[的計计]士", text):
+            return "macau", "mo-payments-transit"
 
     # A flight, stay or local tour keeps its travel category even when booked online.
     if cross_border:
@@ -1390,14 +1413,98 @@ def classify_overseas_activity(item, as_of):
     return None
 
 
-def overseas_hub_page(activities, as_of):
-    url = f'{TOPICS_URL}{OVERSEAS_TOPIC["slug"]}.html'
-    today = as_of.isoformat()
+class PublishedTravelOffers(HTMLParser):
+    """Read the existing editorial travel cards and their public detail links."""
+
+    def __init__(self):
+        super().__init__()
+        self.items = []
+        self.card = None
+        self.field = None
+
+    def handle_starttag(self, tag, attrs):
+        data = dict(attrs)
+        if self.card is None:
+            if tag == "li" and data.get("data-valid-from") and data.get("data-valid-to"):
+                self.card = {"attributes": data, "heading": [], "paragraphs": [], "sources": []}
+            return
+        if tag == "h3":
+            self.field = self.card["heading"]
+        elif tag == "p":
+            self.field = []
+            self.card["paragraphs"].append(self.field)
+        elif tag == "a" and safe_source(data.get("href", "")):
+            self.card["sources"].append(data["href"])
+
+    def handle_data(self, text):
+        if self.field is not None:
+            self.field.append(text)
+
+    def handle_endtag(self, tag):
+        if tag in ("h3", "p"):
+            self.field = None
+        if tag != "li" or self.card is None:
+            return
+
+        card, self.card = self.card, None
+        data = card["attributes"]
+        title = "".join(card["heading"]).strip()
+        paragraphs = ["".join(value).strip() for value in card["paragraphs"]]
+        web_id = data.get("id", "")
+        detail_id = data.get("data-detail-id", "")
+        if not re.fullmatch(r"[a-z0-9-]+", web_id) or len(paragraphs) < 2:
+            return
+        is_shared = bool(re.fullmatch(r"[1-9][0-9]*", detail_id))
+        if not is_shared and data.get("data-distribution-scope") != "web_only":
+            return
+        self.items.append({
+            "id": detail_id if is_shared else f"web-overseas-{web_id}",
+            "webId": None if is_shared else web_id,
+            "url": f"/detail.html?id={detail_id}" if is_shared else f"/detail.html?web={web_id}&topic=travel-card-offers",
+            "title": title,
+            "institution": data.get("data-merchant") or title.split("·", 1)[0].strip(),
+            "region": data.get("data-market") or paragraphs[0],
+            "summary": paragraphs[1],
+            "validFrom": data["data-valid-from"],
+            "validTo": data["data-valid-to"],
+            "channel": data.get("data-channel") or "官网 / App",
+            "createdAt": data.get("data-added-at"),
+            "distributionScope": data.get("data-distribution-scope"),
+            "sources": card["sources"],
+            "rules": paragraphs[2:-1],
+        })
+
+
+def overseas_groups(activities, as_of):
     classified = {}
     for item in activities:
         category = classify_overseas_activity(item, as_of)
         if category:
             classified.setdefault(category, []).append(item)
+    return classified
+
+
+def write_overseas_pages(activities, as_of):
+    published = PublishedTravelOffers()
+    published.feed((TOPICS_OUTPUT / "travel-card-offers.html").read_text(encoding="utf-8"))
+    by_id = {item["id"]: item for item in activities}
+    for item in published.items:
+        by_id.setdefault(item["id"], item)
+    selected = list(by_id.values())
+    groups = overseas_groups(selected, as_of)
+    catalog = {
+        "categories": {item["id"]: group for (group, _), items in groups.items() for item in items},
+        "websiteOffers": [item for items in groups.values() for item in items if item.get("webId")],
+    }
+    topic_html = overseas_hub_page(selected, as_of)
+    (OUTPUT / "overseas-catalog.json").write_text(json.dumps(catalog, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+    (TOPICS_OUTPUT / "overseas-deals.html").write_text(topic_html, encoding="utf-8")
+
+
+def overseas_hub_page(activities, as_of):
+    url = f'{TOPICS_URL}{OVERSEAS_TOPIC["slug"]}.html'
+    today = as_of.isoformat()
+    classified = overseas_groups(activities, as_of)
 
     sections = (
         ("hong-kong", "香港本地優惠",
@@ -1405,6 +1512,10 @@ def overseas_hub_page(activities, as_of):
          "zh-Hant-HK",
          (("查香港及澳門線下刷卡優惠", "travel-card-offers.html#hong-kong-daily"),
           ("查港卡及境外消費回贈", "hk-overseas.html"))),
+        ("macau", "澳門本地優惠",
+         "查澳門餐飲、購物、酒店、景點和刷卡優惠。付款前核對指定商戶、可用卡種、交易幣種及回贈上限。",
+         "zh-Hant-MO",
+         (("查港澳線下刷卡優惠", "travel-card-offers.html#hong-kong-daily"),)),
         ("shopping", "海淘购物",
          "查跨境网购和外币线上消费优惠。比较到手价时，把运费、税费、汇率及外币交易费一起计入，再确认发卡地区、指定商户与返现封顶。",
          "zh-CN",
@@ -1436,8 +1547,9 @@ def overseas_hub_page(activities, as_of):
             cards = []
             for item in featured:
                 region = f'{item["institution"]} · {item["region"]}'
+                path = item.get("url", f'/activities/{item["id"]}.html').removeprefix(SITE)
                 cards.append(f"""          <li class="detail-section topic-activity-card">
-            <a class="topic-activity-link" href="/activities/{escape(item["id"])}.html">
+            <a class="topic-activity-link" href="{escape(path)}">
               <span class="topic-card-title">{escape(item["title"])}</span>
               <span class="topic-card-summary">{escape(item["summary"])}</span>
               <span class="seo-card-meta">{escape(region)} · 截至 {time_element(item["validTo"])}</span>
@@ -1471,14 +1583,14 @@ def overseas_hub_page(activities, as_of):
         <a href="/">首页</a> / <a href="/activities/topics/">优惠专题</a> / <span aria-current="page">海外优惠</span>
       </nav>
       <h1>{OVERSEAS_TOPIC["h1"]}</h1>
-      <p>{OVERSEAS_TOPIC["desc"]}</p>
+      <p>{OVERSEAS_TOPIC["desc"]} <a href="/?category=overseas-deals">打开海外优惠活动列表</a></p>
       <p class="seo-card-meta">本页精选按 {time_element(today)} 的有效期筛选。优惠名额与实际资格请以商户或发卡机构规则为准。</p>
       <nav class="topic-category-nav" aria-label="海外优惠分类">
 {section_links}
       </nav>
       <details id="selection-rules">
         <summary>哪些优惠会收录？</summary>
-        <p>收录有官方来源、参与资格、实际优惠和有效期明确的香港本地、跨境网购及出境旅行优惠。按实际使用场景归类，发卡地区和账户资格请查看活动详情。常驻列表只展示有效期内的活动，黑五专属促销在季节专题查看。</p>
+        <p>收录有官方来源、参与资格、实际优惠和有效期明确的香港、澳门、跨境网购及出境旅行优惠。按实际使用场景归类，发卡地区和账户资格请查看活动详情。常驻列表只展示有效期内的活动，黑五专属促销在季节专题查看。</p>
       </details>
 {chr(10).join(section_html)}
       <section class="topic-category-section" id="seasonal" aria-labelledby="seasonal-title">
@@ -1911,9 +2023,13 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("feed", type=Path)
     parser.add_argument("--as-of", required=True, type=date.fromisoformat)
+    parser.add_argument("--overseas-only", action="store_true", help="Rebuild the overseas topic from the published website feed and travel cards.")
     args = parser.parse_args()
 
     feed = json.loads(args.feed.read_text(encoding="utf-8"))
+    if args.overseas_only:
+        write_overseas_pages(feed["activities"], args.as_of)
+        return
     selected, rejected = select_activities(feed, args.as_of)
     active = [
         entry for entry in selected.values()
@@ -1961,7 +2077,6 @@ def main():
     archive_html = archive_directory(ended, args.as_of)
     sitemap = sitemap_xml(public_entries, topic_stats, args.as_of)
     feed = ai_feed(public_entries, args.as_of)
-    topic_pages[OVERSEAS_TOPIC["slug"]] = overseas_hub_page(feed["activities"], args.as_of)
     feed_json = json.dumps(feed, ensure_ascii=False, indent=2) + "\n"
     llms_text = llms_index(active, ended, topic_stats, args.as_of)
     llms_full_text = llms_full(public_entries, args.as_of)
@@ -1972,6 +2087,7 @@ def main():
         (OUTPUT / f"{activity_id}.html").write_text(html, encoding="utf-8")
     for slug, html in topic_pages.items():
         (TOPICS_OUTPUT / f"{slug}.html").write_text(html, encoding="utf-8")
+    write_overseas_pages(feed["activities"], args.as_of)
     (TOPICS_OUTPUT / "index.html").write_text(topics_home_html, encoding="utf-8")
 
     (OUTPUT / "index.html").write_text(directory_html, encoding="utf-8")

@@ -10,7 +10,7 @@ vm.runInNewContext(`${appSource.slice(0, stateStart)}\nglobalThis.blackFridayTes
   match: isBlackFridayCampaign,
   scenes: classifyScenes,
   sceneOptions: SCENE_OPTIONS,
-  topCategory: TOP_CATEGORIES.find((item) => item.key === 'black-friday'),
+  topCategory: TOP_CATEGORIES.at(-1),
   secondaryGroup: SECONDARY_FILTER_GROUPS['黑五优惠']
 };`, context);
 
@@ -49,7 +49,7 @@ if (!topCategory || topCategory.label !== '黑五优惠' || topCategory.scene !=
   console.error(`FAIL top category configuration: ${JSON.stringify(topCategory)}`);
 }
 
-if (!sceneOptions.includes('黑五优惠') || sceneOptions.indexOf('黑五优惠') !== 1) {
+if (!sceneOptions.includes('黑五优惠') || sceneOptions.at(-1) !== '黑五优惠') {
   failures += 1;
   console.error(`FAIL mobile scene filter configuration: ${JSON.stringify(sceneOptions)}`);
 }

@@ -1,4 +1,5 @@
 const API_BASE = 'https://mini.vooqqqm.com/api';
+const OVERSEAS_CATALOG_PATH = './activities/overseas-catalog.json';
 const WEBSITE_BLACK_FRIDAY_PATH = './activities/topics/black-friday-2026.html';
 const CAMPAIGN_LOAD_TIMEOUT = 12000;
 const EXPIRING_SOON_DAYS = 20;
@@ -134,20 +135,21 @@ function classifyPublicBenefitType(activity = {}) {
     : '';
 }
 
-const SCENE_OPTIONS = ['全部', '黑五优惠', '吃喝', '购物', '出行', '境外游', '生活', '发票有奖', '会员权益', '通用优惠'];
+const SCENE_OPTIONS = ['全部', '吃喝', '购物', '出行', '境外游', '海外优惠', '生活', '发票有奖', '会员权益', '通用优惠', '黑五优惠'];
 
 const TOP_CATEGORIES = [
   { key: 'all', label: '全部', scene: '全部', cashback: false },
-  { key: 'black-friday', label: '黑五优惠', scene: '黑五优惠', cashback: false },
   { key: 'food', label: '吃喝', scene: '吃喝', cashback: false },
   { key: 'shopping', label: '购物', scene: '购物', cashback: false },
   { key: 'travel', label: '出行', scene: '出行', cashback: false },
   { key: 'overseas', label: '境外游', scene: '境外游', cashback: false },
+  { key: 'overseas-deals', label: '海外优惠', scene: '海外优惠', cashback: false },
   { key: 'cashback', label: '返现', scene: '全部', cashback: true },
   { key: 'life', label: '生活', scene: '生活', cashback: false },
   { key: 'invoice-benefit', label: '发票有奖', scene: '发票有奖', cashback: false },
   { key: 'vip', label: '会员权益', scene: '会员权益', cashback: false },
-  { key: 'general', label: '通用优惠', scene: '通用优惠', cashback: false }
+  { key: 'general', label: '通用优惠', scene: '通用优惠', cashback: false },
+  { key: 'black-friday', label: '黑五优惠', scene: '黑五优惠', cashback: false }
 ];
 
 const BLACK_FRIDAY_VPS_RE = /VPS|云主机|云服务器|云服务|独立服务器|虚拟主机|网站托管|主机托管|域名|Hostinger|OVHcloud|Cloudways|Namecheap|Porkbun|ScalaHosting|web\s*hosting/i;
@@ -408,6 +410,17 @@ const PUBLIC_BENEFIT_OPTIONS = [
 ];
 
 const SECONDARY_FILTER_GROUPS = {
+  '海外优惠': {
+    key: 'overseas-deals',
+    ariaLabel: '海外优惠场景筛选',
+    options: [
+      { key: '全部', label: '全部海外' },
+      { key: 'hong-kong', label: '中国香港' },
+      { key: 'macau', label: '中国澳门' },
+      { key: 'shopping', label: '海淘购物' },
+      { key: 'travel', label: '出境旅行' }
+    ]
+  },
   '黑五优惠': { key: 'black-friday', ariaLabel: '黑五优惠类型筛选', options: BLACK_FRIDAY_TYPE_OPTIONS },
   '吃喝': { key: 'food', ariaLabel: '吃喝类型筛选', options: FOOD_TYPE_OPTIONS },
   '购物': { key: 'shopping', ariaLabel: '购物类型筛选', options: SHOPPING_TYPE_OPTIONS },
@@ -518,6 +531,7 @@ const state = {
   cashback: false,     // top tab '返现'
   keyword: '',
   sortMode: DEFAULT_SORT_MODE,
+  overseasCatalog: { categories: {}, websiteOffers: [] },
   loadStatus: 'loading',
   requestPending: false,
   showExpired: false
@@ -549,6 +563,7 @@ const els = {
   sceneFilters: document.getElementById('sceneFilters'),
   topCategoryBar: document.getElementById('topCategoryBar'),
   blackFridayTopicLink: document.getElementById('blackFridayTopicLink'),
+  overseasTopicLink: document.getElementById('overseasTopicLink'),
   secondaryFilterBar: document.getElementById('secondaryFilterBar'),
   activeViewBadge: document.getElementById('activeViewBadge'),
   activeCardOrgBadge: document.getElementById('activeCardOrgBadge'),
@@ -929,7 +944,8 @@ function matchesRegion(item, regionKey = state.regionGroup) {
 }
 
 function matchesSceneOrCashback(item, scene = state.scene, cashback = state.cashback) {
-  if (item.websiteDetailPath) return scene === '黑五优惠' && !cashback;
+  if (scene === '海外优惠') return !!item.overseasGroup && !cashback && getCampaignStage(item) === 0;
+  if (item.websiteDetailPath) return !item.overseasGroup && scene === '黑五优惠' && !cashback;
   if (cashback && !item.hasCashback) return false;
   return scene === '全部' || item.sceneLabels.includes(scene);
 }
@@ -948,6 +964,7 @@ function matchesSecondaryFilter(
   const group = getSecondaryFilterGroup(scene, cashback);
   if (!group || !selected || selected === '全部') return true;
   if (group.key === 'overseas') return matchesOverseasDestination(item, selected);
+  if (group.key === 'overseas-deals') return item.overseasGroup === selected;
   if (group.key === 'public-benefit') return item.publicBenefitType === selected;
   const rule = group.options.find((opt) => opt.key === selected);
   const text = group.textField ? item[group.textField] : item.secondaryText;
@@ -1185,6 +1202,9 @@ function mountMiniChips(container, options, stateKey) {
 function syncFilterControls() {
   if (els.blackFridayTopicLink) {
     els.blackFridayTopicLink.hidden = state.scene !== '黑五优惠' || state.cashback;
+  }
+  if (els.overseasTopicLink) {
+    els.overseasTopicLink.hidden = state.scene !== '海外优惠' || state.cashback;
   }
 
   // Top category strip
@@ -2355,6 +2375,30 @@ async function fetchWebsiteBlackFriday(signal) {
   return offers;
 }
 
+async function fetchOverseasCatalog(signal) {
+  const response = await fetch(OVERSEAS_CATALOG_PATH, { signal, cache: 'no-cache' });
+  if (!response.ok) throw new Error(`HTTP ${response.status}`);
+  const catalog = await response.json();
+  if (!catalog.categories || !Array.isArray(catalog.websiteOffers)) {
+    throw new Error('海外活动目录格式错误');
+  }
+  return catalog;
+}
+
+function websiteOverseasCampaign(item) {
+  return {
+    ...item,
+    bankName: item.institution,
+    desc: item.summary,
+    websiteOfferId: item.webId,
+    websiteDetailPath: item.url,
+    pathUrl: item.sources[0] || '',
+    pathDesc: '打开官方活动页，核对适用地区、资格及参与步骤。',
+    awardDesc: [...item.rules, '【官方来源】', ...item.sources].join('\n'),
+    tags: ['海外优惠', '网站专题']
+  };
+}
+
 async function fetchCampaigns() {
   if (!isListPage() || state.requestPending) return;
   state.requestPending = true;
@@ -2372,7 +2416,11 @@ async function fetchCampaigns() {
   try {
     const websiteOffers = fetchWebsiteBlackFriday(controller.signal).catch((error) => {
       console.warn('网页黑五活动暂未载入', error);
-      return state.campaigns.filter((item) => item.websiteDetailPath);
+      return state.campaigns.filter((item) => item.websiteDetailPath && !item.overseasGroup);
+    });
+    const overseasCatalog = fetchOverseasCatalog(controller.signal).catch((error) => {
+      console.warn('海外优惠目录暂未载入', error);
+      return state.overseasCatalog;
     });
     const response = await fetch(`${API_BASE}/campaigns.php?view=web-list`, {
       credentials: 'omit',
@@ -2386,8 +2434,10 @@ async function fetchCampaigns() {
     }
 
     const sharedOffers = payload.data.filter(item => item && item.id != null);
-    state.campaigns = [...sharedOffers, ...await websiteOffers]
-      .map(normalizeCampaign);
+    const [blackFriday, overseas] = await Promise.all([websiteOffers, overseasCatalog]);
+    state.overseasCatalog = overseas;
+    state.campaigns = [...sharedOffers, ...blackFriday, ...overseas.websiteOffers.map(websiteOverseasCampaign)]
+      .map((item) => normalizeCampaign({ ...item, overseasGroup: overseas.categories[item.id] }));
     state.loadStatus = 'ready';
     applyFilters();
   } catch (err) {
@@ -2454,6 +2504,7 @@ function initializeCampaignPage() {
   if (query) state.keyword = query;
   const view = params.get('view');
   if (view && ['credit', 'debit'].includes(view)) state.view = view;
+  if (params.get('category') === 'overseas-deals') state.scene = '海外优惠';
   const sortMode = params.get('sort');
   if (sortMode && SORT_MODES.has(sortMode)) state.sortMode = sortMode;
   const shouldOpenMenu = params.get('menu') === '1';
