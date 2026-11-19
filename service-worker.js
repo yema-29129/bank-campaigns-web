@@ -60,8 +60,10 @@ self.addEventListener('fetch', (event) => {
   const url = new URL(request.url);
   if (url.origin !== self.location.origin) return;
 
-  const isBlackFridayTopic = url.pathname === '/activities/topics/black-friday-2026.html';
-  if (request.mode === 'navigate' || isBlackFridayTopic) {
+  const isWebsiteOfferSource =
+    url.pathname === '/activities/topics/black-friday-2026.html' ||
+    url.pathname === '/activities/topics/travel-card-offers.html';
+  if (request.mode === 'navigate' || isWebsiteOfferSource) {
     event.respondWith(
       fetch(request)
         .then((response) => {
