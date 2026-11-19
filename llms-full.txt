@@ -2,6 +2,23 @@
 
 > 更新于 2026-11-18，共 932 条公开活动（含当前有效与历史归档）。每条记录包含机构名称、优惠力度、适用地区、支付渠道、有效期、参与步骤及独立详情网址。
 
+## 新增专题与机器可读入口
+
+- 专题：海外旅行、订房与信用卡优惠
+- 专题网址：https://bank.vooqqqm.com/activities/topics/travel-card-offers.html
+- 专题摘要：汇总 23 项 Agoda、Trip.com、Klook、AEON 积分与 Apple 刷卡优惠，逐项列明发卡地区、门槛、有效期、参与步骤和官方入口。
+- 最近核验：2026-11-19
+
+- 专题：2026 海外黑五优惠大全
+- 专题网址：https://bank.vooqqqm.com/activities/topics/black-friday-2026.html
+- 专题摘要：汇总 89 项 VPS、苹果数码、旅行 eSIM、美国百货、日本乐天、欧洲亚马逊、韩国电商等海外黑五优惠，附有效期、人民币参考价与官方入口。
+- 最近核验：2026-11-19
+
+- 结构化 JSON 数据源：https://bank.vooqqqm.com/activities/feed.json
+- XML 站点地图：https://bank.vooqqqm.com/sitemap.xml
+
+## 活动详情索引
+
 ## 月湖区商务局：四季度消费券满1000减200元
 
 - 详情网址：https://bank.vooqqqm.com/activities/951.html

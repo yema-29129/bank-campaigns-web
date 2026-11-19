@@ -35,8 +35,11 @@ def load_published_urls(feed_path: Path, published_on: str):
         if item.get("datePublished") == published_on and item.get("url", "").startswith(f"{SITE}/activities/")
     ]
     discovery_urls = (
+        f"{SITE}/",
         f"{SITE}/activities/",
         f"{SITE}/activities/topics/",
+        f"{SITE}/activities/topics/travel-card-offers.html",
+        f"{SITE}/activities/topics/black-friday-2026.html",
         f"{SITE}/sitemap.xml",
         f"{SITE}/llms.txt",
         f"{SITE}/llms-full.txt",
