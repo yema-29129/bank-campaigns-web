@@ -31,7 +31,7 @@ TOPICS_OUTPUT = OUTPUT / "topics"
 
 OVERSEAS_TOPIC = {
     "slug": "overseas-deals",
-    "h1": "海外优惠：香港、澳门、海淘与出境旅行",
+    "h1": "海外活动：香港、澳门、海淘与出境旅行",
     "desc": "全年查香港、澳门、海淘购物与出境旅行优惠，核对指定商户、卡种、参与条件和有效期。",
     "group": "card",
 }
@@ -1580,12 +1580,12 @@ def overseas_hub_page(activities, as_of):
     body = f"""  <main class="info-shell">
     <article class="info-card">
       <nav class="seo-breadcrumb" aria-label="面包屑导航">
-        <a href="/">首页</a> / <a href="/activities/topics/">优惠专题</a> / <span aria-current="page">海外优惠</span>
+        <a href="/">首页</a> / <a href="/activities/topics/">优惠专题</a> / <span aria-current="page">海外活动</span>
       </nav>
       <h1>{OVERSEAS_TOPIC["h1"]}</h1>
-      <p>{OVERSEAS_TOPIC["desc"]} <a href="/?category=overseas-deals">打开海外优惠活动列表</a></p>
+      <p>{OVERSEAS_TOPIC["desc"]} <a href="/?category=overseas-deals">打开海外活动列表</a></p>
       <p class="seo-card-meta">本页精选按 {time_element(today)} 的有效期筛选。优惠名额与实际资格请以商户或发卡机构规则为准。</p>
-      <nav class="topic-category-nav" aria-label="海外优惠分类">
+      <nav class="topic-category-nav" aria-label="海外活动分类">
 {section_links}
       </nav>
       <details id="selection-rules">
@@ -1604,7 +1604,7 @@ def overseas_hub_page(activities, as_of):
         "itemListElement": [
             {"@type": "ListItem", "position": 1, "name": "首页", "item": f"{SITE}/"},
             {"@type": "ListItem", "position": 2, "name": "优惠专题", "item": TOPICS_URL},
-            {"@type": "ListItem", "position": 3, "name": "海外优惠", "item": url},
+            {"@type": "ListItem", "position": 3, "name": "海外活动", "item": url},
         ],
     }
     return document(f'{OVERSEAS_TOPIC["h1"]}{TITLE_SUFFIX}', OVERSEAS_TOPIC["desc"], url,

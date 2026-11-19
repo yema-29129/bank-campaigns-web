@@ -135,11 +135,11 @@ function classifyPublicBenefitType(activity = {}) {
     : '';
 }
 
-const SCENE_OPTIONS = ['全部', '吃喝', '购物', '出行', '境外游', '海外优惠', '生活', '发票有奖', '会员权益', '通用优惠', '黑五优惠'];
+const SCENE_OPTIONS = ['全部', '吃喝', '购物', '出行', '境外游', '海外活动', '生活', '发票有奖', '会员权益', '通用优惠', '黑五优惠'];
 
 const TOP_CATEGORIES = [
-  { key: 'overseas-deals', label: '海外优惠', scene: '海外优惠', cashback: false },
   { key: 'all', label: '全部', scene: '全部', cashback: false },
+  { key: 'overseas-deals', label: '海外活动', scene: '海外活动', cashback: false },
   { key: 'food', label: '吃喝', scene: '吃喝', cashback: false },
   { key: 'shopping', label: '购物', scene: '购物', cashback: false },
   { key: 'travel', label: '出行', scene: '出行', cashback: false },
@@ -410,9 +410,9 @@ const PUBLIC_BENEFIT_OPTIONS = [
 ];
 
 const SECONDARY_FILTER_GROUPS = {
-  '海外优惠': {
+  '海外活动': {
     key: 'overseas-deals',
-    ariaLabel: '海外优惠场景筛选',
+    ariaLabel: '海外活动场景筛选',
     options: [
       { key: '全部', label: '全部海外' },
       { key: 'hong-kong', label: '中国香港' },
@@ -474,7 +474,9 @@ function classifyScenes(activity = {}) {
   const isBlackFriday = isBlackFridayCampaign(activity);
   const explicit = activity.scenes || activity.scene || activity.sceneCategory;
   const values = Array.isArray(explicit) ? explicit : String(explicit || '').split(/[,，、|]/);
-  const known = values.map(v => String(v).trim()).filter(v => SCENE_OPTIONS.includes(v) && v !== '全部');
+  const known = values.map(v => String(v).trim())
+    .map(v => v === '海外优惠' ? '海外活动' : v)
+    .filter(v => SCENE_OPTIONS.includes(v) && v !== '全部');
   if (known.length) {
     if (publicBenefitType) known.push('发票有奖');
     if (isBlackFriday) known.push('黑五优惠');
@@ -944,7 +946,7 @@ function matchesRegion(item, regionKey = state.regionGroup) {
 }
 
 function matchesSceneOrCashback(item, scene = state.scene, cashback = state.cashback) {
-  if (scene === '海外优惠') return !!item.overseasGroup && !cashback && getCampaignStage(item) === 0;
+  if (scene === '海外活动') return !!item.overseasGroup && !cashback && getCampaignStage(item) === 0;
   if (item.websiteDetailPath) return !item.overseasGroup && scene === '黑五优惠' && !cashback;
   if (cashback && !item.hasCashback) return false;
   return scene === '全部' || item.sceneLabels.includes(scene);
@@ -1098,6 +1100,9 @@ function mountSecondaryFilters(group = getSecondaryFilterGroup()) {
     });
     els.secondaryFilterBar.appendChild(btn);
   });
+  if (group.key === 'overseas-deals' && els.overseasTopicLink) {
+    els.secondaryFilterBar.appendChild(els.overseasTopicLink);
+  }
 }
 
 function mountBankGroups() {
@@ -1202,9 +1207,6 @@ function mountMiniChips(container, options, stateKey) {
 function syncFilterControls() {
   if (els.blackFridayTopicLink) {
     els.blackFridayTopicLink.hidden = state.scene !== '黑五优惠' || state.cashback;
-  }
-  if (els.overseasTopicLink) {
-    els.overseasTopicLink.hidden = state.scene !== '海外优惠' || state.cashback;
   }
 
   // Top category strip
@@ -2206,6 +2208,9 @@ function bindEvents() {
   }
 
   document.addEventListener('click', (event) => {
+    document.querySelectorAll('.site-topic-menu[open]').forEach((menu) => {
+      if (!menu.contains(event.target)) menu.open = false;
+    });
     const contactQrTrigger = event.target.closest('[data-open-contact-qr]');
     if (contactQrTrigger) {
       event.preventDefault();
@@ -2297,6 +2302,12 @@ function bindEvents() {
 
   document.addEventListener('keydown', (event) => {
     if (event.key === 'Escape') {
+      const topicMenu = document.querySelector('.site-topic-menu[open]');
+      if (topicMenu) {
+        topicMenu.open = false;
+        topicMenu.querySelector('summary').focus();
+        return;
+      }
       const contactQrModal = document.getElementById('wechatContactQrModal');
       if (contactQrModal && !contactQrModal.classList.contains('hidden')) return closeWechatContactQrModal();
       const mpModal = document.getElementById('mpQrModal');
@@ -2395,7 +2406,7 @@ function websiteOverseasCampaign(item) {
     pathUrl: item.sources[0] || '',
     pathDesc: '打开官方活动页，核对适用地区、资格及参与步骤。',
     awardDesc: [...item.rules, '【官方来源】', ...item.sources].join('\n'),
-    tags: ['海外优惠', '网站专题']
+    tags: ['海外活动', '网站专题']
   };
 }
 
@@ -2419,7 +2430,7 @@ async function fetchCampaigns() {
       return state.campaigns.filter((item) => item.websiteDetailPath && !item.overseasGroup);
     });
     const overseasCatalog = fetchOverseasCatalog(controller.signal).catch((error) => {
-      console.warn('海外优惠目录暂未载入', error);
+      console.warn('海外活动目录暂未载入', error);
       return state.overseasCatalog;
     });
     const response = await fetch(`${API_BASE}/campaigns.php?view=web-list`, {
@@ -2504,7 +2515,7 @@ function initializeCampaignPage() {
   if (query) state.keyword = query;
   const view = params.get('view');
   if (view && ['credit', 'debit'].includes(view)) state.view = view;
-  if (params.get('category') === 'overseas-deals') state.scene = '海外优惠';
+  if (params.get('category') === 'overseas-deals') state.scene = '海外活动';
   const sortMode = params.get('sort');
   if (sortMode && SORT_MODES.has(sortMode)) state.sortMode = sortMode;
   const shouldOpenMenu = params.get('menu') === '1';

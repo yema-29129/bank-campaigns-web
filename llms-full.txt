@@ -24,7 +24,7 @@
 - 专题摘要：汇总 91 项 VPS、苹果数码、旅行 eSIM、美国百货、日本乐天、欧洲亚马逊、韩国电商等海外黑五优惠，附有效期、人民币参考价与官方入口。
 - 最近核验：2026-11-20
 
-- [海外优惠：香港、澳门、海淘与出境旅行](https://bank.vooqqqm.com/activities/topics/overseas-deals.html)：全年查香港、澳门、海淘购物与出境旅行优惠，核对指定商户、卡种、参与条件和有效期。
+- [海外活动：香港、澳门、海淘与出境旅行](https://bank.vooqqqm.com/activities/topics/overseas-deals.html)：全年查香港、澳门、海淘购物与出境旅行优惠，核对指定商户、卡种、参与条件和有效期。
 - 结构化 JSON 数据源：https://bank.vooqqqm.com/activities/feed.json
 - XML 站点地图：https://bank.vooqqqm.com/sitemap.xml
 
