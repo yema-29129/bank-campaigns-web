@@ -23,13 +23,15 @@ const topics = [
     path: 'activities/topics/travel-card-offers.html',
     url: `${SITE}/activities/topics/travel-card-offers.html`,
     countPattern: /<li class="detail-section"/g,
-    expectedCount: 36,
+    expectedCount: 38,
+    lastmod: "2026-11-20",
   },
   {
     path: 'activities/topics/black-friday-2026.html',
     url: `${SITE}/activities/topics/black-friday-2026.html`,
     countPattern: /<li class="detail-section"[^>]*data-campaign/g,
     expectedCount: 89,
+    lastmod: "2026-11-19",
     allWebsiteOnly: true,
   },
 ];
@@ -44,7 +46,7 @@ for (const topic of topics) {
   assert(html.includes('<meta name="twitter:card" content="summary">'), `${topic.path}: missing Twitter card`);
   assert(html.includes('href="https://bank.vooqqqm.com/llms.txt"'), `${topic.path}: missing llms.txt discovery link`);
   assert(html.includes('href="https://bank.vooqqqm.com/llms-full.txt"'), `${topic.path}: missing llms-full.txt discovery link`);
-  assert(html.includes('<time datetime="2026-11-19">'), `${topic.path}: missing machine-readable verification date`);
+  assert(html.includes(`<time datetime="${topic.lastmod}">`), `${topic.path}: missing machine-readable verification date`);
   assert(html.includes('href="/editorial-policy.html"'), `${topic.path}: missing editorial policy link`);
 
   const schemas = jsonLdBlocks(html);
@@ -65,7 +67,7 @@ for (const topic of topics) {
   const escapedUrl = topic.url.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
   const matches = sitemap.match(new RegExp(`<loc>${escapedUrl}</loc>`, 'g')) || [];
   assert(matches.length === 1, `sitemap.xml: ${topic.url} must appear exactly once`);
-  assert(sitemap.includes(`<loc>${topic.url}</loc>\n    <lastmod>2026-11-19</lastmod>`), `sitemap.xml: ${topic.url} needs current lastmod`);
+  assert(sitemap.includes(`<loc>${topic.url}</loc>\n    <lastmod>${topic.lastmod}</lastmod>`), `sitemap.xml: ${topic.url} needs current lastmod`);
 }
 
 const llms = read('llms.txt');

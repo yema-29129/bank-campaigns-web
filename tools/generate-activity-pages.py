@@ -58,6 +58,13 @@ OVERSEAS_SUBCATEGORIES = {
 
 MANUAL_TOPICS = (
     {
+        "slug": "dining-vouchers",
+        "h1": "餐饮与到店消费券",
+        "desc": "查各地餐饮团购、到店满减和日常消费券，核对适用地区、领券入口、门槛与核销时间。",
+        "lastmod": "2026-11-20",
+        "group": "payment",
+    },
+    {
         "slug": "payment-limits",
         "h1": "银行卡支付限额与付款失败查询",
         "desc": "查工行借记卡京东与抖音限额、邮储及农行支付宝限制，以及交通银行抖音、农行拼多多、招行美团付款失败的官方查询路径。",
@@ -68,7 +75,7 @@ MANUAL_TOPICS = (
         "slug": "travel-card-offers",
         "h1": "海外旅行、订房与信用卡优惠",
         "desc": "汇总 Agoda、Trip.com、Klook、AEON 积分与 Apple 刷卡优惠，逐项列明发卡地区、门槛、有效期、参与步骤和官方入口。",
-        "lastmod": "2026-11-19",
+        "lastmod": "2026-11-20",
         "group": "card",
     },
     {

@@ -5,6 +5,11 @@ const WEBSITE_TOPIC_CONFIG = {
     selector: '[data-campaign][data-website-only]',
     tags: ['黑五', '网站专题']
   },
+  'dining-vouchers': {
+    path: './activities/topics/dining-vouchers.html',
+    selector: '[data-valid-from][data-valid-to]',
+    tags: ['消费券', '到店优惠', '网站专题']
+  },
   'travel-card-offers': {
     path: './activities/topics/travel-card-offers.html',
     selector: '[data-valid-from][data-valid-to]',
@@ -845,7 +850,7 @@ async function fetchWebsiteOfferDetail(id, topic, signal) {
     desc,
     validFrom,
     validTo,
-    channel: /门店/.test(schedule) ? '官网/门店' : '官网',
+    channel: offer.dataset.channel || (/门店/.test(schedule) ? '官网/门店' : '官网'),
     pathUrl,
     pathDesc: `打开${merchant}官方活动页面 → 核对商品、日期、地区与结账条件 → 按页面提示参与`,
     pricing: topic === 'black-friday' && window.BlackFridayPricing
