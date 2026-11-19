@@ -1,5 +1,16 @@
 const API_BASE = 'https://mini.vooqqqm.com/api';
-const WEBSITE_BLACK_FRIDAY_PATH = './activities/topics/black-friday-2026.html';
+const WEBSITE_TOPIC_CONFIG = {
+  'black-friday': {
+    path: './activities/topics/black-friday-2026.html',
+    selector: '[data-campaign][data-website-only]',
+    tags: ['黑五', '网站专题']
+  },
+  'travel-card-offers': {
+    path: './activities/topics/travel-card-offers.html',
+    selector: '[data-valid-from][data-valid-to]',
+    tags: ['旅行优惠', '信用卡优惠', '网站专题']
+  }
+};
 const DETAIL_LOAD_TIMEOUT = 12000;
 const GROUP_QR_URL = 'https://github.com/yema-29129/bank-campaigns-web/blob/main/assets/group-wechat-qr.png?raw=true';
 
@@ -29,6 +40,7 @@ const POSTER_FIELDS = [
 const params = new URLSearchParams(window.location.search);
 const campaignId = params.get('id');
 const websiteOfferId = params.get('web');
+const websiteOfferTopic = params.get('topic') || 'black-friday';
 
 const els = {
   root: document.getElementById('detailRoot'),
@@ -189,7 +201,9 @@ function buildDiscountText(activity) {
 function getDetailUrl() {
   const webId = String(websiteOfferId || '').trim();
   if (/^[a-z0-9-]+$/.test(webId)) {
-    return `https://bank.vooqqqm.com/detail.html?web=${encodeURIComponent(webId)}`;
+    const topic = /^[a-z0-9-]+$/.test(websiteOfferTopic) ? websiteOfferTopic : 'black-friday';
+    const topicQuery = topic === 'black-friday' ? '' : `&topic=${encodeURIComponent(topic)}`;
+    return `https://bank.vooqqqm.com/detail.html?web=${encodeURIComponent(webId)}${topicQuery}`;
   }
   const id = String(campaignId || '').trim();
   return /^\d+$/.test(id)
@@ -559,7 +573,7 @@ function renderDetail(activity) {
             ${isPathUrlLink ? `<a class="dx-clean-btn is-primary" href="${escapeAttribute(pathUrl)}" target="_blank" rel="noopener noreferrer">直达活动入口 ↗</a>` : ''}
             ${pathUrl ? `<button class="dx-clean-btn" type="button" id="copyPathBtn">复制${isPathUrlLink ? '链接' : '路径'}</button>` : ''}
             ${posterUrl ? `<button class="dx-clean-btn" type="button" id="viewPosterBtn">查看活动图片 / 二维码</button>` : ''}
-            ${topicUrl ? `<a class="dx-clean-btn" href="${escapeAttribute(topicUrl)}" target="_blank" rel="noopener noreferrer">查看黑五专题 ↗</a>` : ''}
+            ${topicUrl ? `<a class="dx-clean-btn" href="${escapeAttribute(topicUrl)}" target="_blank" rel="noopener noreferrer">查看原专题 ↗</a>` : ''}
           </div>
           ${(!isPathUrlLink && pathUrl) ? `<div class="dx-clean-path-box">${escapeHtml(pathUrl)}</div>` : ''}
         ` : ''}
@@ -783,26 +797,33 @@ function unwrapDetailPayload(payload) {
   return null;
 }
 
-async function fetchWebsiteBlackFridayDetail(id, signal) {
+async function fetchWebsiteOfferDetail(id, topic, signal) {
   if (!/^[a-z0-9-]+$/.test(id)) throw new Error('invalid_website_offer_id');
+  const config = WEBSITE_TOPIC_CONFIG[topic];
+  if (!config) throw new Error('invalid_website_offer_topic');
 
-  const response = await fetch(WEBSITE_BLACK_FRIDAY_PATH, { signal, cache: 'no-cache' });
+  const response = await fetch(config.path, { signal, cache: 'no-cache' });
   if (!response.ok) throw new Error(`HTTP ${response.status}`);
 
   const page = new DOMParser().parseFromString(await response.text(), 'text/html');
   const offer = page.getElementById(id);
-  if (!offer || !offer.matches('[data-campaign][data-website-only]')) throw new Error('not_found');
+  if (!offer || !offer.matches(config.selector)) throw new Error('not_found');
 
-  const { merchant, market, validFrom, validTo } = offer.dataset;
-  const title = offer.querySelector('h2')?.textContent.trim();
+  const { validFrom, validTo } = offer.dataset;
+  const title = offer.querySelector('h2, h3')?.textContent.trim();
   const paragraphs = [...offer.querySelectorAll(':scope > p')];
-  const schedule = paragraphs[0]?.textContent.trim() || '';
-  const desc = paragraphs[1]?.textContent.trim() || '';
-  const detailLines = paragraphs.slice(1)
-    .filter((paragraph) => !paragraph.querySelector('a[href]'))
+  const metaParagraph = paragraphs.find((paragraph) => paragraph.classList.contains('seo-card-meta'));
+  const contentParagraphs = paragraphs.filter((paragraph) =>
+    paragraph !== metaParagraph && !paragraph.querySelector('a[href]')
+  );
+  const schedule = (metaParagraph || paragraphs[0])?.textContent.trim() || '';
+  const desc = contentParagraphs[0]?.textContent.trim() || '';
+  const detailLines = contentParagraphs
     .map((paragraph) => paragraph.textContent.trim());
   const sourceLinks = [...offer.querySelectorAll('a[href]')];
   const pathUrl = sourceLinks[0]?.getAttribute('href') || '';
+  const merchant = offer.dataset.merchant || title?.split(/[·｜|]/)[0]?.trim() || '';
+  const market = offer.dataset.market || schedule.split('·')[0]?.trim() || '专题适用地区';
 
   if (!merchant || !market || !title || !/^\d{4}-\d{2}-\d{2}$/.test(validFrom) ||
       !/^\d{4}-\d{2}-\d{2}$/.test(validTo) || !pathUrl) {
@@ -815,9 +836,9 @@ async function fetchWebsiteBlackFridayDetail(id, signal) {
   ]).filter(Boolean);
 
   return {
-    id: `web-black-friday-${id}`,
+    id: `web-${topic}-${id}`,
     websiteOfferId: id,
-    websiteTopicPath: `${WEBSITE_BLACK_FRIDAY_PATH}#${id}`,
+    websiteTopicPath: `${config.path}#${id}`,
     bankName: merchant,
     region: market,
     title,
@@ -827,13 +848,15 @@ async function fetchWebsiteBlackFridayDetail(id, signal) {
     channel: /门店/.test(schedule) ? '官网/门店' : '官网',
     pathUrl,
     pathDesc: `打开${merchant}官方活动页面 → 核对商品、日期、地区与结账条件 → 按页面提示参与`,
-    pricing: window.BlackFridayPricing ? window.BlackFridayPricing.fromDataset(offer.dataset) : null,
+    pricing: topic === 'black-friday' && window.BlackFridayPricing
+      ? window.BlackFridayPricing.fromDataset(offer.dataset)
+      : null,
     awardDesc: [
       '【活动时间与范围】', schedule,
       '【活动说明】', ...detailLines,
       '【官方来源】', ...sourceLines
     ].filter(Boolean).join('\n'),
-    tags: ['黑五', '网站专题']
+    tags: config.tags
   };
 }
 
@@ -855,7 +878,7 @@ async function fetchDetail() {
   try {
     let data;
     if (websiteOfferId) {
-      data = await fetchWebsiteBlackFridayDetail(websiteOfferId, controller.signal);
+      data = await fetchWebsiteOfferDetail(websiteOfferId, websiteOfferTopic, controller.signal);
     } else {
       const response = await fetch(`${API_BASE}/campaign_detail.php?id=${encodeURIComponent(campaignId)}`, {
         credentials: 'omit',

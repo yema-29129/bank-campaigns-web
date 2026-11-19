@@ -810,7 +810,7 @@ def document(page_title, summary, url, kind, body, lastmod=None, date_published=
   <link rel="alternate" type="text/plain" href="https://bank.vooqqqm.com/llms-full.txt" title="LLMs-Full.txt">
   <link rel="alternate" type="application/json" href="https://bank.vooqqqm.com/activities/feed.json" title="银行优惠活动结构化数据">
   <link rel="stylesheet" href="{styles}">
-  <link rel="stylesheet" href="/activities/styles.css?v=20261118-editorial1">
+  <link rel="stylesheet" href="/activities/styles.css?v=20261119-topiccards1">
   <script type="application/ld+json">{schema_text}</script>
   <script defer src="/assets/privacy-consent.js?v=20261118-consent1"></script>
   <script defer src="/assets/mobile-back.js?v=20261118-back1"></script>
@@ -1298,11 +1298,13 @@ def build_topic_page(spec, active_entries, ended_entries, generated_on):
         ],
     }
 
-    cards = "\n".join(f"""        <li class="detail-section">
-          <h2><a href="/activities/{e["id"]}.html">{escape(e["seo"]["search_title"])}</a></h2>
-          <p><strong>{escape(e["seo"]["discount_phrase"])}</strong> · {escape(e["desc"])}</p>
-          <p class="seo-card-meta">{escape(e["bankName"])} · {escape(e["region"] or "全国")} · {escape(e["channel"] or e["consumeChannel"] or "官方渠道")} · {period(e)}</p>
-          <p class="seo-card-path">参与路径：{escape(truncate_clean(e["pathDesc"], 78))}</p>
+    cards = "\n".join(f"""        <li class="detail-section topic-activity-card">
+          <a class="topic-activity-link" href="/activities/{e["id"]}.html" target="_blank" rel="noopener">
+            <span class="topic-card-title">{escape(e["seo"]["search_title"])}</span>
+            <span class="topic-card-summary"><strong>{escape(e["seo"]["discount_phrase"])}</strong> · {escape(e["desc"])}</span>
+            <span class="seo-card-meta">{escape(e["bankName"])} · {escape(e["region"] or "全国")} · {escape(e["channel"] or e["consumeChannel"] or "官方渠道")} · {period(e)}</span>
+            <span class="topic-card-action">查看活动详情 <span aria-hidden="true">↗</span></span>
+          </a>
         </li>""" for e in matched_active)
 
     ended_block = ""
@@ -1336,7 +1338,7 @@ def build_topic_page(spec, active_entries, ended_entries, generated_on):
       <h1>{escape(spec["h1"])}</h1>
       <p>{escape(spec["desc"])}</p>
       <div class="seo-ai-summary">
-        <p><strong>专题数据速览（更新于 {generated_on.isoformat()}）：</strong>当前共有 <strong>{len(matched_active)}</strong> 项正在进行的{escape(spec["short"])}活动。点击任一活动标题即可查看完整领取入口、名额限制与核销规则；也可<a href="/">返回首页使用多维实时筛选器</a>。</p>
+        <p><strong>专题数据速览（更新于 {generated_on.isoformat()}）：</strong>当前共有 <strong>{len(matched_active)}</strong> 项正在进行的{escape(spec["short"])}活动。点击任一活动卡片即可在新窗口查看完整领取入口、名额限制与核销规则；也可<a href="/">返回首页使用多维实时筛选器</a>。</p>
       </div>
       <h2>全部优惠专题快速切换</h2>
       {topic_hub_nav_markup(spec["slug"])}
@@ -1372,20 +1374,42 @@ def topics_index_page(topic_stats, active_total, generated_on):
     )
     keywords = "银行优惠专题,微信立减金汇总,云闪付满减汇总,支付宝银行卡优惠,信用卡返现大全,农行优惠,工行优惠,建行优惠,中行优惠,港卡返现,羊毛助手·羊毛线报活动站"
 
-    channel_cards = ["""        <li class="detail-section">
-          <h2><a href="/activities/topics/travel-card-offers.html">海外旅行与信用卡优惠</a></h2>
-          <p>查看 Agoda 订房、汇丰 Trip.com、AEON 积分与 Apple 刷卡优惠的发卡资格、门槛及官方入口。</p>
-        </li>"""]
-    bank_cards = []
-    for spec, count, _ in topic_stats:
-        card_html = f"""        <li class="detail-section">
-          <h2><a href="/activities/topics/{spec["slug"]}.html">{escape(spec["short"])}（{count} 条有效）</a></h2>
-          <p>{escape(spec["desc"])}</p>
+    def topic_card(href, title, desc):
+        return f"""        <li class="detail-section topic-index-card">
+          <a class="topic-card-link" href="{href}" target="_blank" rel="noopener">
+            <span class="topic-card-title">{title}</span>
+            <span class="topic-card-summary">{escape(truncate_clean(desc, 82))}</span>
+            <span class="topic-card-action">打开专题 <span aria-hidden="true">↗</span></span>
+          </a>
         </li>"""
-        if spec["kind"] == "channel":
-            channel_cards.append(card_html)
+
+    grouped_cards = {
+        "payment": [],
+        "card": [topic_card(
+            "/activities/topics/travel-card-offers.html",
+            "海外旅行、订房与信用卡优惠",
+            "Agoda、Trip.com、Klook、AEON 积分与 Apple 刷卡优惠，按发卡地区核对资格、门槛和官方入口。",
+        )],
+        "platform": [],
+        "bank": [],
+    }
+    payment_slugs = {"wechat-pay", "unionpay", "alipay", "red-packet"}
+    card_slugs = {"credit-card", "hk-overseas"}
+    platform_slugs = {"jd-douyin-meituan", "travel-fuel"}
+    for spec, count, _ in topic_stats:
+        card_html = topic_card(
+            f'/activities/topics/{spec["slug"]}.html',
+            f'{escape(spec["short"])}（{count} 条有效）',
+            spec["desc"],
+        )
+        if spec["slug"] in payment_slugs:
+            grouped_cards["payment"].append(card_html)
+        elif spec["slug"] in card_slugs:
+            grouped_cards["card"].append(card_html)
+        elif spec["slug"] in platform_slugs:
+            grouped_cards["platform"].append(card_html)
         else:
-            bank_cards.append(card_html)
+            grouped_cards["bank"].append(card_html)
 
     body = f"""  <main class="info-shell">
     <section class="info-card">
@@ -1397,14 +1421,36 @@ def topics_index_page(topic_stats, active_total, generated_on):
       <h1>2026银行优惠与支付立减专题导航</h1>
       <p>{escape(summary)}</p>
       <p>数据更新日期：{generated_on.isoformat()} · <a href="/">返回首页实时筛选全部活动</a> · <a href="/activities/">查看完整活动目录</a></p>
-      <h2>按热门支付渠道与场景浏览</h2>
+      <nav class="topic-category-nav" aria-label="优惠专题分类">
+        <a href="#payment-topics">支付立减与红包</a>
+        <a href="#card-topics">信用卡与境外</a>
+        <a href="#platform-topics">电商平台与出行</a>
+        <a href="#bank-topics">发卡银行</a>
+      </nav>
+      <section class="topic-category-section" id="payment-topics">
+      <h2>支付立减、消费券与红包</h2>
       <ul class="activity-directory">
-{chr(10).join(channel_cards)}
+{chr(10).join(grouped_cards["payment"])}
       </ul>
+      </section>
+      <section class="topic-category-section" id="card-topics">
+      <h2>信用卡、境外返现与旅行订房</h2>
+      <ul class="activity-directory">
+{chr(10).join(grouped_cards["card"])}
+      </ul>
+      </section>
+      <section class="topic-category-section" id="platform-topics">
+      <h2>电商平台、加油充电与交通出行</h2>
+      <ul class="activity-directory">
+{chr(10).join(grouped_cards["platform"])}
+      </ul>
+      </section>
+      <section class="topic-category-section" id="bank-topics">
       <h2>按热门发卡银行浏览</h2>
       <ul class="activity-directory">
-{chr(10).join(bank_cards)}
+{chr(10).join(grouped_cards["bank"])}
       </ul>
+      </section>
     </section>
   </main>"""
     return document(page_title, summary, TOPICS_URL, "CollectionPage", body, lastmod=generated_on.isoformat(), keywords=keywords)
