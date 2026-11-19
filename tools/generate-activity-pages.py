@@ -28,6 +28,13 @@ TOPICS_URL = f"{SITE}/activities/topics/"
 OUTPUT = Path(__file__).resolve().parents[1] / "activities"
 TOPICS_OUTPUT = OUTPUT / "topics"
 
+OVERSEAS_TOPIC = {
+    "slug": "overseas-deals",
+    "h1": "海外优惠：香港本地、海淘购物与出境旅行",
+    "desc": "按香港本地消费、海淘购物和出境旅行查找优惠，了解港卡回赠、跨境网购、机票酒店的适用地区、用卡资格与有效期。",
+    "group": "card",
+}
+
 MANUAL_TOPICS = (
     {
         "slug": "payment-limits",
@@ -1278,6 +1285,117 @@ def topic_hub_nav_markup(active_slug=None):
     return '<div class="seo-hub-grid">' + "\n          ".join(pills) + "</div>"
 
 
+def overseas_hub_page(activities, as_of):
+    url = f'{TOPICS_URL}{OVERSEAS_TOPIC["slug"]}.html'
+    today = as_of.isoformat()
+    eligible = [
+        item for item in activities
+        if item["sources"] and item["validFrom"] <= today <= item["validTo"]
+        and not re.search(r"黑[五伍]|黑色星期五|网一|Black[ -]?Friday|Cyber[ -]?Monday", item["title"], re.I)
+    ]
+
+    def hong_kong(item):
+        return (
+            re.search(r"香港|Hong Kong", item["region"], re.I)
+            and not re.search(r"香港(?:[发發]卡|[始出][发發]|往返)", item["region"])
+            and re.search(r"餐[饮飲]|超市|商[场場]|商超|百[货貨]|八[达達]通|便利店|港[铁鐵]|茶[饮飲]|OpenRice",
+                          f'{item["title"]} {item["summary"]}', re.I)
+        )
+
+    def shopping(item):
+        return re.search(
+            r"海[淘购購]|跨境[电電]商|(?:海外|境外|跨境)[网網][购購]|亚马逊|亞馬遜|Amazon|iHerb|[网網]上非港[币幣]",
+            f'{item["title"]} {item["summary"]} {item["region"]}', re.I,
+        )
+
+    def travel(item):
+        return (
+            re.search(r"境外|海外|全球|國際|国际|香港|澳[门門]|日本|韩[国國]|泰[国國]|新加坡|欧洲|美国|澳大利亚",
+                      f'{item["region"]} {item["title"]}')
+            and re.search(r"[机機]票|航班|酒店|[订訂]房|旅[游遊]|景[区區][门門]票|租[车車]|上[网網]卡|eSIM|[机機][场場]|境外交通",
+                          f'{item["title"]} {item["summary"]}', re.I)
+        )
+
+    sections = (
+        ("hong-kong", "香港本地優惠",
+         "搵香港餐飲、超市、商場、八達通同信用卡回贈。參加前先睇發卡地區、指定商戶，以及是否要先登記或綁定電子錢包。",
+         "zh-Hant-HK", hong_kong,
+         (("查香港及澳門線下刷卡優惠", "travel-card-offers.html#hong-kong-daily"),
+          ("查港卡及境外消費回贈", "hk-overseas.html"))),
+        ("shopping", "海淘购物",
+         "查跨境网购和外币线上消费优惠。比较到手价时，把运费、税费、汇率及外币交易费一起计入，再确认发卡地区、指定商户与返现封顶。",
+         "zh-CN", shopping,
+         (("搜索海淘优惠", "/index.html?q=海淘"), ("浏览境外刷卡与返现", "hk-overseas.html"))),
+        ("travel", "出境旅行",
+         "查机票、酒店、景点门票、租车和出行优惠。预订前区分下单与入住或出发日期，核对适用目的地、付款卡种、税费及退改条件。",
+         "zh-CN", travel,
+         (("查 Agoda、Klook 等订房优惠", "travel-card-offers.html#hotels"),
+          ("查 Trip.com 机票与酒店优惠", "travel-card-offers.html#travel"))),
+    )
+
+    section_links = "\n".join(
+        f'        <a href="#{slug}" lang="{lang}">{title}</a>'
+        for slug, title, _, lang, _, _ in sections
+    )
+    section_html = []
+    for slug, title, description, lang, match, links in sections:
+        featured = [item for item in eligible if match(item)][:6]
+        cards = []
+        for item in featured:
+            region = f'{item["institution"]} · {item["region"]}'
+            cards.append(f"""          <li class="detail-section topic-activity-card">
+            <a class="topic-activity-link" href="/activities/{escape(item["id"])}.html">
+              <span class="topic-card-title">{escape(item["title"])}</span>
+              <span class="topic-card-summary">{escape(item["summary"])}</span>
+              <span class="seo-card-meta">{escape(region)} · 截至 {time_element(item["validTo"])}</span>
+              <span class="topic-card-action">查看完整规则</span>
+            </a>
+          </li>""")
+        highlights = (
+            '<ul class="activity-directory">\n' + "\n".join(cards) + "\n        </ul>"
+            if cards else '<p>目前暂无可在这里推荐的在期活动，可通过下方入口继续查找。</p>'
+        )
+        related = " · ".join(
+            f'<a href="{escape(href if href.startswith("/") else "/activities/topics/" + href)}" lang="{lang}">{text}</a>'
+            for text, href in links
+        )
+        section_html.append(f"""      <section class="topic-category-section" id="{slug}" aria-labelledby="{slug}-title">
+        <h2 id="{slug}-title" lang="{lang}">{title}</h2>
+        <p lang="{lang}">{description}</p>
+        {highlights}
+        <p class="seo-card-meta">{related}</p>
+      </section>""")
+
+    body = f"""  <main class="info-shell">
+    <article class="info-card">
+      <nav class="seo-breadcrumb" aria-label="面包屑导航">
+        <a href="/">首页</a> / <a href="/activities/topics/">优惠专题</a> / <span aria-current="page">海外优惠</span>
+      </nav>
+      <h1>{OVERSEAS_TOPIC["h1"]}</h1>
+      <p>{OVERSEAS_TOPIC["desc"]}</p>
+      <p class="seo-card-meta">本页精选按 {time_element(today)} 的有效期筛选。优惠名额与实际资格请以商户或发卡机构规则为准。</p>
+      <nav class="topic-category-nav" aria-label="海外优惠分类">
+{section_links}
+      </nav>
+{chr(10).join(section_html)}
+      <section class="topic-category-section" id="seasonal" aria-labelledby="seasonal-title">
+        <h2 id="seasonal-title">季节专题</h2>
+        <p>查看<a href="/activities/topics/black-friday-2026.html">2026 海外黑五优惠专题</a>，按活动日期辨别是否仍可参加。</p>
+      </section>
+    </article>
+  </main>"""
+    breadcrumb = {
+        "@type": "BreadcrumbList",
+        "itemListElement": [
+            {"@type": "ListItem", "position": 1, "name": "首页", "item": f"{SITE}/"},
+            {"@type": "ListItem", "position": 2, "name": "优惠专题", "item": TOPICS_URL},
+            {"@type": "ListItem", "position": 3, "name": "海外优惠", "item": url},
+        ],
+    }
+    return document(f'{OVERSEAS_TOPIC["h1"]}{TITLE_SUFFIX}', OVERSEAS_TOPIC["desc"], url,
+                    "CollectionPage", body, lastmod=today, extra_graph=[breadcrumb])
+
+
 def build_topic_page(spec, active_entries, ended_entries, generated_on):
     matched_active = [e for e in active_entries if spec["match"](e)]
     matched_ended = [e for e in ended_entries if spec["match"](e)][:12]
@@ -1394,7 +1512,7 @@ def build_topic_page(spec, active_entries, ended_entries, generated_on):
 def topics_index_page(topic_stats, active_total, generated_on):
     page_title = f"2026银行优惠专题导航：按银行与支付方式查立减金、返现与红包{TITLE_SUFFIX}"
     summary = (
-        f"羊毛助手·羊毛线报活动站优惠专题导航页，按微信立减金、云闪付、支付宝、信用卡返现、海外旅行、黑五优惠及农行、工行、建行、中行、邮储、招行等{len(TOPIC_SPECS) + len(MANUAL_TOPICS)}个专题分类汇总 {active_total} 条实时有效银行活动。"
+        f"羊毛助手优惠专题导航，按支付渠道、发卡银行、境外用卡及香港本地、海淘和出境旅行等场景浏览。银行活动目录当前列出 {active_total} 条活动。"
     )
     keywords = "银行优惠专题,微信立减金汇总,云闪付满减汇总,支付宝银行卡优惠,信用卡返现大全,农行优惠,工行优惠,建行优惠,中行优惠,港卡返现,羊毛助手·羊毛线报活动站"
 
@@ -1408,7 +1526,7 @@ def topics_index_page(topic_stats, active_total, generated_on):
         </li>"""
 
     grouped_cards = {"payment": [], "card": [], "platform": [], "bank": []}
-    for manual_topic in MANUAL_TOPICS:
+    for manual_topic in (OVERSEAS_TOPIC, *MANUAL_TOPICS):
         grouped_cards[manual_topic["group"]].append(topic_card(
             f'/activities/topics/{manual_topic["slug"]}.html',
             manual_topic["h1"],
@@ -1551,7 +1669,7 @@ def sitemap_xml(entries, topic_stats, generated_on):
         if lmod:
             ET.SubElement(u, "lastmod").text = lmod
 
-    for manual_topic in MANUAL_TOPICS:
+    for manual_topic in ({**OVERSEAS_TOPIC, "lastmod": today_str}, *MANUAL_TOPICS):
         u = ET.SubElement(root, "url")
         ET.SubElement(u, "loc").text = f'{TOPICS_URL}{manual_topic["slug"]}.html'
         ET.SubElement(u, "lastmod").text = manual_topic["lastmod"]
@@ -1571,7 +1689,7 @@ def sitemap_xml(entries, topic_stats, generated_on):
 
 
 def ai_feed(entries, generated_on):
-    payload = {
+    return {
         "site": BRAND_MAIN,
         "alternateName": SITE_NAME,
         "url": f"{SITE}/",
@@ -1600,7 +1718,6 @@ def ai_feed(entries, generated_on):
             "sources": list(entry["sources"]),
         } for entry in entries],
     }
-    return json.dumps(payload, ensure_ascii=False, indent=2) + "\n"
 
 
 def llms_index(current, ended, topic_stats, generated_on):
@@ -1621,6 +1738,7 @@ def llms_index(current, ended, topic_stats, generated_on):
 - [首页实时多维筛选]({SITE}/): 支持按银行、消费场景、支付方式、卡组织、地区筛选实时活动。
 - [当前有效银行优惠总目录]({DIRECTORY}): 全部 {len(current)} 条当前有效活动的纯静态 HTML 列表。
 - [银行与支付渠道专题总导航]({TOPICS_URL}): 按 12 大主流银行与 8 大高频支付/消费场景聚合的专题页面。
+- [{OVERSEAS_TOPIC["h1"]}]({TOPICS_URL}{OVERSEAS_TOPIC["slug"]}.html): {OVERSEAS_TOPIC["desc"]}
 - [活动全文 Markdown 索引]({SITE}/llms-full.txt): 面向大模型 RAG 检索的全量活动结构化摘要与参与路径。
 - [结构化 JSON 数据源]({SITE}/activities/feed.json): 全部公开活动的机器可读 JSON 数据接口。
 - [历史已结束活动归档]({DIRECTORY}archive.html): {len(ended)} 条已结束活动历史资料。
@@ -1657,6 +1775,7 @@ def llms_full(entries, generated_on):
             "",
         ])
     lines.extend([
+        f'- [{OVERSEAS_TOPIC["h1"]}]({TOPICS_URL}{OVERSEAS_TOPIC["slug"]}.html)：{OVERSEAS_TOPIC["desc"]}',
         f'- 结构化 JSON 数据源：{SITE}/activities/feed.json',
         f'- XML 站点地图：{SITE}/sitemap.xml',
         "",
@@ -1738,7 +1857,9 @@ def main():
     directory_html = directory(active, args.as_of)
     archive_html = archive_directory(ended, args.as_of)
     sitemap = sitemap_xml(public_entries, topic_stats, args.as_of)
-    feed_json = ai_feed(public_entries, args.as_of)
+    feed = ai_feed(public_entries, args.as_of)
+    topic_pages[OVERSEAS_TOPIC["slug"]] = overseas_hub_page(feed["activities"], args.as_of)
+    feed_json = json.dumps(feed, ensure_ascii=False, indent=2) + "\n"
     llms_text = llms_index(active, ended, topic_stats, args.as_of)
     llms_full_text = llms_full(public_entries, args.as_of)
 
