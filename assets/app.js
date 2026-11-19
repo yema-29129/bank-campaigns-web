@@ -2208,9 +2208,6 @@ function bindEvents() {
   }
 
   document.addEventListener('click', (event) => {
-    document.querySelectorAll('.site-topic-menu[open]').forEach((menu) => {
-      if (!menu.contains(event.target)) menu.open = false;
-    });
     const contactQrTrigger = event.target.closest('[data-open-contact-qr]');
     if (contactQrTrigger) {
       event.preventDefault();
@@ -2302,12 +2299,6 @@ function bindEvents() {
 
   document.addEventListener('keydown', (event) => {
     if (event.key === 'Escape') {
-      const topicMenu = document.querySelector('.site-topic-menu[open]');
-      if (topicMenu) {
-        topicMenu.open = false;
-        topicMenu.querySelector('summary').focus();
-        return;
-      }
       const contactQrModal = document.getElementById('wechatContactQrModal');
       if (contactQrModal && !contactQrModal.classList.contains('hidden')) return closeWechatContactQrModal();
       const mpModal = document.getElementById('mpQrModal');

@@ -19,6 +19,8 @@ import sys
 from urllib.parse import urlsplit
 import xml.etree.ElementTree as ET
 
+from site_topic_menu import MENU_ASSETS, topic_menu
+
 SITE = "https://bank.vooqqqm.com"
 BRAND_MAIN = "羊毛助手·羊毛线报活动站"
 SITE_NAME = "羊毛助手"
@@ -879,6 +881,7 @@ def document(page_title, summary, url, kind, body, lastmod=None, date_published=
   <script type="application/ld+json">{schema_text}</script>
   <script defer src="/assets/privacy-consent.js?v=20261118-consent1"></script>
   <script defer src="/assets/mobile-back.js?v=20261118-back1"></script>
+{MENU_ASSETS}
 </head>
 <body>
   <header class="site-header">
@@ -898,7 +901,7 @@ def document(page_title, summary, url, kind, body, lastmod=None, date_published=
       <nav class="site-nav" aria-label="主导航">
         <a class="site-nav-link" href="/">首页</a>
         <a class="site-nav-link" href="/index.html?view=credit">信用卡活动</a>
-        <a class="site-nav-link" href="/activities/topics/">优惠专题</a>
+{topic_menu()}
         <div class="site-nav-qr">
           <button type="button" class="site-nav-link site-nav-qr-btn" aria-haspopup="true" aria-expanded="false">微信小程序</button>
           <div class="site-nav-qr-pop" role="region" aria-label="微信小程序二维码">
