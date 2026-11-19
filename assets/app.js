@@ -2,6 +2,7 @@ const API_BASE = 'https://mini.vooqqqm.com/api';
 const WEBSITE_BLACK_FRIDAY_PATH = './activities/topics/black-friday-2026.html';
 const CAMPAIGN_LOAD_TIMEOUT = 12000;
 const EXPIRING_SOON_DAYS = 20;
+const SORT_MODES = new Set(['recommended', 'ending', 'starting', 'discount', 'merchant']);
 const GROUP_QR_URL = 'https://github.com/yema-29129/bank-campaigns-web/blob/main/assets/group-wechat-qr.png?raw=true';
 const WECHAT_CONTACT_QR_URL = './assets/wechat-contact-qr.jpg';
 
@@ -515,6 +516,7 @@ const state = {
   secondaryFilter: '全部', // 当前一级分类对应的二级筛选
   cashback: false,     // top tab '返现'
   keyword: '',
+  sortMode: 'recommended',
   loadStatus: 'loading',
   requestPending: false,
   showExpired: false
@@ -526,6 +528,7 @@ const els = {
   empty: document.getElementById('emptyState'),
   grid: document.getElementById('cardGrid'),
   resultSummary: document.getElementById('resultSummary'),
+  sortSelect: document.getElementById('sortSelect'),
   searchInput: document.getElementById('searchInput'),
   mobileSearchInput: document.getElementById('mobileSearchInput'),
   refreshBtn: document.getElementById('refreshBtn'),
@@ -624,6 +627,88 @@ function getSortTime(item) {
   return Number.isNaN(n) ? 0 : n;
 }
 
+function getTodayStartTime() {
+  const now = new Date();
+  return new Date(now.getFullYear(), now.getMonth(), now.getDate(), 0, 0, 0, 0).getTime();
+}
+
+function getDateTime(value, fallback) {
+  const date = parseDate(value);
+  return date ? date.getTime() : fallback;
+}
+
+function getCampaignStage(item) {
+  if (item.isExpired) return 2;
+  const startTime = getDateTime(item.validFrom, -Infinity);
+  return startTime > getTodayStartTime() ? 1 : 0;
+}
+
+function getDiscountMetrics(item = {}) {
+  const text = [
+    item.title, item.desc, item.awardDesc, item.cashbackText,
+    item.discountText, item.pathDesc
+  ].filter(Boolean).join(' ');
+  let rate = 0;
+  let amount = 0;
+
+  const addRate = (value) => {
+    const number = Number(value);
+    if (Number.isFinite(number) && number > 0 && number <= 100) rate = Math.max(rate, number);
+  };
+  const addAmount = (value) => {
+    const number = Number(String(value ?? '').replace(/,/g, ''));
+    if (Number.isFinite(number) && number > 0) amount = Math.max(amount, number);
+  };
+
+  String(item.cashbackRate || '').match(/\d+(?:\.\d+)?/g)?.forEach(addRate);
+  [item.discountMax, item.discountAmount, item.discountMin].forEach(addAmount);
+
+  for (const pattern of [
+    /(?:最高|最多|至多|额外|再|立)?(?:减|省|优惠|折扣|返现|返|回赠)\s*(\d+(?:\.\d+)?)\s*%/gi,
+    /(\d+(?:\.\d+)?)\s*%\s*(?:返现|返|回赠|优惠|折扣|减免)/gi
+  ]) {
+    for (const match of text.matchAll(pattern)) addRate(match[1]);
+  }
+
+  for (const match of text.matchAll(/(\d+(?:\.\d+)?)\s*折(?!合)/g)) {
+    const fold = Number(match[1]);
+    if (!Number.isFinite(fold) || fold <= 0) continue;
+    const payablePercent = fold <= 10 ? fold * 10 : fold;
+    if (payablePercent > 0 && payablePercent <= 100) addRate(100 - payablePercent);
+  }
+
+  for (const match of text.matchAll(/(?:每)?满\s*([\d,]+(?:\.\d+)?)\s*(?:元|美元|美金|港元|港币|英镑|欧元|日元|韩元|澳元|加元|兹罗提|PLN|USD|EUR|GBP|JPY|KRW|AUD|CAD)?\s*(?:立)?(?:减|返)\s*([\d,]+(?:\.\d+)?)/gi)) {
+    const threshold = Number(match[1].replace(/,/g, ''));
+    const saving = Number(match[2].replace(/,/g, ''));
+    if (threshold > 0 && saving > 0 && saving <= threshold) addRate((saving / threshold) * 100);
+  }
+
+  for (const match of text.matchAll(/(?:支付|用|花)\s*([\d,]+(?:\.\d+)?)\s*(?:元|美元|港元|港币)?\s*(?:买|购)\s*(?:面值)?\s*([\d,]+(?:\.\d+)?)\s*(?:元|美元|港元|港币)?\s*礼卡/gi)) {
+    const paid = Number(match[1].replace(/,/g, ''));
+    const value = Number(match[2].replace(/,/g, ''));
+    if (value > 0 && paid > 0 && paid < value) addRate(((value - paid) / value) * 100);
+  }
+
+  // Only compare explicit RMB savings as an amount. Foreign-currency face values are
+  // not mixed directly because 1 yen, 1 dollar and 1 pound are not comparable.
+  for (const match of text.matchAll(/(?:最高|最多|至多)?(?:减|省|返|立减|回赠)\s*([\d,]+(?:\.\d+)?)\s*(元|人民币)/g)) {
+    addAmount(match[1]);
+  }
+
+  return {
+    discountRate: Math.round(rate * 100) / 100,
+    discountAmount: amount
+  };
+}
+
+function compareDiscount(a, b) {
+  const rateDiff = (b.discountRate || 0) - (a.discountRate || 0);
+  if (rateDiff) return rateDiff;
+  const amountDiff = (b.discountAmount || 0) - (a.discountAmount || 0);
+  if (amountDiff) return amountDiff;
+  return 0;
+}
+
 function isExpired(validTo) {
   const d = parseDate(validTo);
   if (!d) return false;
@@ -708,6 +793,7 @@ function normalizeCampaign(item) {
   const referenceDate = getCreatedDate(normalized) ||
     parseDate(normalized.updatedAt || normalized.validFrom || normalized.validTo);
   const bankInfo = classifyBank(normalized.bankName);
+  const discountMetrics = getDiscountMetrics(normalized);
 
   return {
     ...normalized,
@@ -742,21 +828,52 @@ function normalizeCampaign(item) {
     isExpired: isExpired(normalized.validTo),
     isSoon: !isFixedCampaign(normalized) && !isDailyCampaign(normalized) && isSoon(normalized.validTo),
     isTodayAdded: isTodayAdded(normalized),
+    ...discountMetrics,
     referenceTime: referenceDate ? referenceDate.getTime() : null,
     sortTime: getSortTime(normalized)
   };
 }
 
-function compareCampaign(a, b) {
-  const ea = a.isExpired ? 1 : 0;
-  const eb = b.isExpired ? 1 : 0;
-  if (ea !== eb) return ea - eb;
+function compareCampaign(a, b, mode = 'recommended') {
+  const stageA = getCampaignStage(a);
+  const stageB = getCampaignStage(b);
+  if (a.isExpired !== b.isExpired) return a.isExpired ? 1 : -1;
+  if (!['discount', 'merchant'].includes(mode) && stageA !== stageB) return stageA - stageB;
 
-  const na = a.isTodayAdded ? 0 : 1;
-  const nb = b.isTodayAdded ? 0 : 1;
-  if (na !== nb) return na - nb;
+  const startA = getDateTime(a.validFrom, -Infinity);
+  const startB = getDateTime(b.validFrom, -Infinity);
+  const endA = getDateTime(a.validTo, Infinity);
+  const endB = getDateTime(b.validTo, Infinity);
 
-  return b.sortTime - a.sortTime;
+  if (mode === 'discount') {
+    const dealDiff = compareDiscount(a, b);
+    if (dealDiff) return dealDiff;
+  } else if (mode === 'starting') {
+    const startDiff = stageA === 1 ? startA - startB : startB - startA;
+    if (startDiff) return startDiff;
+  } else if (mode === 'merchant') {
+    const merchantDiff = String(a.bankName || '').localeCompare(String(b.bankName || ''), 'zh-CN', {
+      numeric: true,
+      sensitivity: 'base'
+    });
+    if (merchantDiff) return merchantDiff;
+  } else if (mode === 'ending') {
+    if (endA !== endB) return stageA === 2 ? endB - endA : endA - endB;
+  } else {
+    // Default: people can act now first. Ongoing offers ending sooner rise to the
+    // top; upcoming offers follow by nearest start date; expired items stay last.
+    if (stageA === 0 && endA !== endB) return endA - endB;
+    if (stageA === 1 && startA !== startB) return startA - startB;
+    if (stageA === 2 && endA !== endB) return endB - endA;
+    const dealDiff = compareDiscount(a, b);
+    if (dealDiff) return dealDiff;
+  }
+
+  if (a.isTodayAdded !== b.isTodayAdded) return a.isTodayAdded ? -1 : 1;
+  if (stageA !== stageB) return stageA - stageB;
+  const timeDiff = (b.sortTime || 0) - (a.sortTime || 0);
+  if (timeDiff) return timeDiff;
+  return String(a.id || '').localeCompare(String(b.id || ''), 'zh-CN');
 }
 
 function setLoadingState({ loading = false, error = false, empty = false } = {}) {
@@ -1158,6 +1275,7 @@ function syncFilterControls() {
   // Search input sync
   if (els.searchInput && els.searchInput.value !== state.keyword) els.searchInput.value = state.keyword;
   if (els.mobileSearchInput && els.mobileSearchInput.value !== state.keyword) els.mobileSearchInput.value = state.keyword;
+  if (els.sortSelect && els.sortSelect.value !== state.sortMode) els.sortSelect.value = state.sortMode;
 
   // Reset buttons & mobile badge
   const isDefault = hasDefaultFilters();
@@ -1382,7 +1500,9 @@ function applyFilters() {
   updateSidebarCounts();
   if (state.loadStatus !== 'ready') return;
 
-  const result = state.campaigns.filter((item) => matchesAll(item));
+  const result = state.campaigns
+    .filter((item) => matchesAll(item))
+    .sort((a, b) => compareCampaign(a, b, state.sortMode));
   state.filtered = result;
 
   const activeCount = result.filter((item) => !item.isExpired).length;
@@ -1935,6 +2055,17 @@ function bindEvents() {
 
   if (els.searchInput) els.searchInput.addEventListener('input', (e) => handleSearch(e.target.value));
   if (els.mobileSearchInput) els.mobileSearchInput.addEventListener('input', (e) => handleSearch(e.target.value));
+  if (els.sortSelect) {
+    els.sortSelect.addEventListener('change', (event) => {
+      state.sortMode = SORT_MODES.has(event.target.value) ? event.target.value : 'recommended';
+      state.showExpired = false;
+      const url = new URL(window.location.href);
+      if (state.sortMode === 'recommended') url.searchParams.delete('sort');
+      else url.searchParams.set('sort', state.sortMode);
+      window.history.replaceState(window.history.state, '', `${url.pathname}${url.search}${url.hash}`);
+      applyFilters();
+    });
+  }
 
   if (els.refreshBtn) els.refreshBtn.addEventListener('click', fetchCampaigns);
   if (els.retryLoadBtn) els.retryLoadBtn.addEventListener('click', fetchCampaigns);
@@ -2248,7 +2379,7 @@ async function fetchCampaigns() {
 
     const sharedOffers = payload.data.filter(item => item && item.id != null);
     state.campaigns = [...sharedOffers, ...await websiteOffers]
-      .map(normalizeCampaign).sort(compareCampaign);
+      .map(normalizeCampaign);
     state.loadStatus = 'ready';
     applyFilters();
   } catch (err) {
@@ -2315,6 +2446,8 @@ function initializeCampaignPage() {
   if (query) state.keyword = query;
   const view = params.get('view');
   if (view && ['credit', 'debit'].includes(view)) state.view = view;
+  const sortMode = params.get('sort');
+  if (sortMode && SORT_MODES.has(sortMode)) state.sortMode = sortMode;
   const shouldOpenMenu = params.get('menu') === '1';
 
   syncFilterControls();
