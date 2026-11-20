@@ -30,7 +30,7 @@
   <link rel="preconnect" href="https://mini.vooqqqm.com" crossorigin>
   <link rel="stylesheet" href="./assets/styles.css?v=20261118-price1">
   <link rel="stylesheet" href="./assets/theme.css?v=20261118-mobileopt2">
-  <link rel="stylesheet" href="./assets/radar.css?v=20261121-yesterday">
+  <link rel="stylesheet" href="./assets/radar.css?v=20261121-bank-lookup">
   <script type="application/ld+json">
   {
     "@context": "https://schema.org",
@@ -355,7 +355,7 @@
 
       <main class="radar-feed-wrap">
         <details id="todayDeals" class="today-deals" hidden>
-          <summary>今天我能用什么 <span>查外卖立减</span></summary>
+          <summary>按地区和发卡行查活动</summary>
           <form class="today-deals-form">
             <div class="today-deals-location">
               <label>消费省份/地区
@@ -366,15 +366,14 @@
               </label>
             </div>
             <div data-deal-cards></div>
+            <p id="bank-issuer-hint" class="bank-issuer-hint">请核对发卡行，以银行卡或银行 App 上显示的银行全称为准。</p>
             <div class="today-deals-actions">
-              <button class="radar-text-reset" type="button" data-add-deal-card>添加一张卡</button>
-              <button class="primary-btn" type="submit" disabled>查今天的优惠</button>
+              <button class="radar-text-reset" type="button" data-add-deal-card>添加发卡行</button>
+              <button class="primary-btn" type="submit" disabled>查询活动</button>
+              <button class="radar-text-reset hidden" type="button" data-clear-bank-search>退出查询</button>
             </div>
           </form>
-          <div class="today-deals-results">
-            <p data-deal-status aria-live="polite"></p>
-            <ul data-deal-results></ul>
-          </div>
+          <p class="bank-lookup-status" data-deal-status role="status"></p>
         </details>
         <div id="loadingState" class="state-card hidden">正在加载活动数据...</div>
         <div id="errorState" class="state-card is-error hidden">
@@ -515,9 +514,9 @@
   </div>
 
   <script defer src="./assets/black-friday-pricing.js?v=20261118-price1"></script>
-  <script defer src="./assets/china-regions.js?v=20261121"></script>
-  <script defer src="./assets/today-deals.js?v=20261121-regions"></script>
-  <script defer src="./assets/app.js?v=20261121-yesterday"></script>
+  <script defer src="./assets/china-regions.js?v=20261121-bank-lookup"></script>
+  <script defer src="./assets/today-deals.js?v=20261121-bank-lookup"></script>
+  <script defer src="./assets/app.js?v=20261121-bank-lookup"></script>
   <noscript><p class="state-card">请启用 JavaScript 以使用实时筛选；也可直接浏览静态归档目录：<a href="./activities/">当前银行优惠活动目录</a> · <a href="./activities/archive.html">历史活动资料归档</a> · <a href="./sitemap.xml">站点地图</a>。</p></noscript>
 </body>
 </html>

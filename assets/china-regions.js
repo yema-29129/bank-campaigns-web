@@ -79,10 +79,11 @@
     return exact ? { province: exact.province, city } : null;
   }
 
-  function matches(value, location = {}) {
+  function matches(value, location = {}, { includeOverseas = false } = {}) {
     const region = clean(value);
-    if (!region || /^(?:境外|全球|海外|港澳台及境外)|中国(?:内地|大陆)(?:以外|境外)/.test(region)) return false;
     const { province, city } = location;
+    const overseas = /^(?:境外|全球|海外|港澳台及境外)|中国(?:内地|大陆)(?:以外|境外)/.test(region);
+    if (!region || (overseas && (!includeOverseas || !NON_MAINLAND.has(province)))) return false;
     const matchesPlace = area => area.province === province &&
       (!area.city || area.city === city);
     const exclusions = [];

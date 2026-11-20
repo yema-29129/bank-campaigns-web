@@ -526,6 +526,7 @@ const state = {
   view: 'all',         // 'all' | 'credit' | 'debit'
   cardOrg: '全部',      // CARD_ORG_OPTIONS.key
   bank: '全部',         // '全部' | 'group:<key>' | '<subKey>'
+  bankLookup: null,
   pay: '全部',          // PAY_OPTIONS.key
   regionGroup: '全部',  // REGION_OPTIONS.key
   scene: '全部',        // SCENE_OPTIONS
@@ -601,7 +602,7 @@ const els = {
 const detailCache = new Map();
 const pendingDetails = new Map();
 let drawerRequest = 0;
-let todayDeals;
+let bankLookupForm;
 let selectedId = null;
 let currentDrawerActivity = null;
 let currentLightboxType = 'poster';
@@ -949,7 +950,9 @@ function matchesRegion(item, regionKey = state.regionGroup) {
 
 function matchesSceneOrCashback(item, scene = state.scene, cashback = state.cashback) {
   if (scene === '海外活动') return !!item.overseasGroup && !cashback && getCampaignStage(item) === 0;
-  if (item.websiteDetailPath) return !item.overseasGroup && scene === '黑五优惠' && !cashback;
+  if (item.websiteDetailPath) {
+    return !cashback && ((state.bankLookup && scene === '全部') || (!item.overseasGroup && scene === '黑五优惠'));
+  }
   if (cashback && !item.hasCashback) return false;
   return scene === '全部' || item.sceneLabels.includes(scene);
 }
@@ -989,6 +992,7 @@ function matchesAll(item, override = {}) {
   const selectedScene = 'scene' in override ? override.scene : state.scene;
   const selectedCashback = 'cashback' in override ? override.cashback : state.cashback;
   return (
+    (!state.bankLookup || window.BankLookup.matches(item, state.bankLookup)) &&
     matchesKeyword(item) &&
     matchesView(item) &&
     matchesCardOrg(item, 'cardOrg' in override ? override.cardOrg : state.cardOrg) &&
@@ -1012,6 +1016,7 @@ function hasDefaultFilters() {
     state.view === 'all' &&
     state.cardOrg === '全部' &&
     state.bank === '全部' &&
+    !state.bankLookup &&
     state.pay === '全部' &&
     state.regionGroup === '全部' &&
     state.scene === '全部' &&
@@ -1026,6 +1031,7 @@ function countActiveExtraFilters() {
   if (state.view !== 'all') n++;
   if (state.cardOrg !== '全部') n++;
   if (state.bank !== '全部') n++;
+  if (state.bankLookup) n++;
   if (state.pay !== '全部') n++;
   if (state.regionGroup !== '全部') n++;
   if (state.scene !== '全部' || state.cashback) n++;
@@ -1039,6 +1045,7 @@ function resetFilters() {
     view: 'all',
     cardOrg: '全部',
     bank: '全部',
+    bankLookup: null,
     pay: '全部',
     regionGroup: '全部',
     scene: '全部',
@@ -1471,7 +1478,7 @@ function buildRow(item, index) {
     tags.push('<span class="radar-tag is-expired">已过期</span>');
   } else {
     if (item.isTodayAdded) tags.push('<span class="radar-tag is-new">今日新增</span>');
-    if (item.websiteDetailPath && parseDate(item.validFrom) > new Date()) {
+    if ((state.bankLookup || item.websiteDetailPath) && getCampaignStage(item) === 1) {
       tags.push('<span class="radar-tag is-new">未开始</span>');
     }
     if (item.isSoon) {
@@ -1545,6 +1552,7 @@ function applyFilters() {
       : `符合条件 ${activeCount} 条`;
   }
   if (els.mobileResultCount) els.mobileResultCount.textContent = String(activeCount);
+  bankLookupForm?.showResultCount(state.bankLookup, activeCount, result.length - activeCount);
 
   setHomeMeta();
   setLoadingState({ loading: false, error: false, empty: !result.length });
@@ -2301,7 +2309,7 @@ function bindEvents() {
       selectedId &&
       !event.composedPath().includes(els.detailDrawer) &&
       !event.target.closest('[data-close-drawer="true"]') &&
-      !event.target.closest('.radar-row, [data-deal-results] a') &&
+      !event.target.closest('.radar-row') &&
       !event.target.closest('#shareSheet') &&
       !event.target.closest('#imageLightbox') &&
       !event.target.closest('#wechatContactQrModal') &&
@@ -2499,7 +2507,7 @@ async function fetchCampaigns() {
       .map((item) => normalizeCampaign({ ...item, overseasGroup: overseas.categories[item.id] }));
     state.loadStatus = 'ready';
     applyFilters();
-    todayDeals?.syncCampaigns();
+    bankLookupForm?.syncCampaigns();
   } catch (err) {
     const message = controller.signal.aborted ? '活动加载超时' : '活动加载失败';
     if (!hadData) {
@@ -2550,14 +2558,22 @@ function initializeCampaignPage() {
   mountMiniChips(els.sceneFilters, SCENE_OPTIONS, 'scene');
   syncBankCategoryDisclosure();
   bindEvents();
-  const todayDealsRoot = document.getElementById('todayDeals');
-  if (todayDealsRoot && window.TodayDeals && window.ChinaRegions) {
-    todayDeals = window.TodayDeals.mount({
-      root: todayDealsRoot,
+  const bankLookupRoot = document.getElementById('todayDeals');
+  if (bankLookupRoot && window.BankLookup && window.ChinaRegions) {
+    bankLookupForm = window.BankLookup.mount({
+      root: bankLookupRoot,
       bankGroups: BANK_GROUPS,
       getCampaigns: () => state.campaigns,
-      getDetail: getLiveCampaignDetail,
-      openDetail: openDetailDrawer
+      onSearch(choices) {
+        resetFilters();
+        state.bankLookup = choices;
+        applyFilters();
+      },
+      onClear() {
+        state.bankLookup = null;
+        state.showExpired = false;
+        applyFilters();
+      }
     });
   }
 

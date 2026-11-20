@@ -2023,7 +2023,7 @@ body.radar-page {
   }
 }
 
-/* Today’s matched offers */
+/* Bank and location lookup */
 .today-deals:not([hidden]) {
   margin: 12px 24px;
   border: 1px solid #dce6f6;
@@ -2038,15 +2038,7 @@ body.radar-page {
   font-weight: 650;
 }
 
-.today-deals summary span {
-  margin-inline-start: 8px;
-  color: #4f6482;
-  font-size: 12px;
-  font-weight: 500;
-}
-
-.today-deals-form,
-.today-deals-results {
+.today-deals-form {
   padding: 0 15px 12px;
 }
 
@@ -2098,29 +2090,21 @@ body.radar-page {
   margin-top: 12px;
 }
 
-.today-deals-results ul {
+.bank-issuer-hint {
+  margin: 8px 0 0;
+  color: #4f6482;
+  font-size: 13px;
+}
+
+.bank-lookup-status {
   margin: 0;
-  padding: 0;
-  list-style: none;
-}
-
-.today-deals-results li {
-  padding: 10px 0;
+  padding: 8px 15px 10px;
   border-top: 1px solid #dce6f6;
-}
-
-.today-deals-results a {
-  color: #1649ce;
-  font-weight: 650;
-}
-
-.today-deals-results p {
-  margin: 4px 0;
   color: #334762;
 }
 
-.today-deals-results p:empty {
-  margin: 0;
+.bank-lookup-status:empty {
+  display: none;
 }
 
 @media (max-width: 580px) {
