@@ -8,7 +8,7 @@
 - [当前有效银行优惠总目录](https://bank.vooqqqm.com/activities/): 全部 789 条当前有效活动的纯静态 HTML 列表。
 - [银行与支付渠道专题总导航](https://bank.vooqqqm.com/activities/topics/): 按 12 大主流银行与 8 大高频支付/消费场景聚合的专题页面。
 - [海外活动：香港、澳门、海淘与出境旅行](https://bank.vooqqqm.com/activities/topics/overseas-deals.html): 全年查香港、澳门、海淘购物与出境旅行优惠，核对指定商户、卡种、参与条件和有效期。
-- [海外旅行、订房与信用卡优惠](https://bank.vooqqqm.com/activities/topics/travel-card-offers.html): 39 项 Agoda、Trip.com、Klook、港澳线下刷卡、AEON 积分与 Apple 刷卡优惠，含发卡地区、门槛、有效期和官方入口；最近核验于 2026-11-20。
+- [海外旅行、订房与信用卡优惠](https://bank.vooqqqm.com/activities/topics/travel-card-offers.html): 41 项 Agoda、Trip.com、Klook、港澳线下刷卡、AEON 积分与 Apple 刷卡优惠，含发卡地区、门槛、有效期和官方入口；最近核验于 2026-11-20。
 - [餐饮与到店消费券](https://bank.vooqqqm.com/activities/topics/dining-vouchers.html): 查各地餐饮团购、到店满减和日常消费券，核对适用地区、领券入口、门槛与核销时间。 最近核验于 2026-11-20。
 - [银行卡支付限额与付款失败查询](https://bank.vooqqqm.com/activities/topics/payment-limits.html): 按付款提示查银行卡限额、交易受限或优惠未显示，覆盖工行京东、交行抖音／拼多多／微信、农行支付宝／拼多多、邮储支付宝与招行美团。 最近核验于 2026-11-20。
 - [2026 海外黑五优惠大全](https://bank.vooqqqm.com/activities/topics/black-friday-2026.html): 91 项 VPS、苹果数码、旅行 eSIM 与全球电商黑五优惠，含有效期、人民币参考价和官方入口；最近核验于 2026-11-20。

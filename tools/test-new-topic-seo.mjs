@@ -23,7 +23,7 @@ const topics = [
     path: 'activities/topics/travel-card-offers.html',
     url: `${SITE}/activities/topics/travel-card-offers.html`,
     countPattern: /<li class="detail-section"/g,
-    expectedCount: 39,
+    expectedCount: 41,
     lastmod: "2026-11-20",
   },
   {
