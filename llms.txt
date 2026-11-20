@@ -42,6 +42,13 @@
 - [2026中国民生银行最新优惠活动汇总](https://bank.vooqqqm.com/activities/topics/cmbc.html): 当前有效 25 条，整理中国民生银行信用卡与储蓄卡最新微信、支付宝、抖音、京东立减优惠及全民生活APP专属消费券领取方式。
 - [2026宁波银行及热门城商行最新优惠活动汇总](https://bank.vooqqqm.com/activities/topics/nbcb.html): 当前有效 36 条，精选宁波银行、上海银行、北京银行、广州银行、江苏银行等优质地方城商行高额微信立减金、绑卡红包与本地商超加油满减活动。
 
+## 2026-11-20 新增活动详情与专题
+
+- [本批 177 项独立活动详情](https://bank.vooqqqm.com/activities/#latest-details)，可按活动原文核对参与路径、日期和来源。
+- [海外活动：香港、澳门、海淘与出境旅行](https://bank.vooqqqm.com/activities/topics/overseas-deals.html)。香港本地活动按餐饮、购物、交通缴费和电子钱包查找。澳门活动按餐饮购物、酒店景点和支付交通查找。海淘核对运费、税费与外币交易费，出境旅行分开核对预订和入住或出发时间。
+- [餐饮与到店消费券](https://bank.vooqqqm.com/activities/topics/dining-vouchers.html)。湛江餐饮券通过云闪付活动会场查询，深圳光明餐饮券在抖音搜索「光明消费券」。查看参与门店、领券时段、实际支付门槛、券面有效期和退款后能否重用。
+- [银行卡支付限额与付款失败查询](https://bank.vooqqqm.com/activities/topics/payment-limits.html)。出现超限，向发卡行核对实际卡种和渠道对应的单笔、日累计或月累计额度。出现交易受限，按收银台提示核验。能付款但无立减，核对活动资格、名额和次数。专题标注公开参考值和用户反馈来源。
+
 ## 网站说明与核验声明
 
 - [关于我们](https://bank.vooqqqm.com/about.html): 数据整理准则与每日更新机制。

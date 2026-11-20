@@ -1088,7 +1088,7 @@ def matching_topics_for_entry(entry):
     return matched[:4]
 
 
-def detail(entry, active_entries):
+def detail(entry, active_entries, page_published=None):
     seo = entry["seo"]
     title = seo["search_title"]
     activity_id = entry["id"]
@@ -1115,10 +1115,12 @@ def detail(entry, active_entries):
     status = entry["status"]
     status_badge = "当前有效" if status == "current" else ("即将开始" if status == "upcoming" else "已结束")
     publication_meta_html = ""
-    if entry["datePublished"] == SEO_REVISION_DATE.isoformat():
+    if page_published is None and entry["datePublished"] == SEO_REVISION_DATE.isoformat():
+        page_published = entry["datePublished"]
+    if page_published:
         publication_meta_html = (
             '                <p class="seo-card-meta">页面首次发布：'
-            f'{time_element(entry["datePublished"])} · 最近复核：{time_element(entry["lastmod"])}'
+            f'{time_element(page_published)} · 最近更新：{time_element(entry["lastmod"])}'
             '</p>\n'
         )
 
@@ -1292,7 +1294,7 @@ def detail(entry, active_entries):
         "WebPage",
         body,
         lastmod=entry["lastmod"],
-        date_published=entry["datePublished"] if entry["datePublished"] == SEO_REVISION_DATE.isoformat() else None,
+        date_published=page_published,
         indexable=not bool(duplicate_of),
         keywords=seo["keywords"],
         extra_graph=[breadcrumb_schema, faq_schema],
@@ -1535,6 +1537,7 @@ def overseas_hub_page(activities, as_of):
         for slug, title, _, lang, _ in sections
     )
     section_html = []
+    featured_links = {}
     for slug, title, description, lang, links in sections:
         subcategory_links = []
         subcategory_html = []
@@ -1551,6 +1554,7 @@ def overseas_hub_page(activities, as_of):
             for item in featured:
                 region = f'{item["institution"]} · {item["region"]}'
                 path = item.get("url", f'/activities/{item["id"]}.html').removeprefix(SITE)
+                featured_links.setdefault(f"{SITE}{path}", item["title"])
                 cards.append(f"""          <li class="detail-section topic-activity-card">
             <a class="topic-activity-link" href="{escape(path)}">
               <span class="topic-card-title">{escape(item["title"])}</span>
@@ -1610,8 +1614,16 @@ def overseas_hub_page(activities, as_of):
             {"@type": "ListItem", "position": 3, "name": "海外活动", "item": url},
         ],
     }
+    items = {
+        "@type": "ItemList",
+        "name": "海外活动专题精选",
+        "itemListElement": [
+            {"@type": "ListItem", "position": position, "url": link, "name": title}
+            for position, (link, title) in enumerate(featured_links.items(), start=1)
+        ],
+    }
     return document(f'{OVERSEAS_TOPIC["h1"]}{TITLE_SUFFIX}', OVERSEAS_TOPIC["desc"], url,
-                    "CollectionPage", body, lastmod=today, extra_graph=[breadcrumb])
+                    "CollectionPage", body, lastmod=today, extra_graph=[breadcrumb, items])
 
 
 def build_topic_page(spec, active_entries, ended_entries, generated_on):
@@ -1819,11 +1831,7 @@ def directory(entries, generated_on):
         f"浏览羊毛助手·羊毛线报活动站核验整理的 {len(entries)} 项当前有效银行及支付优惠活动，涵盖微信立减金、云闪付消费券、支付宝红包、数币红包与信用卡境外返现，附活动时间、领取入口与详细规则。"
     )
     keywords = "银行优惠活动目录,2026银行羊毛大全,微信立减金目录,信用卡返现汇总,云闪付满减,羊毛助手·羊毛线报活动站,羊毛助手"
-    cards = "\n".join(f"""        <li class="detail-section">
-          <h2><a href="/activities/{entry["id"]}.html">{escape(entry["seo"]["search_title"])}</a></h2>
-          <p><strong>{escape(entry["seo"]["discount_phrase"])}</strong> · {escape(entry["desc"])}</p>
-          <p class="seo-card-meta">{escape(entry["bankName"])} · {escape(entry["region"] or "全国")} · {period(entry)}</p>
-        </li>""" for entry in entries)
+    cards = "\n".join(directory_card(entry) for entry in entries)
     body = f"""  <main class="info-shell">
     <section class="info-card">
       <h1>2026当前有效银行优惠活动总目录</h1>
@@ -1838,6 +1846,14 @@ def directory(entries, generated_on):
     </section>
   </main>"""
     return document(page_title, summary, DIRECTORY, "CollectionPage", body, lastmod=generated_on.isoformat(), keywords=keywords)
+
+
+def directory_card(entry):
+    return f"""        <li class="detail-section">
+          <h2><a href="/activities/{entry["id"]}.html">{escape(entry["seo"]["search_title"])}</a></h2>
+          <p><strong>{escape(entry["seo"]["discount_phrase"])}</strong> · {escape(entry["desc"])}</p>
+          <p class="seo-card-meta">{escape(entry["bankName"])} · {escape(entry["region"] or "全国")} · {period(entry)}</p>
+        </li>"""
 
 
 def archive_directory(entries, generated_on):
@@ -2050,8 +2066,16 @@ def main():
 
     manifest_path = OUTPUT / "manifest.json"
     previous = json.loads(manifest_path.read_text(encoding="utf-8"))["activities"] if manifest_path.exists() else []
+    for old in previous:
+        entry = selected.get(old["id"])
+        if entry and old.get("pagePublished"):
+            entry["pagePublished"] = old["pagePublished"]
+            entry["lastmod"] = max(entry["lastmod"], entry["pagePublished"])
     published = dict(selected)
-    pages = {entry["id"]: detail(entry, active) for entry in selected.values()}
+    pages = {
+        entry["id"]: detail(entry, active, page_published=entry.get("pagePublished"))
+        for entry in selected.values()
+    }
     for old in previous:
         activity_id = old["id"]
         if not re.fullmatch(r"[1-9][0-9]*", activity_id):
@@ -2073,7 +2097,7 @@ def main():
     topics_home_html = topics_index_page(topic_stats, len(active), args.as_of)
 
     manifest = {"activities": [
-        {key: entry[key] for key in ("id", "lastmod", "validTo", "status")}
+        {key: entry[key] for key in ("id", "lastmod", "validTo", "status", "pagePublished") if key in entry}
         for entry in published.values()
     ]}
     directory_html = directory(active, args.as_of)

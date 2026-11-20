@@ -28,6 +28,9 @@ concurrency:
 
 jobs:
   notify:
+    # A website-only search update can add static discovery entries for offers
+    # that are already live without announcing them as new offers to the group.
+    if: github.event_name != 'push' || !contains(github.event.head_commit.message, '[seo-only]')
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
