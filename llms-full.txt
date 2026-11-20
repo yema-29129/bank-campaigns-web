@@ -6,17 +6,17 @@
 
 - 专题：海外旅行、订房与信用卡优惠
 - 专题网址：https://bank.vooqqqm.com/activities/topics/travel-card-offers.html
-- 专题摘要：汇总 41 项 Agoda、Trip.com、Klook、港澳线下刷卡、AEON 积分与 Apple 刷卡优惠，逐项列明发卡地区、门槛、有效期、参与步骤和官方入口。
+- 专题摘要：查 Agoda 万事达 88 折、WeWa 86 折、香港汇丰 Trip.com 信用卡优惠码、AEON 积分兑换与 Apple Pay 绑卡，核对发卡地、门槛与截止日期。
 - 最近核验：2026-11-20
 
 - 专题：餐饮与到店消费券
 - 专题网址：https://bank.vooqqqm.com/activities/topics/dining-vouchers.html
-- 专题摘要：查各地餐饮团购、到店满减和日常消费券，核对适用地区、领券入口、门槛与核销时间。
+- 专题摘要：查餐饮消费券怎么领、到店满减怎么用。按地区查发券平台、参与门店、实付门槛、核销时间与退款规则。
 - 最近核验：2026-11-20
 
 - 专题：银行卡支付限额与付款失败查询
 - 专题网址：https://bank.vooqqqm.com/activities/topics/payment-limits.html
-- 专题摘要：按付款提示查银行卡限额、交易受限或优惠未显示，覆盖工行京东、交行抖音／拼多多／微信、农行支付宝／拼多多、邮储支付宝与招行美团。
+- 专题摘要：查工行借记卡与京东支付限额、中行／交行／农行拼多多限额、交行与邮储抖音支付，以及微信、支付宝和美团交易受限的查询路径。
 - 最近核验：2026-11-20
 
 - 专题：2026 海外黑五优惠大全
@@ -27,6 +27,17 @@
 - [海外活动：香港、澳门、海淘与出境旅行](https://bank.vooqqqm.com/activities/topics/overseas-deals.html)：全年查香港、澳门、海淘购物与出境旅行优惠，核对指定商户、卡种、参与条件和有效期。
 - 结构化 JSON 数据源：https://bank.vooqqqm.com/activities/feed.json
 - XML 站点地图：https://bank.vooqqqm.com/sitemap.xml
+
+## 香港信用卡回贈與海外簽賬指南
+
+- 專頁：https://bank.vooqqqm.com/activities/topics/hk-credit-card-rewards.html
+- 最近核驗：2026-11-20，適用發卡及消費條件見各段官方條款。
+- Chill Card：World 及 Platinum 海外／網上合資格簽賬分別合計 5% 及 4%，指定商戶按當月實體簽賬和月上限計算。https://bank.vooqqqm.com/activities/topics/hk-credit-card-rewards.html#chill-card
+- 中銀 Go 卡：指定手機簽賬按地區計算，海外實體店外幣交易費回贈另有登記。https://bank.vooqqqm.com/activities/topics/hk-credit-card-rewards.html#go-card
+- 中銀淘寶卡：選 HKD，指定付款路徑可即時免手續費或先收後退。香港發行版和澳門發行版各查本地條款。https://bank.vooqqqm.com/activities/topics/hk-credit-card-rewards.html#taobao-card
+- Motion：合資格食肆或網上簽賬 6% 有 HK$3,800 月門檻，5.6% 額外回贈每月最多 HK$200。https://bank.vooqqqm.com/activities/topics/hk-credit-card-rewards.html#motion-card
+- 狂賞飛：2026 年第 2 階段登記至 11 月 30 日，合資格交易至 12 月 31 日，內地澳門與其他海外實體店分開累計。https://bank.vooqqqm.com/activities/topics/hk-credit-card-rewards.html#boc-travel-rebate
+- 海外收費：比較外幣交易費、商戶換算和可取得的回贈。https://bank.vooqqqm.com/activities/topics/hk-credit-card-rewards.html#overseas-fees
 
 ## 2026-11-20 新增活动详情与专题
 
