@@ -2037,8 +2037,7 @@ body.radar-page {
   font-weight: 650;
 }
 
-.today-deals summary span,
-.today-deals-form label > span {
+.today-deals summary span {
   margin-inline-start: 8px;
   color: #4f6482;
   font-size: 12px;
@@ -2057,13 +2056,7 @@ body.radar-page {
   color: #24354f;
 }
 
-.today-deals-form label > span {
-  display: inline;
-  margin: 0;
-}
-
-.today-deals-form select,
-.today-deals-form input {
+.today-deals-form select {
   box-sizing: border-box;
   width: 100%;
   min-width: 0;
@@ -2076,8 +2069,11 @@ body.radar-page {
   font: inherit;
 }
 
-.today-deals-form input {
-  max-width: 330px;
+.today-deals-location {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+  max-width: 430px;
 }
 
 .today-card {

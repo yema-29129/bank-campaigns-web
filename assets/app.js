@@ -2551,9 +2551,10 @@ function initializeCampaignPage() {
   syncBankCategoryDisclosure();
   bindEvents();
   const todayDealsRoot = document.getElementById('todayDeals');
-  if (todayDealsRoot && window.TodayDeals) {
+  if (todayDealsRoot && window.TodayDeals && window.ChinaRegions) {
     todayDeals = window.TodayDeals.mount({
       root: todayDealsRoot,
+      bankGroups: BANK_GROUPS,
       getCampaigns: () => state.campaigns,
       getDetail: getLiveCampaignDetail,
       openDetail: openDetailDrawer

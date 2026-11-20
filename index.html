@@ -30,7 +30,7 @@
   <link rel="preconnect" href="https://mini.vooqqqm.com" crossorigin>
   <link rel="stylesheet" href="./assets/styles.css?v=20261118-price1">
   <link rel="stylesheet" href="./assets/theme.css?v=20261118-mobileopt2">
-  <link rel="stylesheet" href="./assets/radar.css?v=20261121-today-deals">
+  <link rel="stylesheet" href="./assets/radar.css?v=20261121-deal-regions">
   <script type="application/ld+json">
   {
     "@context": "https://schema.org",
@@ -349,9 +349,14 @@
         <details id="todayDeals" class="today-deals" hidden>
           <summary>今天我能用什么 <span>查外卖立减</span></summary>
           <form class="today-deals-form">
-            <label>消费城市 <span>选填</span>
-              <input name="city" type="text" maxlength="28" placeholder="如武汉，留空匹配全国活动">
-            </label>
+            <div class="today-deals-location">
+              <label>消费省份/地区
+                <select name="province"><option value="">全国通用</option></select>
+              </label>
+              <label>消费城市
+                <select name="city" disabled><option value="">请先选择省级地区</option></select>
+              </label>
+            </div>
             <div data-deal-cards></div>
             <div class="today-deals-actions">
               <button class="radar-text-reset" type="button" data-add-deal-card>添加一张卡</button>
@@ -502,8 +507,9 @@
   </div>
 
   <script defer src="./assets/black-friday-pricing.js?v=20261118-price1"></script>
-  <script defer src="./assets/today-deals.js?v=20261121"></script>
-  <script defer src="./assets/app.js?v=20261121-drawer"></script>
+  <script defer src="./assets/china-regions.js?v=20261121"></script>
+  <script defer src="./assets/today-deals.js?v=20261121-regions"></script>
+  <script defer src="./assets/app.js?v=20261121-deal-banks"></script>
   <noscript><p class="state-card">请启用 JavaScript 以使用实时筛选；也可直接浏览静态归档目录：<a href="./activities/">当前银行优惠活动目录</a> · <a href="./activities/archive.html">历史活动资料归档</a> · <a href="./sitemap.xml">站点地图</a>。</p></noscript>
 </body>
 </html>
