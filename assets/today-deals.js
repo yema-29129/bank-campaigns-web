@@ -50,13 +50,15 @@
       : [...banks].sort(([, a], [, b]) => a.localeCompare(b, 'zh-CN'))]);
   }
 
-  function mount({ root, bankGroups, getCampaigns, onSearch, onClear }) {
+  function mount({ root, bankGroups, categories, getCampaigns, onSearch, onClear }) {
     const form = root.querySelector('form');
     const cardList = root.querySelector('[data-deal-cards]');
     const province = form.elements.province;
     const city = form.elements.city;
+    const category = form.elements.category;
     const regions = window.ChinaRegions;
     regions.provinces.forEach(([label]) => province.add(new Option(label, label)));
+    categories.filter(({ key }) => key !== 'all').forEach(({ key, label }) => category.add(new Option(label, key)));
 
     function populateCities(preferred = '') {
       city.replaceChildren(new Option(province.value ? '仅地区通用' : '请先选择省级地区', ''));
@@ -72,6 +74,7 @@
     const submit = form.querySelector('[type="submit"]');
     let bankOptions = [];
     let loaded = false;
+    let appliedCategory = null;
 
     function loadSaved() {
       try {
@@ -87,7 +90,7 @@
       row.innerHTML = `
         <label>发卡行<select name="bank" required aria-describedby="bank-issuer-hint"><option value="">选择银行</option></select></label>
         <label>卡种<select name="cardType"><option value="all">全部卡种</option><option value="debit">储蓄卡</option><option value="credit">信用卡</option></select></label>
-        <button class="radar-text-reset" type="button" aria-label="移除这张卡">移除</button>
+        <button class="radar-text-reset" type="button" aria-label="移除该发卡行">移除</button>
       `;
       const bank = row.querySelector('[name="bank"]');
       bankOptions.forEach(([name, entries]) => {
@@ -113,18 +116,25 @@
       return bank;
     }
 
-    function showResultCount(query, activeCount, archivedCount) {
+    function showResultCount(query, activeCount, archivedCount, activeCategory) {
       clear.classList.toggle('hidden', !query);
       if (!query) {
+        if (appliedCategory !== null) category.value = 'all';
+        appliedCategory = null;
         status.textContent = '';
         return;
+      }
+      if (activeCategory.key !== appliedCategory) {
+        category.value = activeCategory.key;
+        appliedCategory = activeCategory.key;
       }
       const locationLabel = query.location.city || query.location.province || '全国通用';
       const bankLabels = [...new Set(query.cards.map(({ bank, type }) => {
         const cardType = type === 'credit' ? '信用卡' : type === 'debit' ? '储蓄卡' : '';
         return cardType ? `${BANK_NAMES[bank] || bank}（${cardType}）` : (BANK_NAMES[bank] || bank);
       }))];
-      const scope = [locationLabel, ...bankLabels].join(' · ');
+      const categoryLabel = activeCategory.key === 'all' ? '' : activeCategory.label;
+      const scope = [locationLabel, ...bankLabels, categoryLabel].filter(Boolean).join(' · ');
       const archived = archivedCount ? `，另有 ${archivedCount} 条已过期` : '';
       status.textContent = `${scope} · 未过期 ${activeCount} 条${archived}`;
     }
@@ -143,6 +153,7 @@
         const location = saved.location || regions.fromLegacyCity(saved.city);
         province.value = location?.province || '';
         populateCities(location?.city);
+        category.value = categories.some(({ key }) => key === saved.category) ? saved.category : 'all';
       }
       const savedCards = Array.isArray(saved.cards) ? saved.cards.filter(card => card && banks.has(card.bank)).slice(0, 6)
         .map(card => ({ ...card, type: saved.queryVersion === 2 ? card.type : 'all' })) : [];
@@ -161,6 +172,7 @@
       event.preventDefault();
       const choices = {
         location: { province: province.value, city: city.value },
+        category: category.value,
         cards: [...cardList.children].map(row => ({
           bank: row.querySelector('[name="bank"]').value,
           type: row.querySelector('[name="cardType"]').value

@@ -2025,82 +2025,152 @@ body.radar-page {
 
 /* Bank and location lookup */
 .today-deals:not([hidden]) {
-  margin: 12px 24px;
-  border: 1px solid #dce6f6;
+  margin: 12px 16px;
+  border: 1px solid #dce4ef;
   border-radius: 12px;
-  background: #f5f8ff;
+  background: #fff;
 }
 
 .today-deals summary {
-  padding: 12px 15px;
+  padding: 11px 14px;
   cursor: pointer;
   color: #172641;
+  font-size: 14px;
   font-weight: 650;
 }
 
+.today-deals summary::marker {
+  color: #64748b;
+}
+
 .today-deals-form {
-  padding: 0 15px 12px;
+  padding: 1px 14px 9px;
+}
+
+.bank-lookup-fields {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  gap: 9px 10px;
+}
+
+.bank-lookup-fields > label {
+  flex: 1 1 112px;
 }
 
 .today-deals-form label {
   display: grid;
-  gap: 5px;
+  gap: 4px;
   min-width: 0;
-  color: #24354f;
+  color: #43536a;
+  font-size: 12px;
+  font-weight: 600;
+  line-height: 18px;
 }
 
 .today-deals-form select {
   box-sizing: border-box;
   width: 100%;
   min-width: 0;
-  min-height: 40px;
-  padding: 6px 9px;
-  border: 1px solid #c9d7e9;
+  min-height: 36px;
+  padding: 5px 8px;
+  border: 1px solid #cdd8e7;
   border-radius: 7px;
   background: #fff;
   color: #172641;
   font: inherit;
+  font-size: 13px;
+  font-weight: 500;
+  text-overflow: ellipsis;
 }
 
-.today-deals-location {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 10px;
-  max-width: 430px;
+.today-deals-form select:disabled {
+  background: #f6f8fb;
+  color: #64748b;
+}
+
+.bank-lookup-issuers {
+  flex: 2 1 250px;
+  min-width: min(250px, 100%);
 }
 
 .today-card {
   display: grid;
-  grid-template-columns: minmax(0, 220px) minmax(0, 115px) auto;
-  gap: 10px;
-  justify-content: start;
+  grid-template-columns: minmax(0, 1.65fr) minmax(86px, 1fr) auto;
+  gap: 8px;
   align-items: end;
-  margin-top: 10px;
+}
+
+.today-card:only-child {
+  grid-template-columns: minmax(0, 1.65fr) minmax(86px, 1fr);
+}
+
+.today-card:only-child button {
+  display: none;
+}
+
+.today-card + .today-card {
+  margin-top: 8px;
 }
 
 .today-card button {
-  min-height: 40px;
+  min-height: 36px;
+  white-space: nowrap;
 }
 
-.today-deals-actions {
+.bank-lookup-command {
+  display: flex;
+  flex: 1.5 1 186px;
+  min-width: min(178px, 100%);
+  align-items: flex-end;
+  gap: 10px;
+}
+
+.bank-lookup-command label {
+  flex: 1;
+}
+
+.primary-btn.bank-lookup-submit {
+  min-height: 36px;
+  padding-inline: 14px;
+  border-radius: 7px;
+  box-shadow: none;
+  font-size: 13px;
+  white-space: nowrap;
+}
+
+.bank-lookup-footer,
+.bank-lookup-actions {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
-  gap: 12px;
-  margin-top: 12px;
+  gap: 2px 12px;
+}
+
+.bank-lookup-footer {
+  justify-content: space-between;
+  margin-top: 6px;
+}
+
+.bank-lookup-actions button {
+  min-height: 28px;
+  white-space: nowrap;
 }
 
 .bank-issuer-hint {
-  margin: 8px 0 0;
-  color: #4f6482;
-  font-size: 13px;
+  margin: 0;
+  color: #52647c;
+  font-size: 12px;
+  line-height: 1.55;
 }
 
 .bank-lookup-status {
   margin: 0;
-  padding: 8px 15px 10px;
-  border-top: 1px solid #dce6f6;
+  padding: 8px 14px 9px;
+  border-top: 1px solid #e4ebf5;
+  background: #f7f9fd;
   color: #334762;
+  font-size: 13px;
 }
 
 .bank-lookup-status:empty {
@@ -2112,8 +2182,18 @@ body.radar-page {
     margin-inline: 12px;
   }
 
-  .today-card {
-    grid-template-columns: minmax(0, 1fr) minmax(0, 104px) auto;
+  .bank-lookup-issuers {
+    flex-basis: 100%;
+  }
+
+  .today-deals-form select,
+  .today-card button,
+  .primary-btn.bank-lookup-submit {
+    min-height: 42px;
+  }
+
+  .bank-lookup-actions button {
+    min-height: 34px;
   }
 }
 

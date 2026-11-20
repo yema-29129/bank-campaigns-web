@@ -949,9 +949,9 @@ function matchesRegion(item, regionKey = state.regionGroup) {
 }
 
 function matchesSceneOrCashback(item, scene = state.scene, cashback = state.cashback) {
-  if (scene === '海外活动') return !!item.overseasGroup && !cashback && getCampaignStage(item) === 0;
-  if (item.websiteDetailPath) {
-    return !cashback && ((state.bankLookup && scene === '全部') || (!item.overseasGroup && scene === '黑五优惠'));
+  if (scene === '海外活动') return !!item.overseasGroup && !cashback && (state.bankLookup != null || getCampaignStage(item) === 0);
+  if (item.websiteDetailPath && !state.bankLookup) {
+    return !cashback && !item.overseasGroup && scene === '黑五优惠';
   }
   if (cashback && !item.hasCashback) return false;
   return scene === '全部' || item.sceneLabels.includes(scene);
@@ -1235,7 +1235,7 @@ function syncFilterControls() {
   }
 
   if (els.secondaryFilterBar) {
-    const group = getSecondaryFilterGroup();
+    const group = state.bankLookup ? null : getSecondaryFilterGroup();
     if (group && els.secondaryFilterBar.dataset.secondaryGroup !== group.key) {
       mountSecondaryFilters(group);
     }
@@ -1552,7 +1552,8 @@ function applyFilters() {
       : `符合条件 ${activeCount} 条`;
   }
   if (els.mobileResultCount) els.mobileResultCount.textContent = String(activeCount);
-  bankLookupForm?.showResultCount(state.bankLookup, activeCount, result.length - activeCount);
+  const category = TOP_CATEGORIES.find((option) => option.scene === state.scene && option.cashback === state.cashback);
+  bankLookupForm?.showResultCount(state.bankLookup, activeCount, result.length - activeCount, category || TOP_CATEGORIES[0]);
 
   setHomeMeta();
   setLoadingState({ loading: false, error: false, empty: !result.length });
@@ -2563,15 +2564,22 @@ function initializeCampaignPage() {
     bankLookupForm = window.BankLookup.mount({
       root: bankLookupRoot,
       bankGroups: BANK_GROUPS,
+      categories: TOP_CATEGORIES,
       getCampaigns: () => state.campaigns,
-      onSearch(choices) {
+      onSearch({ category, ...choices }) {
         resetFilters();
+        const selectedCategory = TOP_CATEGORIES.find(({ key }) => key === category) || TOP_CATEGORIES[0];
         state.bankLookup = choices;
+        state.scene = selectedCategory.scene;
+        state.cashback = selectedCategory.cashback;
         applyFilters();
       },
       onClear() {
         state.bankLookup = null;
         state.showExpired = false;
+        state.scene = '全部';
+        state.cashback = false;
+        state.secondaryFilter = '全部';
         applyFilters();
       }
     });
