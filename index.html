@@ -30,7 +30,7 @@
   <link rel="preconnect" href="https://mini.vooqqqm.com" crossorigin>
   <link rel="stylesheet" href="./assets/styles.css?v=20261118-price1">
   <link rel="stylesheet" href="./assets/theme.css?v=20261118-mobileopt2">
-  <link rel="stylesheet" href="./assets/radar.css?v=20261120-sharedmenu">
+  <link rel="stylesheet" href="./assets/radar.css?v=20261121-today-deals">
   <script type="application/ld+json">
   {
     "@context": "https://schema.org",
@@ -346,6 +346,23 @@
       </header>
 
       <main class="radar-feed-wrap">
+        <details id="todayDeals" class="today-deals" hidden>
+          <summary>今天我能用什么 <span>查外卖立减</span></summary>
+          <form class="today-deals-form">
+            <label>消费城市 <span>选填</span>
+              <input name="city" type="text" maxlength="28" placeholder="如武汉，留空匹配全国活动">
+            </label>
+            <div data-deal-cards></div>
+            <div class="today-deals-actions">
+              <button class="radar-text-reset" type="button" data-add-deal-card>添加一张卡</button>
+              <button class="primary-btn" type="submit" disabled>查今天的优惠</button>
+            </div>
+          </form>
+          <div class="today-deals-results">
+            <p data-deal-status aria-live="polite"></p>
+            <ul data-deal-results></ul>
+          </div>
+        </details>
         <div id="loadingState" class="state-card hidden">正在加载活动数据...</div>
         <div id="errorState" class="state-card is-error hidden">
           <span id="loadErrorMessage">活动暂时加载失败。</span>
@@ -444,7 +461,7 @@
       <div id="drawerHeadMeta" class="radar-drawer-meta">活动详情</div>
       <div class="radar-drawer-tools">
         <button id="drawerShareBtn" class="radar-tool-btn" type="button">分享</button>
-        <a id="drawerOpenPage" class="radar-tool-btn" href="./detail.html" target="_blank" rel="noopener noreferrer">新窗口 ↗</a>
+        <a id="drawerOpenPage" class="radar-tool-btn" href="./detail.html" target="_blank" rel="noopener noreferrer">独立详情 ↗</a>
         <button class="radar-tool-btn is-close" type="button" data-close-drawer="true" aria-label="关闭详情">✕</button>
       </div>
     </header>
@@ -485,7 +502,8 @@
   </div>
 
   <script defer src="./assets/black-friday-pricing.js?v=20261118-price1"></script>
-  <script defer src="./assets/app.js?v=20261120-sharedmenu"></script>
+  <script defer src="./assets/today-deals.js?v=20261121"></script>
+  <script defer src="./assets/app.js?v=20261121-drawer"></script>
   <noscript><p class="state-card">请启用 JavaScript 以使用实时筛选；也可直接浏览静态归档目录：<a href="./activities/">当前银行优惠活动目录</a> · <a href="./activities/archive.html">历史活动资料归档</a> · <a href="./sitemap.xml">站点地图</a>。</p></noscript>
 </body>
 </html>

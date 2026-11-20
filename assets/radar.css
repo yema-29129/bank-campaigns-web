@@ -2021,3 +2021,117 @@ body.radar-page {
     color: #1f5eff;
   }
 }
+
+/* Today’s matched offers */
+.today-deals:not([hidden]) {
+  margin: 12px 24px;
+  border: 1px solid #dce6f6;
+  border-radius: 12px;
+  background: #f5f8ff;
+}
+
+.today-deals summary {
+  padding: 12px 15px;
+  cursor: pointer;
+  color: #172641;
+  font-weight: 650;
+}
+
+.today-deals summary span,
+.today-deals-form label > span {
+  margin-inline-start: 8px;
+  color: #4f6482;
+  font-size: 12px;
+  font-weight: 500;
+}
+
+.today-deals-form,
+.today-deals-results {
+  padding: 0 15px 12px;
+}
+
+.today-deals-form label {
+  display: grid;
+  gap: 5px;
+  min-width: 0;
+  color: #24354f;
+}
+
+.today-deals-form label > span {
+  display: inline;
+  margin: 0;
+}
+
+.today-deals-form select,
+.today-deals-form input {
+  box-sizing: border-box;
+  width: 100%;
+  min-width: 0;
+  min-height: 40px;
+  padding: 6px 9px;
+  border: 1px solid #c9d7e9;
+  border-radius: 7px;
+  background: #fff;
+  color: #172641;
+  font: inherit;
+}
+
+.today-deals-form input {
+  max-width: 330px;
+}
+
+.today-card {
+  display: grid;
+  grid-template-columns: minmax(0, 220px) minmax(0, 115px) auto;
+  gap: 10px;
+  justify-content: start;
+  align-items: end;
+  margin-top: 10px;
+}
+
+.today-card button {
+  min-height: 40px;
+}
+
+.today-deals-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px;
+  margin-top: 12px;
+}
+
+.today-deals-results ul {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.today-deals-results li {
+  padding: 10px 0;
+  border-top: 1px solid #dce6f6;
+}
+
+.today-deals-results a {
+  color: #1649ce;
+  font-weight: 650;
+}
+
+.today-deals-results p {
+  margin: 4px 0;
+  color: #334762;
+}
+
+.today-deals-results p:empty {
+  margin: 0;
+}
+
+@media (max-width: 580px) {
+  .today-deals:not([hidden]) {
+    margin-inline: 12px;
+  }
+
+  .today-card {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 104px) auto;
+  }
+}

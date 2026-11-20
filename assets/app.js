@@ -599,6 +599,9 @@ const els = {
 };
 
 const detailCache = new Map();
+const pendingDetails = new Map();
+let drawerRequest = 0;
+let todayDeals;
 let selectedId = null;
 let currentDrawerActivity = null;
 let currentLightboxType = 'poster';
@@ -1723,7 +1726,7 @@ function renderCleanSteps(text) {
   return `<ol class="clean-steps">${steps.map((s) => `<li>${escapeHtml(s)}</li>`).join('')}</ol>`;
 }
 
-function renderCleanDetailBody(data) {
+function renderCleanDetailBody(data, rulesNotice = '') {
   const discount = buildDiscountText(data);
   const amountVal = discount !== '--' ? discount : (data.cashbackRate || '');
   const minVal = (data.minAmount || data.minAmount === 0) ? `${data.minAmount} 元` : '';
@@ -1779,7 +1782,8 @@ function renderCleanDetailBody(data) {
 
       <section class="clean-section">
         <h3>活动规则</h3>
-        ${renderCleanRules(data.awardDesc)}
+        ${rulesNotice}
+        ${data.awardDesc ? renderCleanRules(data.awardDesc) : ''}
       </section>
 
       <footer class="clean-foot">
@@ -1852,10 +1856,107 @@ function syncDetailDrawerHistory(id) {
   }
 }
 
+function getLiveCampaignDetail(id) {
+  if (detailCache.has(id)) return Promise.resolve(detailCache.get(id));
+  if (pendingDetails.has(id)) return pendingDetails.get(id);
+
+  const controller = new AbortController();
+  const timeout = setTimeout(() => controller.abort(), 5000);
+  const request = fetch(`${API_BASE}/campaign_detail.php?id=${encodeURIComponent(id)}`, {
+    credentials: 'omit', signal: controller.signal
+  }).then(async (response) => {
+    if (!response.ok) throw new Error(`HTTP ${response.status}`);
+    const payload = await response.json();
+    const data = payload?.code === 0 ? payload.data : payload?.code == null ? payload : null;
+    if (String(data?.id) !== id || !data.title || !data.awardDesc?.trim()) {
+      throw new Error('活动规则未返回');
+    }
+    const detail = { ...data, tags: normalizeTags(data.tags) };
+    detailCache.set(id, detail);
+    return detail;
+  }).finally(() => {
+    clearTimeout(timeout);
+    pendingDetails.delete(id);
+  });
+
+  pendingDetails.set(id, request);
+  return request;
+}
+
+async function getPublishedCampaignDetail(listItem) {
+  if (!/^\d+$/.test(String(listItem.id))) return null;
+  const path = `./activities/${listItem.id}.html`;
+  const controller = new AbortController();
+  const timeout = setTimeout(() => controller.abort(), 2500);
+  try {
+    const response = await fetch(path, { signal: controller.signal });
+    if (!response.ok) return null;
+    const html = new DOMParser().parseFromString(await response.text(), 'text/html');
+    const rules = [...html.querySelectorAll('#offer-details .activity-copy')].map(node => node.textContent.trim());
+    if (!rules.some(Boolean)) return null;
+
+    return {
+      ...listItem,
+      awardDesc: rules.join('\n\n'),
+      pathDesc: html.querySelector('#participation .activity-copy')?.textContent.trim() || '',
+      websiteDetailPath: path
+    };
+  } catch {
+    return null;
+  } finally {
+    clearTimeout(timeout);
+  }
+}
+
+function renderDrawerActivity(data, notice = '') {
+  currentDrawerActivity = data;
+  els.drawerBody.innerHTML = renderCleanDetailBody(data, notice);
+  bindDrawerBodyActions(data);
+}
+
+async function loadDrawerRules(listItem) {
+  const version = ++drawerRequest;
+  const detailPath = `./detail.html?id=${encodeURIComponent(listItem.id)}`;
+  const detailAction = `<a class="clean-btn" href="${escapeAttribute(detailPath)}" target="_blank" rel="noopener noreferrer">查看独立详情 ↗</a>`;
+  const id = String(listItem.id);
+
+  renderDrawerActivity(listItem, '<p class="clean-loading" role="status">正在载入参与方式与完整活动规则…</p>');
+  try {
+    const detail = await getLiveCampaignDetail(id);
+    if (version === drawerRequest) renderDrawerActivity(detail);
+  } catch {
+    if (version !== drawerRequest) return;
+    const published = await getPublishedCampaignDetail(listItem);
+    if (version !== drawerRequest) return;
+
+    const detailLink = published
+      ? `<a class="clean-btn" href="${escapeAttribute(published.websiteDetailPath)}" target="_blank" rel="noopener noreferrer">查看完整详情 ↗</a>`
+      : detailAction;
+    if (published && els.drawerOpenPage) els.drawerOpenPage.href = published.websiteDetailPath;
+    const notice = published ? '以下为已发布的活动规则，最新名额和资格以官方为准。' : '活动摘要已显示，完整规则暂时无法获取。';
+
+    renderDrawerActivity(published || listItem, `
+      <div class="clean-error" role="status">
+        <p>${notice}</p>
+        <div class="clean-actions">
+          <button class="clean-btn" type="button" data-retry-rules>重新加载规则</button>
+          ${detailLink}
+        </div>
+      </div>
+    `);
+    const retry = els.drawerBody.querySelector('[data-retry-rules]');
+    retry.addEventListener('click', () => {
+      if (els.drawerOpenPage) els.drawerOpenPage.href = detailPath;
+      void loadDrawerRules(listItem);
+    });
+  }
+}
+
 async function openDetailDrawer(listItem, { syncHistory = true } = {}) {
   if (!els.detailDrawer || !els.drawerBody) return;
   const id = String(listItem.id);
   if (syncHistory) syncDetailDrawerHistory(id);
+  drawerRequest += 1;
   selectedId = id;
   currentDrawerActivity = listItem;
   syncRowSelection();
@@ -1877,59 +1978,13 @@ async function openDetailDrawer(listItem, { syncHistory = true } = {}) {
   if (els.drawerBackdrop) els.drawerBackdrop.classList.remove('hidden');
   document.body.classList.add('drawer-open');
 
-  if (listItem.websiteOfferId) {
-    detailCache.set(id, listItem);
-    currentDrawerActivity = listItem;
-    els.drawerBody.innerHTML = renderCleanDetailBody(listItem);
-    els.drawerBody.scrollTop = 0;
-    bindDrawerBodyActions(listItem);
+  els.drawerBody.scrollTop = 0;
+  if (listItem.websiteOfferId || detailCache.has(id)) {
+    renderDrawerActivity(detailCache.get(id) || listItem);
     return;
   }
 
-  if (detailCache.has(id)) {
-    const cached = detailCache.get(id);
-    currentDrawerActivity = cached;
-    els.drawerBody.innerHTML = renderCleanDetailBody(cached);
-    els.drawerBody.scrollTop = 0;
-    bindDrawerBodyActions(cached);
-    return;
-  }
-
-  els.drawerBody.innerHTML = `
-    <div class="clean-detail">
-      ${renderCleanTopCommunity()}
-      <h2 class="clean-title">${escapeHtml(listItem.title || '加载中…')}</h2>
-      ${listItem.desc ? `<p class="clean-desc">${escapeHtml(listItem.desc)}</p>` : ''}
-      <div class="clean-loading">正在加载完整活动规则…</div>
-    </div>
-  `;
-
-  try {
-    const resp = await fetch(`${API_BASE}/campaign_detail.php?id=${encodeURIComponent(id)}`, { credentials: 'omit' });
-    if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
-    const payload = await resp.json();
-    const data = (payload && payload.code === 0 && payload.data) ? payload.data : payload;
-    if (!data || (!data.id && !data.title)) throw new Error('empty');
-    data.tags = normalizeTags(data.tags);
-    detailCache.set(id, data);
-
-    if (String(selectedId) !== id) return;
-    currentDrawerActivity = data;
-    els.drawerBody.innerHTML = renderCleanDetailBody(data);
-    els.drawerBody.scrollTop = 0;
-    bindDrawerBodyActions(data);
-  } catch (err) {
-    console.error('加载抽屉详情失败', err);
-    if (String(selectedId) !== id) return;
-    els.drawerBody.innerHTML = `
-      <div class="clean-detail">
-        ${renderCleanTopCommunity()}
-        <h2 class="clean-title">${escapeHtml(listItem.title || '活动详情')}</h2>
-        ${listItem.desc ? `<p class="clean-desc">${escapeHtml(listItem.desc)}</p>` : ''}
-        <p class="clean-error">完整规则暂时加载失败，可点击右上角「新窗口 ↗」重试。</p>
-      </div>
-    `;
-  }
+  await loadDrawerRules(listItem);
 }
 
 function closeDetailDrawer({ fromHistory = false } = {}) {
@@ -1938,6 +1993,7 @@ function closeDetailDrawer({ fromHistory = false } = {}) {
     window.history.back();
     return;
   }
+  drawerRequest += 1;
   selectedId = null;
   syncRowSelection();
   els.detailDrawer.classList.remove('is-open');
@@ -2243,8 +2299,9 @@ function bindEvents() {
 
     if (
       selectedId &&
-      !event.target.closest('#detailDrawer') &&
-      !event.target.closest('.radar-row') &&
+      !event.composedPath().includes(els.detailDrawer) &&
+      !event.target.closest('[data-close-drawer="true"]') &&
+      !event.target.closest('.radar-row, [data-deal-results] a') &&
       !event.target.closest('#shareSheet') &&
       !event.target.closest('#imageLightbox') &&
       !event.target.closest('#wechatContactQrModal') &&
@@ -2442,6 +2499,7 @@ async function fetchCampaigns() {
       .map((item) => normalizeCampaign({ ...item, overseasGroup: overseas.categories[item.id] }));
     state.loadStatus = 'ready';
     applyFilters();
+    todayDeals?.syncCampaigns();
   } catch (err) {
     const message = controller.signal.aborted ? '活动加载超时' : '活动加载失败';
     if (!hadData) {
@@ -2492,6 +2550,15 @@ function initializeCampaignPage() {
   mountMiniChips(els.sceneFilters, SCENE_OPTIONS, 'scene');
   syncBankCategoryDisclosure();
   bindEvents();
+  const todayDealsRoot = document.getElementById('todayDeals');
+  if (todayDealsRoot && window.TodayDeals) {
+    todayDeals = window.TodayDeals.mount({
+      root: todayDealsRoot,
+      getCampaigns: () => state.campaigns,
+      getDetail: getLiveCampaignDetail,
+      openDetail: openDetailDrawer
+    });
+  }
 
   const mobileDisclosureQuery = window.matchMedia('(max-width: 860px)');
   const handleDisclosureModeChange = () => syncBankCategoryDisclosure();
