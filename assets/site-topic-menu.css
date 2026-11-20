@@ -3,6 +3,10 @@
   min-width: 0;
 }
 
+.site-nav > .site-topic-menu {
+  flex: none;
+}
+
 .site-topic-menu > summary {
   gap: 7px;
   list-style: none;
@@ -61,5 +65,12 @@
   .site-nav:has(> .site-topic-menu[open]) {
     flex-wrap: wrap;
     overflow: visible;
+  }
+}
+
+@media (max-width: 420px) {
+  .site-nav > .site-topic-menu > .site-topic-menu-links {
+    inset-inline-start: auto;
+    inset-inline-end: 0;
   }
 }

@@ -1,5 +1,5 @@
-const STATIC_CACHE = 'yangmao-assistant-static-v44';
-const RUNTIME_CACHE = 'yangmao-assistant-runtime-v44';
+const STATIC_CACHE = 'yangmao-assistant-static-v45';
+const RUNTIME_CACHE = 'yangmao-assistant-runtime-v45';
 const STATIC_ASSETS = [
   '/',
   '/index.html',
@@ -19,7 +19,7 @@ const STATIC_ASSETS = [
   '/activities/styles.css?v=20261119-topiccards1',
   '/assets/theme.css?v=20261118-contactfix1',
   '/assets/radar.css?v=20261121-yesterday',
-  '/assets/site-topic-menu.css?v=1',
+  new Request('/assets/site-topic-menu.css?v=1', { cache: 'reload' }),
   '/assets/site-topic-menu.js?v=1',
   '/assets/detail-v2.css?v=20261117-radar10',
   '/assets/app.js?v=20261121-yesterday',
