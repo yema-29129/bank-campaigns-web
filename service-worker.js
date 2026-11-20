@@ -1,5 +1,5 @@
-const STATIC_CACHE = 'yangmao-assistant-static-v43';
-const RUNTIME_CACHE = 'yangmao-assistant-runtime-v43';
+const STATIC_CACHE = 'yangmao-assistant-static-v44';
+const RUNTIME_CACHE = 'yangmao-assistant-runtime-v44';
 const STATIC_ASSETS = [
   '/',
   '/index.html',
@@ -18,11 +18,11 @@ const STATIC_ASSETS = [
   '/assets/styles.css?v=20261118-price1',
   '/activities/styles.css?v=20261119-topiccards1',
   '/assets/theme.css?v=20261118-contactfix1',
-  '/assets/radar.css?v=20261121-deal-regions',
+  '/assets/radar.css?v=20261121-yesterday',
   '/assets/site-topic-menu.css?v=1',
   '/assets/site-topic-menu.js?v=1',
   '/assets/detail-v2.css?v=20261117-radar10',
-  '/assets/app.js?v=20261121-deal-banks',
+  '/assets/app.js?v=20261121-yesterday',
   '/assets/china-regions.js?v=20261121',
   '/assets/today-deals.js?v=20261121-regions',
   '/assets/detail.js?v=20261120-topicdetails1',

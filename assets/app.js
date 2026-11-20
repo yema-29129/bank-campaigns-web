@@ -522,7 +522,7 @@ function classifyBank(bankName) {
 const state = {
   campaigns: [],
   filtered: [],
-  quick: 'all',        // 'all' | 'today' | 'expiring' | 'recurring'
+  quick: 'all',        // 'all' | 'today' | 'yesterday' | 'expiring' | 'recurring'
   view: 'all',         // 'all' | 'credit' | 'debit'
   cardOrg: '全部',      // CARD_ORG_OPTIONS.key
   bank: '全部',         // '全部' | 'group:<key>' | '<subKey>'
@@ -759,14 +759,13 @@ function getCreatedDate(item) {
   return null;
 }
 
-function isTodayAdded(d) {
-  if (!d) return false;
-  const now = new Date();
-  return (
-    d.getFullYear() === now.getFullYear() &&
-    d.getMonth() === now.getMonth() &&
-    d.getDate() === now.getDate()
-  );
+function getCalendarDaysAgo(date, now = new Date()) {
+  if (!date) return null;
+  const beijingNow = new Date(now.getTime() + 8 * 60 * 60 * 1000);
+  const today = Date.UTC(beijingNow.getUTCFullYear(), beijingNow.getUTCMonth(), beijingNow.getUTCDate());
+  // The public API's dates without a timezone are already written in Beijing time.
+  const activityDay = Date.UTC(date.getFullYear(), date.getMonth(), date.getDate());
+  return (today - activityDay) / 86400000;
 }
 
 function normalizeTags(tags) {
@@ -848,7 +847,7 @@ function normalizeCampaign(item) {
     isRecurring: Number(normalized.isRecurring) === 1 || !!normalized.recurringText,
     isExpired: isExpired(normalized.validTo),
     isSoon: !isFixedCampaign(normalized) && !isDailyCampaign(normalized) && isSoon(normalized.validTo),
-    isTodayAdded: isTodayAdded(createdDate),
+    isTodayAdded: getCalendarDaysAgo(createdDate) === 0,
     addedTime: createdDate ? createdDate.getTime() : null,
     ...discountMetrics,
     referenceTime: referenceDate ? referenceDate.getTime() : null,
@@ -978,6 +977,9 @@ function matchesSecondaryFilter(
 
 function matchesQuick(item, quick = state.quick) {
   if (quick === 'today') return item.isTodayAdded;
+  if (quick === 'yesterday') {
+    return !item.isExpired && item.addedTime != null && getCalendarDaysAgo(new Date(item.addedTime)) === 1;
+  }
   if (quick === 'expiring') return item.isSoon;
   if (quick === 'recurring') return item.isRecurring;
   return true;
@@ -1336,7 +1338,8 @@ function updateSidebarCounts() {
   const quickBase = activeCampaigns.filter((item) => matchesAll(item, { quick: 'all' }));
   const quickCounts = {
     all: quickBase.length,
-    today: quickBase.filter((item) => item.isTodayAdded).length,
+    today: quickBase.filter((item) => matchesQuick(item, 'today')).length,
+    yesterday: quickBase.filter((item) => matchesQuick(item, 'yesterday')).length,
     expiring: quickBase.filter((item) => item.isSoon).length,
     recurring: quickBase.filter((item) => item.isRecurring).length
   };
@@ -1403,10 +1406,7 @@ function formatRowDate(value) {
 function formatRelativeTime(item) {
   const d = getCreatedDate(item) || parseDate(item.updatedAt);
   if (!d) return '';
-  const now = new Date();
-  const todayStart = new Date(now.getFullYear(), now.getMonth(), now.getDate()).getTime();
-  const itemDayStart = new Date(d.getFullYear(), d.getMonth(), d.getDate()).getTime();
-  const diffDays = Math.round((todayStart - itemDayStart) / 86400000);
+  const diffDays = getCalendarDaysAgo(d);
   if (diffDays <= 0) return '今天';
   if (diffDays === 1) return '昨天';
   if (diffDays <= 7) return `${diffDays} 天前`;

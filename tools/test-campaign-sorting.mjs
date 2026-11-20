@@ -7,14 +7,18 @@ const start = appSource.indexOf('function parseDate');
 const end = appSource.indexOf('function setLoadingState');
 if (stateStart < 0 || start <= stateStart || end <= start) throw new Error('Unable to locate sorting source');
 
+const quickStart = appSource.indexOf('function matchesQuick');
+const quickEnd = appSource.indexOf('function matchesAll');
 const context = {};
-vm.runInNewContext(`${appSource.slice(0, stateStart)}\n${appSource.slice(start, end)}\nglobalThis.sortTestApi = {
+vm.runInNewContext(`${appSource.slice(0, stateStart)}\n${appSource.slice(start, end)}\n${appSource.slice(quickStart, quickEnd)}\nglobalThis.sortTestApi = {
   metrics: getDiscountMetrics,
   compare: compareCampaign,
-  normalize: normalizeCampaign
+  normalize: normalizeCampaign,
+  getCalendarDaysAgo,
+  matchesQuick
 };`, context);
 
-const { metrics, compare, normalize } = context.sortTestApi;
+const { metrics, compare, normalize, getCalendarDaysAgo, matchesQuick } = context.sortTestApi;
 let checks = 0;
 let failures = 0;
 
@@ -66,6 +70,16 @@ expect('default compares addition times within the same day', additions[1].id, '
 expect('edits do not change the addition order', additions[2].id, 'older-edited-today');
 expect('older undated activity follows dated entries', additions[3].id, 'unknown-add-time');
 expect('expired records stay in the separate archive group', additions[4].id, 'already-expired');
+
+const chinaMidnight = new Date('2026-01-01T00:00:00+08:00');
+expect('Beijing yesterday crosses the year boundary', getCalendarDaysAgo(new Date(2025, 11, 31, 23, 59), chinaMidnight), 1);
+expect('the first minute of the current Beijing day is today', getCalendarDaysAgo(new Date(2026, 0, 1), chinaMidnight), 0);
+const yesterdayInChina = new Date(Date.now() - 16 * 60 * 60 * 1000).toISOString().slice(0, 10);
+const yesterday = normalize({ createdAt: yesterdayInChina + ' 23:59:59' });
+expect('yesterday uses the recorded addition day', matchesQuick(yesterday, 'yesterday'), true);
+expect('the yesterday count excludes expired entries', matchesQuick({ ...yesterday, isExpired: true }, 'yesterday'), false);
+expect('an edit date alone does not count in the yesterday view', matchesQuick(normalize({ updatedAt: yesterdayInChina }), 'yesterday'), false);
+
 
 const recommended = [
   item('upcoming', 2, 10, 90),

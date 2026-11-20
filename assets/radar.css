@@ -203,6 +203,7 @@ body.radar-page {
 }
 .radar-dot.is-all { background: #1f5eff; }
 .radar-dot.is-today { background: #10b981; }
+.radar-dot.is-yesterday { background: #0d9488; }
 .radar-dot.is-soon { background: #f97316; }
 .radar-dot.is-recurring { background: #8b5cf6; }
 
@@ -1795,7 +1796,7 @@ body.radar-page {
 
   .radar-mobile-quick {
     display: grid;
-    grid-template-columns: repeat(4, minmax(0, 1fr));
+    grid-template-columns: repeat(5, minmax(0, 1fr));
     gap: 6px;
   }
 
@@ -2129,5 +2130,12 @@ body.radar-page {
 
   .today-card {
     grid-template-columns: minmax(0, 1fr) minmax(0, 104px) auto;
+  }
+}
+
+@media (max-width: 380px) {
+  .radar-mq-btn {
+    flex-direction: column;
+    gap: 0;
   }
 }
