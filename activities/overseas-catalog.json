@@ -190,11 +190,13 @@
     "243": "hong-kong",
     "225": "hong-kong",
     "204": "hong-kong",
+    "web-overseas-hktb-mcdonalds-big-mac-winter-2026": "hong-kong",
     "web-overseas-hktb-alipayplus-qts-winter-2026": "hong-kong",
     "577": "shopping",
     "457": "shopping",
     "224": "shopping",
     "386": "macau",
+    "web-overseas-macau-zape-first-stay-vouchers-2026": "macau",
     "262": "macau"
   },
   "websiteOffers": [
@@ -880,6 +882,28 @@
       ]
     },
     {
+      "id": "web-overseas-hktb-mcdonalds-big-mac-winter-2026",
+      "webId": "hktb-mcdonalds-big-mac-winter-2026",
+      "url": "/detail.html?web=hktb-mcdonalds-big-mac-winter-2026&topic=travel-card-offers",
+      "title": "香港麦当劳冬日赏 · 巨无霸套餐买一送一，HK$44.50",
+      "institution": "香港麦当劳 / 香港旅游发展局",
+      "region": "香港指定麦当劳餐厅 · 香港居民及访港旅客",
+      "summary": "香港居民及访港旅客用合资格电子钱包在参与门店扫码，可用 HK$44.50 买两份巨无霸套餐。",
+      "validFrom": "2026-11-18",
+      "validTo": "2027-01-05",
+      "channel": "AlipayHK／内地支付宝／指定 Alipay+ 电子钱包",
+      "createdAt": "2026-11-21",
+      "distributionScope": "web_only",
+      "sources": [
+        "https://www.discoverhongkong.com/tc/events/hong-kong-winterfest/deals-alipay.html",
+        "https://www.discoverhongkong.com/content/dam/dhk/intl/corporate/newsroom/press-release/hktb/2026/11-Hong-Kong-WinterFest-Photo-Release-E.pdf"
+      ],
+      "rules": [
+        "可使用 AlipayHK、内地支付宝或参加活动的 Alipay+ 电子钱包。到店先确认门店参与，再用钱包扫店内冬日赏活动码，打开麦当劳商户优惠，点餐时按活动页提示核销及付款。",
+        "旅发局列出的两份套餐原价合计 HK$89 起。下单前请查看钱包内显示的优惠可用状态及门店条件，并确认优惠已在结账时应用。"
+      ]
+    },
+    {
       "id": "web-overseas-hktb-alipayplus-qts-winter-2026",
       "webId": "hktb-alipayplus-qts-winter-2026",
       "url": "/detail.html?web=hktb-alipayplus-qts-winter-2026&topic=travel-card-offers",
@@ -900,6 +924,28 @@
         "指定錢包包括澳門 MPay、GCash、Kakao Pay、MoMo、OCBC、Toss Pay、Touch ’n Go eWallet 及 TrueMoney。付款前用錢包掃活動碼領券，OCBC 請從 OCBC Cross Border 領取。使用領券的同一錢包在指定實體門店付款。",
         "每人活動期可領用一次，沒有指定消費門檻，單筆最多扣 HK$100。券發出後 7 日有效，並須於活動期內用完。名額由合作錢包共用，先到先得，實際抵扣以付款頁為準。",
         "一般不可與其他優惠同用。全額或部分退款只退實際付款額，券不補發。涉及換匯時以錢包收據為準。"
+      ]
+    },
+    {
+      "id": "web-overseas-macau-zape-first-stay-vouchers-2026",
+      "webId": "macau-zape-first-stay-vouchers-2026",
+      "url": "/detail.html?web=macau-zape-first-stay-vouchers-2026&topic=travel-card-offers",
+      "title": "澳门新口岸消费节 · 首次入住合作酒店，每房领两张 MOP 50 消费券",
+      "institution": "澳门中小型企业联合总商会 / 发现澳门",
+      "region": "澳门指定新口岸酒店及合作商户",
+      "summary": "首次入住指定酒店的住客可在发现澳门领券，到合作商户消费每满 MOP 100 抵 MOP 50。",
+      "validFrom": "2026-11-19",
+      "validTo": "2026-12-31",
+      "channel": "发现澳门 App／指定合作商户",
+      "createdAt": "2026-11-21",
+      "distributionScope": "web_only",
+      "sources": [
+        "https://www.macaotourism.gov.mo/zh-hans/events/whatson/14173",
+        "https://file.findmacau.com/app/findmacau_h5/newfindings/macau-zape-fest-2026.html"
+      ],
+      "rules": [
+        "入住前查活动页的合作酒店名单。入住时打开「发现澳门」的新口岸消费节活动页领券。活动期内每间房首次入住时最多领一次，每次两张，名额先到先得。领券后 3 天内使用，具体到期时间以券面为准。",
+        "餐饮、零售和休闲服务的指定商户可核销。同笔消费每满 MOP 100 可用 1 张，满 MOP 200 可用 2 张。预订前请向酒店确认参加资格和房费退改条件。"
       ]
     }
   ]
