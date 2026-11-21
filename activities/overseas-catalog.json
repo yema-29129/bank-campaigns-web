@@ -51,6 +51,7 @@
     "211": "hong-kong",
     "193": "hong-kong",
     "108": "hong-kong",
+    "web-overseas-citybus-hkmm-ticket-discount-2026": "hong-kong",
     "1063": "travel",
     "1062": "travel",
     "1061": "travel",
@@ -261,6 +262,29 @@
       "rules": [
         "适用香港 Apple 门店、网店或 Apple Store App。单笔满 HK$500 可申请有一次性手续费的 6 或 12 期，按月收息的 18 至 60 期另有单笔 HK$2,000 门槛。DBS Live Fresh、商业卡及私人品牌卡除外。",
         "只计活动期内首次成功申请涉及的最高单笔合资格交易，费用回赠最迟 2027 年 3 月 31 日入账。分期仍按银行批准的手续费或利率收费。"
+      ]
+    },
+    {
+      "id": "web-overseas-citybus-hkmm-ticket-discount-2026",
+      "webId": "citybus-hkmm-ticket-discount-2026",
+      "url": "/detail.html?web=citybus-hkmm-ticket-discount-2026&topic=travel-card-offers",
+      "title": "香港城巴巴士通票 · 凭海事博物馆票尾减 HK$10",
+      "institution": "城巴 / 香港海事博物馆",
+      "region": "香港中环天星码头观光城巴服务站、香港海事博物馆",
+      "summary": "持香港海事博物馆票尾到中环城巴服务站，购买全港游巴士通票可减 HK$10。",
+      "validFrom": "2026-04-17",
+      "validTo": "2026-12-31",
+      "channel": "中环服务站／博物馆售票处",
+      "createdAt": "2026-11-22",
+      "distributionScope": "web_only",
+      "sources": [
+        "https://www.hkmaritimemuseum.org/special-ann-12-citybus-promotion/details?lang=zh",
+        "https://www.citybus.com.hk/tc/uploadedPressRelease/22224_20260427_CHI.pdf"
+      ],
+      "rules": [
+        "先参观博物馆：购票日起 7 天内，带门票存根到中环天星码头观光城巴服务站，购买 24、48 或 72 小时城巴全港游通票时减 HK$10。",
+        "先买巴士通票：购票日起 7 天内，到中环 8 号码头的香港海事博物馆售票处出示有效通票二维码，成人门票半价，减 HK$15。",
+        "购票当天计作第 1 天，须在活动结束前兑换。每张票尾限用一次，且不可叠加其他优惠。购票前可向售票处确认票种和退改条件。"
       ]
     },
     {
