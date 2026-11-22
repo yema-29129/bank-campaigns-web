@@ -1471,7 +1471,10 @@ function buildRow(item, index) {
   const isSelected = selectedId && String(item.id) === String(selectedId);
   row.className = `radar-row${statusCls ? ` ${statusCls}` : ''}${isSelected ? ' is-selected' : ''}`;
   row.dataset.id = String(item.id);
-  row.href = item.websiteDetailPath || `./detail.html?id=${encodeURIComponent(item.id)}`;
+  const idStr = String(item.id);
+  row.href = item.websiteDetailPath || (/^[1-9][0-9]*$/.test(idStr)
+    ? `./activities/${encodeURIComponent(idStr)}.html`
+    : `./detail.html?id=${encodeURIComponent(idStr)}`);
 
   const tags = [];
   if (item.isExpired) {
@@ -1978,7 +1981,9 @@ async function openDetailDrawer(listItem, { syncHistory = true } = {}) {
     `;
   }
   if (els.drawerOpenPage) {
-    els.drawerOpenPage.href = listItem.websiteDetailPath || `./detail.html?id=${encodeURIComponent(id)}`;
+    els.drawerOpenPage.href = listItem.websiteDetailPath || (/^[1-9][0-9]*$/.test(id)
+      ? `./activities/${encodeURIComponent(id)}.html`
+      : `./detail.html?id=${encodeURIComponent(id)}`);
   }
 
   els.detailDrawer.classList.remove('hidden');

@@ -1,5 +1,5 @@
-const STATIC_CACHE = 'yangmao-assistant-static-v47';
-const RUNTIME_CACHE = 'yangmao-assistant-runtime-v47';
+const STATIC_CACHE = 'yangmao-assistant-static-v48';
+const RUNTIME_CACHE = 'yangmao-assistant-runtime-v48';
 const STATIC_ASSETS = [
   '/',
   '/index.html',
@@ -22,12 +22,12 @@ const STATIC_ASSETS = [
   new Request('/assets/site-topic-menu.css?v=1', { cache: 'reload' }),
   '/assets/site-topic-menu.js?v=1',
   '/assets/detail-v2.css?v=20261117-radar10',
-  '/assets/app.js?v=20261121-lookup-layout',
+  '/assets/app.js?v=20261122-seo2',
   '/assets/china-regions.js?v=20261121-bank-lookup',
   '/assets/today-deals.js?v=20261121-lookup-layout',
-  '/assets/detail.js?v=20261120-topicdetails1',
+  '/assets/detail.js?v=20261122-seo2',
   '/assets/black-friday-pricing.js?v=20261118-price1',
-  '/assets/privacy-consent.js?v=20261118-consent1',
+  '/assets/privacy-consent.js?v=20261122-ai1',
   '/assets/privacy-consent.css?v=20261118-consent1',
   '/assets/mobile-back.js?v=20261118-back1',
   '/assets/mobile-back.css?v=20261118-back1',

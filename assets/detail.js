@@ -136,17 +136,20 @@ function updateDetailMeta(activity) {
   ].filter(Boolean).join('，').slice(0, 120);
 
   const url = getDetailUrl();
+  const staticUrl = (campaignId && /^[1-9][0-9]*$/.test(campaignId))
+    ? `https://bank.vooqqqm.com/activities/${encodeURIComponent(campaignId)}.html`
+    : url;
   const structuredDescription = description || '查看银行立减金活动详情、活动时间、参与路径和二维码图片。';
 
   document.title = title;
   setMeta('meta[name="description"]', structuredDescription);
   setMeta('meta[property="og:title"]', title);
   setMeta('meta[property="og:description"]', description || '查看活动时间、参与路径、二维码图片和关键信息。');
-  setMeta('meta[property="og:url"]', url);
+  setMeta('meta[property="og:url"]', staticUrl);
   setMeta('meta[name="twitter:title"]', title);
   setMeta('meta[name="twitter:description"]', description || '查看活动时间、参与路径、二维码图片和关键信息。');
-  setCanonical(url);
-  updateStructuredData(activity, url, structuredDescription);
+  setCanonical(staticUrl);
+  updateStructuredData(activity, staticUrl, structuredDescription);
   void preferPublishedDetail(campaignId, activity, structuredDescription);
 }
 

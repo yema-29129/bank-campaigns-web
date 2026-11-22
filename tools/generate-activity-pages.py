@@ -25,7 +25,7 @@ SITE = "https://bank.vooqqqm.com"
 BRAND_MAIN = "羊毛助手·羊毛线报活动站"
 SITE_NAME = "羊毛助手"
 TITLE_SUFFIX = f"｜{SITE_NAME}"
-SEO_REVISION_DATE = date(2026, 11, 18)
+SEO_REVISION_DATE = date(2026, 11, 22)
 DIRECTORY = f"{SITE}/activities/"
 TOPICS_URL = f"{SITE}/activities/topics/"
 OUTPUT = Path(__file__).resolve().parents[1] / "activities"
@@ -68,36 +68,36 @@ MANUAL_TOPICS = (
     {
         "slug": "dining-vouchers",
         "h1": "餐饮与到店消费券",
-        "desc": "查餐饮消费券怎么领、到店满减怎么用。按地区查发券平台、参与门店、实付门槛、核销时间与退款规则。",
-        "lastmod": "2026-11-20",
+        "desc": "查餐饮消费券怎么领、到店满减怎么用。按地区查发券平台、参与门店、实付门槛、核销时间与退款规则，汇总全国及地方餐饮团购立减入口。",
+        "lastmod": "2026-11-22",
         "group": "payment",
     },
     {
         "slug": "payment-limits",
         "h1": "银行卡支付限额与付款失败查询",
-        "desc": "查工行借记卡与京东支付限额、中行／交行／农行拼多多限额、交行与邮储抖音支付，以及微信、支付宝和美团交易受限的查询路径。",
-        "lastmod": "2026-11-20",
+        "desc": "查农行、工行、邮储、中行、交行、招行在微信、支付宝、拼多多、抖音、京东与美团的支付限额及风控受限解除路径，核对借记卡与信用卡单笔单日额度。",
+        "lastmod": "2026-11-22",
         "group": "payment",
     },
     {
         "slug": "travel-card-offers",
         "h1": "海外旅行、订房与信用卡优惠",
-        "desc": "查 Agoda 万事达 88 折、WeWa 86 折、香港汇丰 Trip.com 信用卡优惠码、AEON 积分兑换与 Apple Pay 绑卡，核对发卡地、门槛与截止日期。",
-        "lastmod": "2026-11-20",
+        "desc": "查 Agoda Mastercard 万事达 88 折、WeWa 86 折、香港汇丰 HSBC Trip.com 信用卡优惠码、AEON 信用卡积分兑换与 Apple Pay 绑卡回赠，核对发卡地与截止日期。",
+        "lastmod": "2026-11-22",
         "group": "card",
     },
     {
         "slug": "hk-credit-card-rewards",
         "h1": "香港信用卡回贈與海外簽賬指南",
-        "desc": "比較中銀 Chill Card、Go 卡、淘寶卡及信銀國際 Motion 信用卡的回贈條件，查狂賞飛登記、外幣交易費及海外港幣簽賬收費。",
-        "lastmod": "2026-11-20",
+        "desc": "比較中銀 Chill Card、Go 卡、淘寶卡、雙幣卡及信銀國際 Motion 信用卡的 10% 回贈條件，查中銀狂賞飛登記、銀聯海外簽賬免手續費及 HSBC Red Apple Pay 回贈。",
+        "lastmod": "2026-11-22",
         "group": "card",
     },
     {
         "slug": "black-friday-2026",
         "h1": "2026 海外黑五优惠大全",
         "desc": "汇总 VPS、苹果数码、旅行 eSIM、美国百货、日本乐天、欧洲亚马逊、韩国电商等海外黑五优惠，附有效期、人民币参考价与官方入口。",
-        "lastmod": "2026-11-19",
+        "lastmod": "2026-11-20",
         "group": "platform",
     },
 )
@@ -437,8 +437,8 @@ def preferred_search_name(bank_name):
 def build_search_title(entry, bank_short, bank_aliases, primary_benefit):
     """Create a natural query-shaped title without keyword-stuffed boilerplate."""
     raw_title = clean_line(entry["title"])
-    is_current_seo_batch = entry.get("datePublished") == SEO_REVISION_DATE.isoformat()
-    separator = "：" if is_current_seo_batch else ""
+    is_current_seo_batch = True
+    separator = "："
     title = re.sub(r"\s*[·•・]\s*", separator, raw_title, count=1)
     title = re.sub(r"\s*[·•・]\s*", "", title)
     for pattern, replacement in TITLE_PREFIX_EXPANSIONS:
@@ -509,21 +509,32 @@ def bank_name_is_generic(bank_name):
 
 
 def build_seo_title(entry, search_title):
-    status = "（已结束）" if entry["status"] == "ended" else ""
-    return f"{search_title}{status}{TITLE_SUFFIX}"
+    year = entry["validTo"][:4] if entry.get("validTo") else "2026"
+    if entry["status"] == "ended":
+        base = f"{search_title}（已结束历史规则查询）"
+    else:
+        base = search_title
+        if len(base) < 24:
+            base = f"{base}：{year}领取入口与活动规则"
+        elif len(base) < 32 and "规则" not in base and "入口" not in base:
+            base = f"{base}（领取入口与规则）"
+    full = f"{base}{TITLE_SUFFIX}"
+    if len(full) < 30:
+        full = f"{base}｜{BRAND_MAIN}"
+    return full
 
 
 def build_seo_description(entry, search_title):
-    status_intro = "该活动已结束，以下为历史规则。" if entry["status"] == "ended" else ""
-    region_txt = entry["region"] or "全国"
-    channel_txt = entry["channel"] or entry["consumeChannel"] or "官方指定渠道"
-    short_path = truncate_clean(entry["pathDesc"].replace("→", "，"), 42)
+    status_intro = "【已结束历史归档】" if entry["status"] == "ended" else "【官方公开规则核验】"
+    region_txt = entry["region"] or "全国适用"
+    channel_txt = entry["channel"] or entry["consumeChannel"] or "银行指定App或支付渠道"
+    short_path = truncate_clean(entry["pathDesc"].replace("→", "，"), 52)
     raw_desc = (
         f"{status_intro}{search_title}：{clean_line(entry['desc'])} "
-        f"有效期{entry['validFrom']}至{entry['validTo']}，适用地区：{region_txt}；"
-        f"参与渠道：{channel_txt}；领取方式：{short_path}。"
+        f"活动有效期：{entry['validFrom']}至{entry['validTo']}；适用地区：{region_txt}；"
+        f"参与及支付渠道：{channel_txt}；参与路径：{short_path}。参加前请核对名额与卡种限制。"
     )
-    return truncate_clean(raw_desc, 150)
+    return truncate_clean(raw_desc, 154)
 
 
 def build_discount_phrase(entry):
@@ -539,10 +550,9 @@ def build_discount_phrase(entry):
         r"抽\d+(?:\.\d+)?元(?:京东E卡|礼品卡|红包|立减金)",
         r"\d+(?:\.\d+)?元(?:微信|支付宝)?立减金",
     )
-    if entry.get("datePublished") == SEO_REVISION_DATE.isoformat():
-        for pattern in title_patterns:
-            if match := re.search(pattern, title):
-                return match.group(0)
+    for pattern in title_patterns:
+        if match := re.search(pattern, title):
+            return match.group(0)
 
     rate = entry.get("cashbackRate") or ""
     d_amt = entry.get("discountAmount") or ""
@@ -589,6 +599,20 @@ def build_search_intent_keywords(entry, combined, bank_short, card_label, benefi
         (r"PlayStation|PS\s*Plus|PSN", ("PlayStation黑五优惠", "PS Plus会员优惠")),
         (r"手机|平板|电脑|数码|Apple|iPhone|MacBook|三星", ("数码产品优惠", "手机电脑优惠")),
         (r"外卖|美团|饿了么", ("外卖满减", "银行卡外卖优惠")),
+        (r"\bChill\b", ("中銀 Chill Card", "Chill Card 10%回贈", "中銀信用卡Chill Card")),
+        (r"Motion|信银|信銀", ("信銀國際 Motion 信用卡", "inMotion 信用卡回贈", "Motion信用卡優惠")),
+        (r"Agoda", ("Agoda Mastercard 88折", "Agoda 信用卡優惠", "Agoda訂房折扣")),
+        (r"Trip\.com|携程", ("Trip.com 信用卡優惠 2026", "HSBC Trip.com 優惠", "携程信用卡满减")),
+        (r"AEON", ("AEON 信用卡積分", "香港 AEON 信用卡優惠")),
+        (r"汇丰|匯豐|HSBC", ("HSBC 信用卡優惠", "HSBC Red 信用卡 Apple Pay", "香港匯豐信用卡回贈")),
+        (r"WeWa|安信", ("WeWa 信用卡優惠", "Agoda WeWa 折扣")),
+        (r"Go\s*卡|SOGO|崇光|狂赏|狂賞|淘寶|双币|雙幣|扣账|扣賬", ("中銀 Go 卡回贈", "中銀狂賞飛", "中銀信用卡海外簽賬")),
+        (r"恒生.*12306|12306.*恒生", ("恒生 12306", "香港恒生卡12306回贈")),
+        (r"12306", ("12306购票优惠", "银行卡买火车票立减")),
+        (r"富邦", ("富邦信用卡迎新", "香港富邦信用卡優惠")),
+        (r"新加坡", ("中国工商银行新加坡分行", "新加坡刷卡返现优惠")),
+        (r"华夏银行|华夏信用卡|华夏优享", ("华夏银行信用卡优惠", "办理华夏银行信用卡福利")),
+        (r"广州银行", ("广州银行信用卡", "广银信用卡优惠")),
     ):
         if re.search(pattern, combined, re.I):
             for value in values:
@@ -627,7 +651,7 @@ def extract_seo_meta(entry):
         else "银行卡" if is_financial_offer else "不限卡种"
     )
 
-    is_current_seo_batch = entry.get("datePublished") == SEO_REVISION_DATE.isoformat()
+    is_current_seo_batch = True
     base_benefit_specs = (
         (r"微信立减金|微信.*立减", "微信立减金"),
         (r"数币|数字人民币", "数币红包"),
@@ -875,18 +899,21 @@ def document(page_title, summary, url, kind, body, lastmod=None, date_published=
   <meta property="og:site_name" content="{BRAND_MAIN}">
   <meta property="og:title" content="{escape(page_title)}">
   <meta property="og:description" content="{escape(summary)}">
-  <meta property="og:url" content="{canonical_url}">{published_tag}{modified_tag}
+  <meta property="og:url" content="{canonical_url}">
+  <meta property="og:image" content="https://bank.vooqqqm.com/assets/logo-lijianjin.png">{published_tag}{modified_tag}
   <meta name="twitter:card" content="summary">
   <meta name="twitter:title" content="{escape(page_title)}">
   <meta name="twitter:description" content="{escape(summary)}">
+  <meta name="twitter:image" content="https://bank.vooqqqm.com/assets/logo-lijianjin.png">
   <link rel="icon" href="/assets/logo-lijianjin.png" type="image/png">
   <link rel="alternate" type="text/plain" href="https://bank.vooqqqm.com/llms.txt" title="LLMs.txt">
   <link rel="alternate" type="text/plain" href="https://bank.vooqqqm.com/llms-full.txt" title="LLMs-Full.txt">
   <link rel="alternate" type="application/json" href="https://bank.vooqqqm.com/activities/feed.json" title="银行优惠活动结构化数据">
+  <link rel="alternate" type="application/rss+xml" href="https://bank.vooqqqm.com/rss.xml" title="银行优惠活动 RSS 订阅">
   <link rel="stylesheet" href="{styles}">
   <link rel="stylesheet" href="/activities/styles.css?v=20261119-topiccards1">
   <script type="application/ld+json">{schema_text}</script>
-  <script defer src="/assets/privacy-consent.js?v=20261118-consent1"></script>
+  <script defer src="/assets/privacy-consent.js?v=20261122-ai1"></script>
   <script defer src="/assets/mobile-back.js?v=20261118-back1"></script>
 {MENU_ASSETS}
 </head>
@@ -1280,7 +1307,7 @@ def detail(entry, active_entries, page_published=None):
                 </ul>
                 <p class="detail-section-copy">本站按公开活动信息核验整理，最近更新于 {time_element(entry["lastmod"])}。活动资格、名额和领取入口以所属机构最新规则为准。</p>
 {publication_meta_html}                <p class="seo-card-meta">编辑与复核：羊毛助手编辑组 · <a class="detail-link" href="/editorial-policy.html">查看核验、更正与发布规范</a></p>
-                <a class="detail-link" href="/detail.html?id={activity_id}">打开交互式详情与活动海报图片</a>
+                <a class="detail-link" href="/detail.html?id={activity_id}" rel="nofollow">打开交互式详情与活动海报图片</a>
               </section>
               <aside class="telegram-subscribe detail-telegram-reminder" id="telegram-reminder" aria-label="订阅优惠更新">
                 <p>信用卡返现、微信立减金和港卡优惠更新。</p>
@@ -1472,7 +1499,7 @@ class PublishedTravelOffers(HTMLParser):
         self.items.append({
             "id": detail_id if is_shared else f"web-overseas-{web_id}",
             "webId": None if is_shared else web_id,
-            "url": f"/detail.html?id={detail_id}" if is_shared else f"/detail.html?web={web_id}&topic=travel-card-offers",
+            "url": f"/activities/{detail_id}.html" if is_shared else f"/detail.html?web={web_id}&topic=travel-card-offers",
             "title": title,
             "institution": data.get("data-merchant") or title.split("·", 1)[0].strip(),
             "region": data.get("data-market") or paragraphs[0],
@@ -1629,8 +1656,12 @@ def overseas_hub_page(activities, as_of):
             for position, (link, title) in enumerate(featured_links.items(), start=1)
         ],
     }
-    return document(f'{OVERSEAS_TOPIC["h1"]}{TITLE_SUFFIX}', OVERSEAS_TOPIC["desc"], url,
-                    "CollectionPage", body, lastmod=today, extra_graph=[breadcrumb, items])
+    overseas_meta_desc = (
+        f"2026海外及港澳刷卡消费优惠专题（更新于{today}）：分类整理香港餐饮超市八达通、澳门酒店购物、跨境海淘电商与出境机票订房信用卡返现活动，核对发卡地区、报名条件与截止日期。"
+    )
+    overseas_kw = "海外活动,港卡优惠,香港信用卡回赠,澳门刷卡优惠,海淘信用卡返现,出境游刷卡优惠,八达通优惠,Agoda优惠,Trip.com信用卡优惠,羊毛助手"
+    return document(f'2026{OVERSEAS_TOPIC["h1"]}优惠汇总{TITLE_SUFFIX}', overseas_meta_desc, url,
+                    "CollectionPage", body, lastmod=today, keywords=overseas_kw, extra_graph=[breadcrumb, items])
 
 
 def build_topic_page(spec, active_entries, ended_entries, generated_on):
@@ -1676,6 +1707,64 @@ def build_topic_page(spec, active_entries, ended_entries, generated_on):
             {"@type": "ListItem", "position": 3, "name": spec["h1"], "item": url},
         ],
     }
+    item_list_schema = {
+        "@type": "ItemList",
+        "@id": f"{url}#itemlist",
+        "name": f'{spec["h1"]}精选列表',
+        "numberOfItems": len(matched_active),
+        "itemListElement": [
+            {
+                "@type": "ListItem",
+                "position": idx,
+                "url": f'{DIRECTORY}{e["id"]}.html',
+                "name": e["seo"]["search_title"],
+            }
+            for idx, e in enumerate(matched_active[:30], start=1)
+        ],
+    }
+
+    bank_counts = {}
+    credit_cnt = 0
+    for e in matched_active:
+        b = e["seo"]["bank_short"]
+        bank_counts[b] = bank_counts.get(b, 0) + 1
+        if e["isCredit"]:
+            credit_cnt += 1
+    top_banks_txt = "、".join(
+        f"{b}（{cnt}项）"
+        for b, cnt in sorted(bank_counts.items(), key=lambda kv: kv[1], reverse=True)[:6]
+    ) or "多家主流发卡机构"
+    debit_cnt = max(0, len(matched_active) - credit_cnt)
+
+    table_rows = "\n".join(
+        f"""            <tr>
+              <td><a href="/activities/{e["id"]}.html">{escape(e["seo"]["search_title"])}</a></td>
+              <td>{escape(e["bankName"])}</td>
+              <td><strong>{escape(e["seo"]["discount_phrase"])}</strong></td>
+              <td>{escape(e["region"] or "全国")}</td>
+              <td>{e["validTo"]}</td>
+            </tr>"""
+        for e in matched_active[:10]
+    )
+    comparison_table_html = ""
+    if table_rows:
+        comparison_table_html = f"""      <h2>近期重点{escape(spec["short"])}速查表（前 {min(10, len(matched_active))} 项）</h2>
+      <div style="overflow-x:auto;margin:0.75rem 0 1.25rem;">
+        <table style="width:100%;border-collapse:collapse;font-size:0.9rem;">
+          <thead>
+            <tr style="background:#f8fafc;text-align:left;border-bottom:2px solid #cbd5e1;">
+              <th style="padding:8px 10px;">活动名称与规则入口</th>
+              <th style="padding:8px 10px;">发卡/主办机构</th>
+              <th style="padding:8px 10px;">核心优惠</th>
+              <th style="padding:8px 10px;">适用地区</th>
+              <th style="padding:8px 10px;">截止日期</th>
+            </tr>
+          </thead>
+          <tbody>
+{table_rows}
+          </tbody>
+        </table>
+      </div>"""
 
     cards = "\n".join(f"""        <li class="detail-section topic-activity-card">
           <a class="topic-activity-link" href="/activities/{e["id"]}.html" target="_blank" rel="noopener">
@@ -1717,11 +1806,12 @@ def build_topic_page(spec, active_entries, ended_entries, generated_on):
       <h1>{escape(spec["h1"])}</h1>
       <p>{escape(spec["desc"])}</p>
       <div class="seo-ai-summary">
-        <p><strong>专题数据速览（更新于 {generated_on.isoformat()}）：</strong>当前共有 <strong>{len(matched_active)}</strong> 项正在进行的{escape(spec["short"])}活动。点击任一活动卡片即可在新窗口查看完整领取入口、名额限制与核销规则；也可<a href="/">返回首页使用多维实时筛选器</a>。</p>
+        <p><strong>专题数据速览（更新于 {generated_on.isoformat()}）：</strong>当前共有 <strong>{len(matched_active)}</strong> 项正在进行的{escape(spec["short"])}活动（信用卡专属约 {credit_cnt} 项，借记卡及通用约 {debit_cnt} 项；主要覆盖机构：{escape(top_banks_txt)}）。点击任一活动卡片即可查看完整领取入口、名额限制与核销规则；也可<a href="/">返回首页使用多维实时筛选器</a>。</p>
       </div>
       <h2>全部优惠专题快速切换</h2>
       {topic_hub_nav_markup(spec["slug"])}
-      <h2>当前有效的{escape(spec["short"])}列表（共 {len(matched_active)} 项）</h2>
+{comparison_table_html}
+      <h2>当前有效的{escape(spec["short"])}完整列表（共 {len(matched_active)} 项）</h2>
       <ul class="activity-directory">
 {cards}
       </ul>
@@ -1742,14 +1832,14 @@ def build_topic_page(spec, active_entries, ended_entries, generated_on):
         lastmod=lastmod,
         indexable=True,
         keywords=spec["keywords"],
-        extra_graph=[breadcrumb_schema, faq_schema],
+        extra_graph=[breadcrumb_schema, item_list_schema, faq_schema],
     ), len(matched_active), lastmod
 
 
 def topics_index_page(topic_stats, active_total, generated_on):
     page_title = f"2026银行优惠专题导航：按银行与支付方式查立减金、返现与红包{TITLE_SUFFIX}"
     summary = (
-        f"羊毛助手优惠专题导航，按支付渠道、发卡银行、境外用卡及香港本地、海淘和出境旅行等场景浏览。银行活动目录当前列出 {active_total} 条活动。"
+        f"羊毛助手·羊毛线报活动站优惠专题总导航（更新于{generated_on.isoformat()}），按微信立减金、云闪付、支付宝、信用卡返现、港卡海外回赠、出行酒店订房、支付限额查询及农行、工行、建行、中行等专题汇总 {active_total} 条实时有效活动。"
     )
     keywords = "银行优惠专题,微信立减金汇总,云闪付满减汇总,支付宝银行卡优惠,信用卡返现大全,农行优惠,工行优惠,建行优惠,中行优惠,港卡返现,羊毛助手·羊毛线报活动站"
 
@@ -1864,9 +1954,9 @@ def directory_card(entry):
 
 
 def archive_directory(entries, generated_on):
-    page_title = f"已结束银行优惠活动规则与历史资料归档{TITLE_SUFFIX}"
+    page_title = f"已结束银行优惠活动规则与历史资料归档（共{len(entries)}项）{TITLE_SUFFIX}"
     summary = (
-        f"归档查询羊毛助手·羊毛线报活动站收录的 {len(entries)} 项已结束银行立减金、信用卡返现与支付满减历史活动资料，供往期活动规则核对与参考。"
+        f"归档查询羊毛助手·羊毛线报活动站收录的 {len(entries)} 项已结束银行微信立减金、信用卡返现、云闪付消费券、港卡回赠与支付满减历史活动资料，保留原活动有效期、参与门槛与规则记录供核对参考。"
     )
     keywords = "历史银行活动归档,已结束银行优惠查询,往期信用卡活动规则,羊毛助手·羊毛线报活动站"
     cards = "\n".join(f"""        <li class="detail-section">
@@ -1961,6 +2051,36 @@ def ai_feed(entries, generated_on):
     }
 
 
+def rss_xml(entries, generated_on):
+    items = []
+    for entry in entries[:200]:
+        link = f'{DIRECTORY}{entry["id"]}.html'
+        desc = f'【{entry["bankName"]} · {entry["seo"]["discount_phrase"]}】{clean_line(entry["desc"])} 有效期：{entry["validFrom"]}至{entry["validTo"]}；参与方式：{clean_line(entry["pathDesc"])}'
+        items.append(
+            "    <item>\n"
+            f'      <title>{escape(entry["seo"]["search_title"])}</title>\n'
+            f"      <link>{link}</link>\n"
+            f'      <guid isPermaLink="true">{link}</guid>\n'
+            f"      <description>{escape(desc)}</description>\n"
+            f'      <category>{escape(entry["bankName"])}</category>\n'
+            f'      <pubDate>{entry["lastmod"]}T00:00:00+08:00</pubDate>\n'
+            "    </item>"
+        )
+    return (
+        '<?xml version="1.0" encoding="UTF-8"?>\n'
+        '<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">\n'
+        "  <channel>\n"
+        f"    <title>{escape(BRAND_MAIN)} - 最新银行优惠与信用卡返现订阅</title>\n"
+        f"    <link>{SITE}/</link>\n"
+        f'    <atom:link href="{SITE}/rss.xml" rel="self" type="application/rss+xml" />\n'
+        f"    <description>每日核验更新全国及港澳海外银行微信立减金、云闪付满减、支付宝红包、信用卡返现与出行酒店折扣活动（更新于 {generated_on.isoformat()}）。</description>\n"
+        "    <language>zh-cn</language>\n"
+        f"    <lastBuildDate>{generated_on.isoformat()}T00:00:00+08:00</lastBuildDate>\n"
+        + "\n".join(items)
+        + "\n  </channel>\n</rss>\n"
+    )
+
+
 def llms_index(current, ended, topic_stats, generated_on):
     manual_topic_lines = "\n".join(
         f'- [{topic["h1"]}]({TOPICS_URL}{topic["slug"]}.html): {topic["desc"]} 最近核验更新于 {topic["lastmod"]}。'
@@ -1972,18 +2092,20 @@ def llms_index(current, ended, topic_stats, generated_on):
     )
     return f"""# {BRAND_MAIN}
 
-> 中国银行卡与移动支付公开优惠信息检索库（https://bank.vooqqqm.com/）。截至 {generated_on.isoformat()}，当前有效活动共 {len(current)} 条，已结束归档活动共 {len(ended)} 条。覆盖微信立减金、云闪付满减、支付宝红包、数字人民币（数币）红包、信用卡消费返现及港卡境外返现。每条活动均具备独立静态 HTML 页面、优惠额度、适用地区、有效期限、领取步骤与常见问答（FAQ），适合搜索引擎与 AI 助手（豆包、DeepSeek、腾讯元宝、Kimi、ChatGPT、Claude、Perplexity 等）直接检索与引用。
+> 中国内地及港澳海外银行卡与移动支付公开优惠检索库（{SITE}/）。截至 {generated_on.isoformat()}，当前有效活动共 {len(current)} 条，已结束归档活动共 {len(ended)} 条。覆盖微信立减金、云闪付满减、支付宝红包、数字人民币（数币）红包、信用卡消费返现、香港信用卡回赠（中銀 Chill Card / Go 卡 / 信銀國際 Motion / HSBC Red / AEON / WeWa）、OTA 旅行订房（Agoda / Trip.com）及各银行支付限额与风控排查指南。每条活动均具备独立静态 HTML 规范页、优惠额度、适用地区、有效期限、领取步骤与 FAQPage 结构化数据，遵循 AI 检索标准，支持 DeepSeek、豆包（Doubao）、腾讯元宝（Yuanbao）、企业微信智能机器人（WeChat Work Bot / 微信搜一搜）、Google Gemini、ChatGPT、Claude、OpenAI Codex、Perplexity、Kimi 等 AI 与 Agent 工具直接抓取和引用。
 
-## 核心检索入口
+## 核心机器可读与检索入口
 
-- [首页实时多维筛选]({SITE}/): 支持按银行、消费场景、支付方式、卡组织、地区筛选实时活动。
+- [首页实时多维筛选]({SITE}/): 支持按银行、消费场景、支付方式、卡组织、省市地区筛选实时活动。
 - [当前有效银行优惠总目录]({DIRECTORY}): 全部 {len(current)} 条当前有效活动的纯静态 HTML 列表。
-- [银行与支付渠道专题总导航]({TOPICS_URL}): 按 12 大主流银行与 8 大高频支付/消费场景聚合的专题页面。
+- [银行与支付渠道专题总导航]({TOPICS_URL}): 按主流发卡银行、高频支付渠道、港卡海外与出行场景聚合的专题页面。
 - [{OVERSEAS_TOPIC["h1"]}]({TOPICS_URL}{OVERSEAS_TOPIC["slug"]}.html): {OVERSEAS_TOPIC["desc"]}
-- [活动全文 Markdown 索引]({SITE}/llms-full.txt): 面向大模型 RAG 检索的全量活动结构化摘要与参与路径。
-- [结构化 JSON 数据源]({SITE}/activities/feed.json): 全部公开活动的机器可读 JSON 数据接口。
+- [活动全文 Markdown 语料库]({SITE}/llms-full.txt): 面向大模型与 Coding/Search Agent（ChatGPT、Gemini、Claude、Codex、DeepSeek、豆包、元宝、企业微信 Work Bot）的全量活动结构化摘要与参与路径。
+- [结构化 JSON 数据源]({SITE}/activities/feed.json): 全部公开活动的机器可读 JSON 接口。
+- [OpenAPI 接口描述]({SITE}/openapi.json): 面向 AI Agent / 工具调用的标准 OpenAPI 3.1 描述文件（配合 `/.well-known/ai-plugin.json`）。
+- [最新活动 RSS 2.0 订阅源]({SITE}/rss.xml): 最新 200 条有效活动的标准 XML 订阅流，支持机器人与聚合器轮询。
 - [历史已结束活动归档]({DIRECTORY}archive.html): {len(ended)} 条已结束活动历史资料。
-- [XML 站点地图]({SITE}/sitemap.xml): 全站公开静态 URL 列表。
+- [XML 站点地图]({SITE}/sitemap.xml): 全站公开规范静态 URL 列表。
 
 ## 热门银行与支付方式专题页（推荐 AI 优先检索引用）
 
@@ -2114,9 +2236,12 @@ def main():
     feed_json = json.dumps(feed, ensure_ascii=False, indent=2) + "\n"
     llms_text = llms_index(active, ended, topic_stats, args.as_of)
     llms_full_text = llms_full(public_entries, args.as_of)
+    rss_text = rss_xml(active, args.as_of)
 
     OUTPUT.mkdir(exist_ok=True)
     TOPICS_OUTPUT.mkdir(exist_ok=True)
+    well_known = OUTPUT.parent / ".well-known"
+    well_known.mkdir(exist_ok=True)
     for activity_id, html in pages.items():
         (OUTPUT / f"{activity_id}.html").write_text(html, encoding="utf-8")
     for slug, html in topic_pages.items():
@@ -2128,7 +2253,9 @@ def main():
     (OUTPUT / "archive.html").write_text(archive_html, encoding="utf-8")
     (OUTPUT / "feed.json").write_text(feed_json, encoding="utf-8")
     (OUTPUT.parent / "sitemap.xml").write_text(sitemap, encoding="utf-8")
+    (OUTPUT.parent / "rss.xml").write_text(rss_text, encoding="utf-8")
     (OUTPUT.parent / "llms.txt").write_text(llms_text, encoding="utf-8")
+    (well_known / "llms.txt").write_text(llms_text, encoding="utf-8")
     (OUTPUT.parent / "llms-full.txt").write_text(llms_full_text, encoding="utf-8")
     manifest_path.write_text(json.dumps(manifest, indent=2) + "\n", encoding="utf-8")
     print(

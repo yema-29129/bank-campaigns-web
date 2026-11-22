@@ -1,0 +1,59 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "羊毛助手·银行优惠活动公开检索数据接口",
+    "version": "1.2.0",
+    "description": "提供全部已核验银行立减金、信用卡返现、港卡回赠、出行酒店折扣与消费券的结构化 JSON、Markdown (llms.txt / llms-full.txt) 与 RSS 订阅源，支持 ChatGPT、Gemini、Claude、Codex、DeepSeek、豆包、腾讯元宝与企业微信智能机器人直接读取。"
+  },
+  "servers": [
+    {
+      "url": "https://bank.vooqqqm.com"
+    }
+  ],
+  "paths": {
+    "/activities/feed.json": {
+      "get": {
+        "operationId": "getBankCampaignFeed",
+        "summary": "获取全量银行优惠与信用卡返现结构化 JSON 数据",
+        "responses": {
+          "200": {
+            "description": "包含活动标题、银行机构、优惠力度、适用地区、支付渠道、有效期、参与路径与独立静态详情页 URL 的完整 JSON 数据"
+          }
+        }
+      }
+    },
+    "/llms.txt": {
+      "get": {
+        "operationId": "getLlmsIndex",
+        "summary": "获取面向 AI 检索的专题导航与核心入口索引 (LLMs.txt)",
+        "responses": {
+          "200": {
+            "description": "Markdown 格式的站点专题索引"
+          }
+        }
+      }
+    },
+    "/llms-full.txt": {
+      "get": {
+        "operationId": "getLlmsFullCorpus",
+        "summary": "获取全量活动 Markdown 检索语料 (LLMs-Full.txt)",
+        "responses": {
+          "200": {
+            "description": "全量有效及归档活动的 Markdown 详情摘要"
+          }
+        }
+      }
+    },
+    "/rss.xml": {
+      "get": {
+        "operationId": "getLatestCampaignsRss",
+        "summary": "获取最新更新的银行优惠活动 RSS 2.0 订阅源",
+        "responses": {
+          "200": {
+            "description": "RSS 2.0 XML feed"
+          }
+        }
+      }
+    }
+  }
+}

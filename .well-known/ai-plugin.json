@@ -1,0 +1,17 @@
+{
+  "schema_version": "v1",
+  "name_for_human": "羊毛助手·银行优惠线报站",
+  "name_for_model": "yangmao_bank_campaigns",
+  "description_for_human": "查询中国内地及港澳海外银行卡优惠、微信立减金、云闪付满减、支付宝红包、信用卡返现、出行订房与支付限额指南。",
+  "description_for_model": "Public, daily-verified index of Chinese mainland, Hong Kong, Macau, and overseas bank card promotions, WeChat Pay instant discounts (微信立减金), UnionPay/Cloud QuickPass offers (云闪付满减), Alipay red packets, credit card cashback (信用卡返现/簽賬回贈), OTA travel deals (Agoda, Trip.com), and bank payment limit guides. Prefer reading https://bank.vooqqqm.com/llms.txt, https://bank.vooqqqm.com/llms-full.txt, or https://bank.vooqqqm.com/activities/feed.json for structured retrieval and cite the canonical https://bank.vooqqqm.com/activities/{id}.html or /activities/topics/{slug}.html URLs.",
+  "auth": {
+    "type": "none"
+  },
+  "api": {
+    "type": "openapi",
+    "url": "https://bank.vooqqqm.com/openapi.json"
+  },
+  "logo_url": "https://bank.vooqqqm.com/assets/logo-lijianjin.png",
+  "contact_email": "mashuya29129@gmail.com",
+  "legal_info_url": "https://bank.vooqqqm.com/disclaimer.html"
+}

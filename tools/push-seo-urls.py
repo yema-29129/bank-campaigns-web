@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
-"""Push public URLs to IndexNow (Bing/AI search) and Baidu API.
+"""Push high-priority & recently updated URLs to IndexNow and Baidu API
+without triggering Bing Webmaster Tools' large-batch throttling warning.
 
 Usage:
-  python3 tools/push-seo-urls.py
-  python3 tools/push-seo-urls.py --published-on 2026-11-18 --baidu-limit 200
+  python3 tools/push-seo-urls.py [--max-indexnow 80]
 """
 
 import argparse
@@ -18,42 +18,36 @@ INDEXNOW_KEY = "aa625855966a884521e7ea6c7c8aa02b3409b011"
 BAIDU_TOKEN = "PbcUSdVrdgkKed55"
 
 
-def load_sitemap_urls(sitemap_path: Path):
+def load_prioritized_urls(sitemap_path: Path):
     root = ET.fromstring(sitemap_path.read_text(encoding="utf-8"))
     ns = {"sm": "http://www.sitemaps.org/schemas/sitemap/0.9"}
-    urls = [el.text for el in root.findall("sm:url/sm:loc", ns) if el.text]
-    for extra in (f"{SITE}/llms.txt", f"{SITE}/llms-full.txt", f"{SITE}/activities/feed.json"):
-        if extra not in urls:
-            urls.append(extra)
-    return urls
+    core_and_topics = []
+    dated_activities = []
+    for u in root.findall("sm:url", ns):
+        loc = (u.findtext("sm:loc", default="", namespaces=ns) or "").strip()
+        lmod = (u.findtext("sm:lastmod", default="", namespaces=ns) or "").strip()
+        if not loc:
+            continue
+        if "/activities/" not in loc or "/activities/topics/" in loc or loc.endswith("/activities/"):
+            core_and_topics.append(loc)
+        else:
+            dated_activities.append((lmod, loc))
+    dated_activities.sort(key=lambda item: item[0], reverse=True)
+    ordered = list(core_and_topics)
+    for extra in (f"{SITE}/llms.txt", f"{SITE}/llms-full.txt", f"{SITE}/activities/feed.json", f"{SITE}/rss.xml"):
+        if extra not in ordered:
+            ordered.append(extra)
+    ordered.extend(loc for _, loc in dated_activities)
+    return ordered
 
 
-def load_published_urls(feed_path: Path, published_on: str):
-    payload = json.loads(feed_path.read_text(encoding="utf-8"))
-    urls = [
-        item["url"] for item in payload.get("activities", [])
-        if item.get("datePublished") == published_on and item.get("url", "").startswith(f"{SITE}/activities/")
-    ]
-    discovery_urls = (
-        f"{SITE}/",
-        f"{SITE}/activities/",
-        f"{SITE}/activities/topics/",
-        f"{SITE}/activities/topics/travel-card-offers.html",
-        f"{SITE}/activities/topics/black-friday-2026.html",
-        f"{SITE}/sitemap.xml",
-        f"{SITE}/llms.txt",
-        f"{SITE}/llms-full.txt",
-        f"{SITE}/activities/feed.json",
-    )
-    return list(dict.fromkeys(urls + list(discovery_urls)))
-
-
-def push_indexnow(urls):
+def push_indexnow(urls, max_urls=80):
+    batch = urls[:max_urls]
     payload = json.dumps({
         "host": "bank.vooqqqm.com",
         "key": INDEXNOW_KEY,
         "keyLocation": f"{SITE}/{INDEXNOW_KEY}.txt",
-        "urlList": urls,
+        "urlList": batch,
     }).encode("utf-8")
     req = urllib.request.Request(
         "https://api.indexnow.org/indexnow",
@@ -62,14 +56,11 @@ def push_indexnow(urls):
         method="POST",
     )
     with urllib.request.urlopen(req, timeout=20) as resp:
-        print(f"[IndexNow] HTTP {resp.status} — pushed {len(urls)} URLs")
+        print(f"[IndexNow] HTTP {resp.status} — pushed {len(batch)} priority/updated URLs")
 
 
 def push_baidu(urls, limit=10):
-    batch = [u for u in urls if not u.endswith((".txt", ".json"))][:limit]
-    if not batch:
-        print("[Baidu API] No eligible URLs to push")
-        return
+    batch = [u for u in urls if not u.endswith((".txt", ".json", ".xml"))][:limit]
     body = "\n".join(batch).encode("utf-8")
     req = urllib.request.Request(
         f"http://data.zz.baidu.com/urls?site={SITE}&token={BAIDU_TOKEN}",
@@ -86,22 +77,16 @@ def push_baidu(urls, limit=10):
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--published-on", help="Only submit activities first published on YYYY-MM-DD")
-    parser.add_argument("--baidu-limit", type=int, default=10, help="Maximum URLs sent to Baidu (default: 10)")
+    parser.add_argument("--max-indexnow", type=int, default=80)
     args = parser.parse_args()
 
     root_dir = Path(__file__).resolve().parents[1]
     sitemap = root_dir / "sitemap.xml"
     if not sitemap.exists():
         sitemap = root_dir / "site" / "sitemap.xml"
-    if args.published_on:
-        feed = root_dir / "activities" / "feed.json"
-        urls = load_published_urls(feed, args.published_on)
-    else:
-        urls = load_sitemap_urls(sitemap)
-    print(f"Selected {len(urls)} URLs for submission")
-    push_indexnow(urls)
-    push_baidu(urls, limit=args.baidu_limit)
+    urls = load_prioritized_urls(sitemap)
+    push_indexnow(urls, max_urls=args.max_indexnow)
+    push_baidu(urls)
 
 
 if __name__ == "__main__":

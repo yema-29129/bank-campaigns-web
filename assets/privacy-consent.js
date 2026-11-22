@@ -39,10 +39,46 @@
     document.head.appendChild(script);
   }
 
+  function detectAiPlatform() {
+    var ref = String(document.referrer || "").toLowerCase();
+    var ua = String(navigator.userAgent || "").toLowerCase();
+    var search = String(window.location.search || "").toLowerCase();
+    var combined = ref + " " + search + " " + ua;
+    var rules = [
+      ["deepseek", /deepseek\.com|deepseek/],
+      ["doubao", /doubao\.com|bytedancewebview|toutiao|ttwebview/],
+      ["yuanbao", /yuanbao\.tencent\.com|hunyuan\.tencent\.com|yuanbao/],
+      ["wechat_workbot", /wxwork|wecom|work\.weixin\.qq\.com/],
+      ["wechat", /micromessenger|weixin\.qq\.com/],
+      ["chatgpt", /chatgpt\.com|chat\.openai\.com|oai-searchbot|gptbot/],
+      ["codex", /\bcodex\b|openai-codex/],
+      ["gemini", /gemini\.google\.com|bard\.google\.com|vertexbot/],
+      ["claude", /claude\.ai|anthropic/],
+      ["perplexity", /perplexity\.ai|perplexitybot/],
+      ["kimi", /moonshot\.cn|kimi\.ai|kimi\.com/],
+      ["copilot", /copilot\.microsoft\.com|bing\.com\/chat/],
+      ["quark_qwen", /quark\.cn|qianwen|tongyi\.aliyun\.com/]
+    ];
+    for (var i = 0; i < rules.length; i++) {
+      if (rules[i][1].test(combined)) return rules[i][0];
+    }
+    return "";
+  }
+
+  function isStrictOptInRegion() {
+    try {
+      var tz = Intl.DateTimeFormat().resolvedOptions().timeZone || "";
+      return /^Europe\//i.test(tz);
+    } catch (error) {
+      return false;
+    }
+  }
+
   function loadAnalytics() {
     if (document.documentElement.dataset.analyticsLoaded === "true") return;
     document.documentElement.dataset.analyticsLoaded = "true";
 
+    var aiPlatform = detectAiPlatform();
     window.gtag("consent", "update", {
       analytics_storage: "granted",
       ad_storage: "denied",
@@ -50,10 +86,25 @@
       ad_personalization: "denied"
     });
     window.gtag("js", new Date());
-    window.gtag("config", GA_ID, { anonymize_ip: true });
+    var gaConfig = { anonymize_ip: true };
+    if (aiPlatform) {
+      gaConfig.campaign_source = aiPlatform;
+      gaConfig.campaign_medium = "ai_assistant";
+    }
+    window.gtag("config", GA_ID, gaConfig);
+    if (aiPlatform) {
+      window.gtag("event", "ai_referral_visit", {
+        ai_platform: aiPlatform,
+        referrer_url: document.referrer || "(in-app-or-direct)",
+        landing_path: window.location.pathname
+      });
+    }
     addScript("googleAnalyticsScript", "https://www.googletagmanager.com/gtag/js?id=" + GA_ID);
 
     window._hmt = window._hmt || [];
+    if (aiPlatform) {
+      window._hmt.push(["_trackEvent", "ai_referral", aiPlatform, window.location.pathname]);
+    }
     addScript("baiduAnalyticsScript", "https://hm.baidu.com/hm.js?" + BAIDU_ID);
     addScript("ttzz", BYTEDANCE_SRC);
   }
@@ -162,8 +213,15 @@
     addStylesheet();
     addSettingsButton();
     var choice = readChoice();
-    if (choice === ACCEPTED) loadAnalytics();
-    if (!choice) openPanel();
+    if (choice === ACCEPTED) {
+      loadAnalytics();
+    } else if (!choice) {
+      if (isStrictOptInRegion()) {
+        openPanel();
+      } else {
+        loadAnalytics();
+      }
+    }
   }
 
   window.YangmaoPrivacy = {
