@@ -883,6 +883,10 @@ def document(page_title, summary, url, kind, body, lastmod=None, date_published=
     kw_tag = f'\n  <meta name="keywords" content="{escape(keywords)}">' if keywords else ""
     published_tag = f'\n  <meta property="article:published_time" content="{date_published}">' if date_published else ""
     modified_tag = f'\n  <meta property="article:modified_time" content="{lastmod}">' if date_published and lastmod else ""
+    adsense_script = (
+        '\n  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-4665323446483162" crossorigin="anonymous"></script>'
+        if indexable else ""
+    )
 
     return f"""<!doctype html>
 <html lang="zh-CN">
@@ -893,6 +897,7 @@ def document(page_title, summary, url, kind, body, lastmod=None, date_published=
   <meta name="description" content="{escape(summary)}">{kw_tag}
   <meta name="robots" content="{robots}">
   <meta name="msvalidate.01" content="C09F13C155CD1821058CACBCDCA96FDE">
+  <meta name="google-adsense-account" content="ca-pub-4665323446483162">
   <link rel="canonical" href="{canonical_url}">
   <meta property="og:locale" content="zh_CN">
   <meta property="og:type" content="{og_type}">
@@ -912,7 +917,7 @@ def document(page_title, summary, url, kind, body, lastmod=None, date_published=
   <link rel="alternate" type="application/rss+xml" href="https://bank.vooqqqm.com/rss.xml" title="银行优惠活动 RSS 订阅">
   <link rel="stylesheet" href="{styles}">
   <link rel="stylesheet" href="/activities/styles.css?v=20261119-topiccards1">
-  <script type="application/ld+json">{schema_text}</script>
+  <script type="application/ld+json">{schema_text}</script>{adsense_script}
   <script defer src="/assets/privacy-consent.js?v=20261122-ai1"></script>
   <script defer src="/assets/mobile-back.js?v=20261118-back1"></script>
 {MENU_ASSETS}
