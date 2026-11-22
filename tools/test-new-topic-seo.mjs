@@ -23,15 +23,15 @@ const topics = [
     path: 'activities/topics/travel-card-offers.html',
     url: `${SITE}/activities/topics/travel-card-offers.html`,
     countPattern: /<li class="detail-section"/g,
-    expectedCount: 44,
+    expectedCount: 46,
     lastmod: "2026-11-22",
   },
   {
     path: 'activities/topics/black-friday-2026.html',
     url: `${SITE}/activities/topics/black-friday-2026.html`,
     countPattern: /<li class="detail-section"[^>]*data-campaign/g,
-    expectedCount: 91,
-    lastmod: "2026-11-20",
+    expectedCount: 96,
+    lastmod: "2026-11-22",
     allWebsiteOnly: true,
   },
 ];

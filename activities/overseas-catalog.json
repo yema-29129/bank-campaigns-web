@@ -145,6 +145,7 @@
     "156": "travel",
     "393": "travel",
     "345": "travel",
+    "web-overseas-hsbc-sg-expedia-16-2026": "travel",
     "web-overseas-taishin-richart-agoda-2026": "travel",
     "web-overseas-ocbc-hk-hutchgo-2026": "travel",
     "web-overseas-wewa-hk-hutchgo-2026": "travel",
@@ -194,6 +195,7 @@
     "243": "hong-kong",
     "225": "hong-kong",
     "204": "hong-kong",
+    "web-overseas-hk-tsim-sha-tsui-empire-dining-2026": "hong-kong",
     "web-overseas-hktb-mcdonalds-big-mac-winter-2026": "hong-kong",
     "web-overseas-hktb-alipayplus-qts-winter-2026": "hong-kong",
     "577": "shopping",
@@ -414,6 +416,29 @@
         "先参观博物馆：购票日起 7 天内，带门票存根到中环天星码头观光城巴服务站，购买 24、48 或 72 小时城巴全港游通票时减 HK$10。",
         "先买巴士通票：购票日起 7 天内，到中环 8 号码头的香港海事博物馆售票处出示有效通票二维码，成人门票半价，减 HK$15。",
         "购票当天计作第 1 天，须在活动结束前兑换。每张票尾限用一次，且不可叠加其他优惠。购票前可向售票处确认票种和退改条件。"
+      ]
+    },
+    {
+      "id": "web-overseas-hsbc-sg-expedia-16-2026",
+      "webId": "hsbc-sg-expedia-16-2026",
+      "url": "/detail.html?web=hsbc-sg-expedia-16-2026&topic=travel-card-offers",
+      "title": "新加坡汇丰信用卡 · Expedia 指定酒店 84 折，最多减 S$55",
+      "institution": "新加坡汇丰 / Expedia",
+      "region": "全球参与酒店 · 新加坡发行的汇丰信用卡",
+      "summary": "新加坡汇丰信用卡持卡人经 Expedia 专页订指定酒店，输入 HSBCSG16 可减 16%。",
+      "validFrom": "2026-10-06",
+      "validTo": "2026-12-31",
+      "channel": "Expedia 新加坡指定网页",
+      "createdAt": "2026-11-22",
+      "distributionScope": "web_only",
+      "sources": [
+        "https://www.expedia.com.sg/hsbc",
+        "https://www.hsbc.com.sg/card-promotions/travel-leisure/expedia16/",
+        "https://www.expedia.com.sg/lp/b/sghsbcpub1620261006"
+      ],
+      "rules": [
+        "经指定网页预付至少一晚，单笔税费前满 S$1，折扣最多 S$55。活动按新加坡时间 12 月 31 日 23:59 截止，入住日期须在 2026 年 10 月 6 日至 2027 年 3 月 31 日内。汇丰说明每月 16 日刷新名额，先到先得。",
+        "仅限指定酒店单订、单间、网上预付。App、电话、机酒套餐及第三方供应的住宿不适用。每券限用一次，税费另计，取消和退款按所选房型及优惠券条款。"
       ]
     },
     {
@@ -906,6 +931,28 @@
       "rules": [
         "限最先成功登记的 5,000 名主卡持卡人，从成功登记所在阶段起计。香港实体店用港币、澳门实体店用澳门元，均须符合非接触式付款要求。每个独立账户每月最多返 HK$100，每阶段最多返 HK$300，全期上限 HK$600。",
         "首阶段至 2026 年 12 月 31 日，次阶段为 2027 年 1 月 1 日至 3 月 31 日。回赠分别最迟于 2027 年 3 月 31 日、6 月 30 日入账。电子钱包、八达通充值、退款等不计。"
+      ]
+    },
+    {
+      "id": "web-overseas-hk-tsim-sha-tsui-empire-dining-2026",
+      "webId": "hk-tsim-sha-tsui-empire-dining-2026",
+      "url": "/detail.html?web=hk-tsim-sha-tsui-empire-dining-2026&topic=travel-card-offers",
+      "title": "香港尖沙咀中心及帝国中心 · 指定餐饮满 HK$500 换 HK$50 餐饮券",
+      "institution": "尖沙咀中心 / 帝国中心",
+      "region": "香港尖沙咀中心及帝国中心指定餐饮商户",
+      "summary": "顾客在两座商场的指定餐厅单笔电子支付满 HK$500，凭当日收据换 HK$50 餐饮券。",
+      "validFrom": "2026-11-17",
+      "validTo": "2027-01-03",
+      "channel": "指定餐厅现场电子支付／商场礼宾处",
+      "createdAt": "2026-11-22",
+      "distributionScope": "web_only",
+      "sources": [
+        "https://www.tsimshatsuicentre.com.hk/tc/promotions/hong-kong-spectacular-rewards-phase-4/",
+        "https://www.tsimshatsuicentre.com.hk/AcceptedMerchantsListAndTnC.pdf"
+      ],
+      "rules": [
+        "凭本人当天机印收据正本及付款凭证到尖沙咀中心地下礼宾处换领，开放时间为 10:00–22:00。支付方式包括合资格银行卡、Apple Pay、支付宝、微信支付和八达通等。现金、网上付款和分拆支付不参加，每人每日限换一张，名额先到先得。",
+        "券限在官方名单所列商户堂食满 HK$100 时用一张，可能与发券商户名单不同。请核对券面期限及商户条件。按活动条款，已登记单据不能再要求商户退款，券不可兑换现金。"
       ]
     },
     {
