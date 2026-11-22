@@ -73,6 +73,7 @@
     "409": "travel",
     "387": "travel",
     "370": "travel",
+    "web-overseas-fasola-narita-unionpay-preorder-2027": "travel",
     "web-overseas-aeon-hk-unionpay-travel": "travel",
     "web-overseas-aeon-jp-kura-waon": "travel",
     "web-overseas-aeon-jp-topvalu-waon": "travel",
@@ -165,7 +166,6 @@
     "803": "travel",
     "556": "travel",
     "432": "travel",
-    "403": "travel",
     "253": "travel",
     "402": "travel",
     "383": "travel",
@@ -206,6 +206,29 @@
     "262": "macau"
   },
   "websiteOffers": [
+    {
+      "id": "web-overseas-fasola-narita-unionpay-preorder-2027",
+      "webId": "fasola-narita-unionpay-preorder-2027",
+      "url": "/detail.html?web=fasola-narita-unionpay-preorder-2027&topic=travel-card-offers",
+      "title": "成田机场 Fa-So-La · 免税商品官网预约，取货刷银联卡享 95 折",
+      "institution": "Fa-So-La SHOPS / 银联国际",
+      "region": "日本成田机场指定出境免税提货柜台",
+      "summary": "从成田机场出境的旅客先在线预约，出发日到店刷银联卡，合资格商品在免税价上再减 5%。",
+      "validFrom": "2026-10-01",
+      "validTo": "2027-09-30",
+      "channel": "Fa-So-La 官网预约／成田机场柜台刷卡",
+      "createdAt": "2026-11-23",
+      "distributionScope": "web_only",
+      "sources": [
+        "https://www.fasola-shop.com/zh-CN/",
+        "https://m.unionpayintl.com/cardholderServ/serviceCenter/wap/merchant/12176438410612?type=1",
+        "https://www.fasola.jp/zh-CN/knowledge.aspx"
+      ],
+      "rules": [
+        "适用于从成田机场搭国际航班出发的旅客。在 Fa-So-La 预约站选择出发日期和商品，当天完成出境检查后到对应航站楼的指定柜台取货，刷银联卡支付日元。银联公告列明各地发行的银联卡均可参加。",
+        "部分品牌和商品不享折扣，个别商品有限购。取货点和预约截止时间以预约页面为准，结账前核对价签及折扣。店方一般不受理个人原因换货，商品有瑕疵可联系 Fa-So-La 客服。"
+      ]
+    },
     {
       "id": "web-overseas-aeon-hk-unionpay-travel",
       "webId": "aeon-hk-unionpay-travel",
