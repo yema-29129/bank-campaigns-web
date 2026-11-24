@@ -888,18 +888,45 @@ async function fetchDetail() {
     if (websiteOfferId) {
       data = await fetchWebsiteOfferDetail(websiteOfferId, websiteOfferTopic, controller.signal);
     } else {
-      const response = await fetch(`${API_BASE}/campaign_detail.php?id=${encodeURIComponent(campaignId)}`, {
-        credentials: 'omit',
-        signal: controller.signal
-      });
+      try {
+        const response = await fetch(`${API_BASE}/campaign_detail.php?id=${encodeURIComponent(campaignId)}`, {
+          credentials: 'omit',
+          signal: controller.signal
+        });
 
-      if (!response.ok) throw new Error(`HTTP ${response.status}`);
+        if (!response.ok) throw new Error(`HTTP ${response.status}`);
 
-      const payload = await response.json();
-      data = unwrapDetailPayload(payload);
+        const payload = await response.json();
+        data = unwrapDetailPayload(payload);
 
-      if (!data) {
-        throw new Error(payload && payload.message ? payload.message : 'not_found');
+        if (!data) {
+          throw new Error(payload && payload.message ? payload.message : 'not_found');
+        }
+      } catch (apiErr) {
+        console.warn('详情实时接口不可用，切换静态快照 feed.json', apiErr);
+        const fbRes = await fetch('./activities/feed.json', { cache: 'no-cache' });
+        if (!fbRes.ok) throw apiErr;
+        const fbJson = await fbRes.json();
+        const found = (fbJson && Array.isArray(fbJson.activities))
+          ? fbJson.activities.find(x => String(x.id) === String(campaignId))
+          : null;
+        if (!found) throw apiErr;
+        data = {
+          id: found.id,
+          title: found.title,
+          desc: found.summary || '',
+          discount: found.discount || '',
+          bankName: found.institution || '',
+          region: found.region || '',
+          channel: found.channel || '',
+          cardType: found.cardType || '',
+          validFrom: found.validFrom || '',
+          validTo: found.validTo || '',
+          awardDesc: found.offer || found.summary || '',
+          pathDesc: found.participation || '',
+          pathUrl: (Array.isArray(found.sources) && found.sources[0]) || '',
+          tags: Array.isArray(found.searchKeywords) ? found.searchKeywords.slice(2, 6) : []
+        };
       }
     }
 

@@ -2495,18 +2495,55 @@ async function fetchCampaigns() {
       console.warn('海外活动目录暂未载入', error);
       return state.overseasCatalog;
     });
-    const response = await fetch(`${API_BASE}/campaigns.php?view=web-list`, {
-      credentials: 'omit',
-      signal: controller.signal
-    });
-    if (!response.ok) throw new Error(`HTTP ${response.status}`);
-
-    const payload = await response.json();
-    if (!payload || payload.code !== 0 || !Array.isArray(payload.data)) {
-      throw new Error((payload && payload.message) || '接口返回异常');
-    }
-
-    const sharedOffers = payload.data.filter(item => item && item.id != null);
+    const sharedOffers = await (async () => {
+      try {
+        const apiCtrl = new AbortController();
+        const apiTimer = setTimeout(() => apiCtrl.abort(), 5000);
+        const onParentAbort = () => apiCtrl.abort();
+        controller.signal.addEventListener('abort', onParentAbort, { once: true });
+        try {
+          const response = await fetch(`${API_BASE}/campaigns.php?view=web-list`, {
+            credentials: 'omit',
+            signal: apiCtrl.signal
+          });
+          if (!response.ok) throw new Error(`HTTP ${response.status}`);
+          const payload = await response.json();
+          if (!payload || payload.code !== 0 || !Array.isArray(payload.data)) {
+            throw new Error((payload && payload.message) || '接口返回异常');
+          }
+          return payload.data.filter(item => item && item.id != null);
+        } finally {
+          clearTimeout(apiTimer);
+          controller.signal.removeEventListener('abort', onParentAbort);
+        }
+      } catch (apiErr) {
+        console.warn('实时接口暂不可用，自动切换至 GitHub 静态快照 feed.json', apiErr);
+        const fbRes = await fetch('./activities/feed.json', { cache: 'no-cache', signal: controller.signal });
+        if (!fbRes.ok) throw apiErr;
+        const fbJson = await fbRes.json();
+        const list = Array.isArray(fbJson && fbJson.activities) ? fbJson.activities : [];
+        return list
+          .filter(item => item && item.id != null && item.status !== 'ended')
+          .map(item => ({
+            id: item.id,
+            title: item.title,
+            desc: item.summary || '',
+            discount: item.discount || '',
+            bankName: item.institution || '',
+            region: item.region || '',
+            channel: item.channel || '',
+            cardType: item.cardType || '',
+            validFrom: item.validFrom || '',
+            validTo: item.validTo || '',
+            startTime: item.validFrom || '',
+            endTime: item.validTo || '',
+            awardDesc: item.offer || item.summary || '',
+            pathDesc: item.participation || '',
+            pathUrl: (Array.isArray(item.sources) && item.sources[0]) || '',
+            tags: Array.isArray(item.searchKeywords) ? item.searchKeywords.slice(2, 6) : []
+          }));
+      }
+    })();
     const [blackFriday, overseas] = await Promise.all([websiteOffers, overseasCatalog]);
     state.overseasCatalog = overseas;
     state.campaigns = [...sharedOffers, ...blackFriday, ...overseas.websiteOffers.map(websiteOverseasCampaign)]
