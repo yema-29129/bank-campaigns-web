@@ -30,8 +30,8 @@ const topics = [
     path: 'activities/topics/black-friday-2026.html',
     url: `${SITE}/activities/topics/black-friday-2026.html`,
     countPattern: /<li class="detail-section"[^>]*data-campaign/g,
-    expectedCount: 96,
-    lastmod: "2026-11-22",
+    expectedCount: 101,
+    lastmod: "2026-11-25",
     allWebsiteOnly: true,
   },
 ];
