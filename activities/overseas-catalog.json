@@ -1,5 +1,33 @@
 {
   "categories": {
+    "1661": "travel",
+    "1648": "travel",
+    "978": "travel",
+    "1003": "travel",
+    "997": "travel",
+    "803": "travel",
+    "556": "travel",
+    "432": "travel",
+    "253": "travel",
+    "402": "travel",
+    "383": "travel",
+    "368": "travel",
+    "367": "travel",
+    "web-overseas-trip-visa-greater-china-2026": "travel",
+    "web-overseas-hsbc-tw-trip-2026": "travel",
+    "web-overseas-bnu-mo-trip-2026": "travel",
+    "web-overseas-hsbc-sg-travelone-trip": "travel",
+    "web-overseas-hsbc-my-visa-trip-2026": "travel",
+    "web-overseas-hang-seng-hk-visa-trip-q4-2026": "travel",
+    "web-overseas-hsbc-sg-trip-friday-2026": "travel",
+    "web-overseas-boc-macau-taobao-trip-2026": "travel",
+    "web-overseas-mastercard-hk-mo-trip-2027": "travel",
+    "1652": "travel",
+    "1633": "travel",
+    "1572": "travel",
+    "1325": "travel",
+    "1323": "travel",
+    "1322": "travel",
     "1163": "travel",
     "1146": "travel",
     "1015": "travel",
@@ -80,6 +108,36 @@
     "web-overseas-aeon-hk-jcb-jpy-37-5x": "travel",
     "web-overseas-taishin-applecare-dataexpress": "travel",
     "web-overseas-esun-tw-unicard-apple-45": "travel",
+    "1647": "travel",
+    "1646": "travel",
+    "1038": "travel",
+    "912": "travel",
+    "911": "travel",
+    "1041": "travel",
+    "1037": "travel",
+    "335": "travel",
+    "265": "travel",
+    "257": "travel",
+    "256": "travel",
+    "235": "travel",
+    "170": "travel",
+    "156": "travel",
+    "393": "travel",
+    "345": "travel",
+    "web-overseas-hsbc-sg-expedia-16-2026": "travel",
+    "web-overseas-taishin-richart-agoda-2026": "travel",
+    "web-overseas-ocbc-hk-hutchgo-2026": "travel",
+    "web-overseas-wewa-hk-hutchgo-2026": "travel",
+    "web-overseas-aeon-hk-klook-hotels-100": "travel",
+    "web-overseas-agoda-tw-mastercard-world-2027": "travel",
+    "web-overseas-agoda-apac-world-legend-2027": "travel",
+    "web-overseas-bochk-agoda-7pct-2028": "travel",
+    "web-overseas-dbs-sg-agoda-sunday-2026": "travel",
+    "web-overseas-dbs-sg-agoda-nov-sale-2026": "travel",
+    "web-overseas-ihg-global-cyber-sale-2026": "travel",
+    "web-overseas-hsbc-hk-trip-annual-2026": "travel",
+    "web-overseas-bea-hk-trip-annual-2026": "travel",
+    "web-overseas-citi-hk-trip-monthly-2027": "travel",
     "1122": "travel",
     "1014": "travel",
     "924": "travel",
@@ -132,54 +190,6 @@
     "193": "hong-kong",
     "108": "hong-kong",
     "web-overseas-citybus-hkmm-ticket-discount-2026": "hong-kong",
-    "1038": "travel",
-    "912": "travel",
-    "911": "travel",
-    "1041": "travel",
-    "1037": "travel",
-    "335": "travel",
-    "265": "travel",
-    "257": "travel",
-    "256": "travel",
-    "235": "travel",
-    "170": "travel",
-    "156": "travel",
-    "393": "travel",
-    "345": "travel",
-    "web-overseas-hsbc-sg-expedia-16-2026": "travel",
-    "web-overseas-taishin-richart-agoda-2026": "travel",
-    "web-overseas-ocbc-hk-hutchgo-2026": "travel",
-    "web-overseas-wewa-hk-hutchgo-2026": "travel",
-    "web-overseas-aeon-hk-klook-hotels-100": "travel",
-    "web-overseas-agoda-tw-mastercard-world-2027": "travel",
-    "web-overseas-agoda-apac-world-legend-2027": "travel",
-    "web-overseas-bochk-agoda-7pct-2028": "travel",
-    "web-overseas-dbs-sg-agoda-sunday-2026": "travel",
-    "web-overseas-dbs-sg-agoda-nov-sale-2026": "travel",
-    "web-overseas-ihg-global-cyber-sale-2026": "travel",
-    "web-overseas-hsbc-hk-trip-annual-2026": "travel",
-    "web-overseas-bea-hk-trip-annual-2026": "travel",
-    "web-overseas-citi-hk-trip-monthly-2027": "travel",
-    "978": "travel",
-    "1003": "travel",
-    "997": "travel",
-    "803": "travel",
-    "556": "travel",
-    "432": "travel",
-    "253": "travel",
-    "402": "travel",
-    "383": "travel",
-    "368": "travel",
-    "367": "travel",
-    "web-overseas-trip-visa-greater-china-2026": "travel",
-    "web-overseas-hsbc-tw-trip-2026": "travel",
-    "web-overseas-bnu-mo-trip-2026": "travel",
-    "web-overseas-hsbc-sg-travelone-trip": "travel",
-    "web-overseas-hsbc-my-visa-trip-2026": "travel",
-    "web-overseas-hang-seng-hk-visa-trip-q4-2026": "travel",
-    "web-overseas-hsbc-sg-trip-friday-2026": "travel",
-    "web-overseas-boc-macau-taobao-trip-2026": "travel",
-    "web-overseas-mastercard-hk-mo-trip-2027": "travel",
     "952": "shopping",
     "213": "shopping",
     "864": "macau",
@@ -207,542 +217,9 @@
   },
   "websiteOffers": [
     {
-      "id": "web-overseas-fasola-narita-unionpay-preorder-2027",
-      "webId": "fasola-narita-unionpay-preorder-2027",
-      "url": "/detail.html?web=fasola-narita-unionpay-preorder-2027&topic=travel-card-offers",
-      "title": "成田机场 Fa-So-La · 免税商品官网预约，取货刷银联卡享 95 折",
-      "institution": "Fa-So-La SHOPS / 银联国际",
-      "region": "日本成田机场指定出境免税提货柜台",
-      "summary": "从成田机场出境的旅客先在线预约，出发日到店刷银联卡，合资格商品在免税价上再减 5%。",
-      "validFrom": "2026-10-01",
-      "validTo": "2027-09-30",
-      "channel": "Fa-So-La 官网预约／成田机场柜台刷卡",
-      "createdAt": "2026-11-23",
-      "distributionScope": "web_only",
-      "sources": [
-        "https://www.fasola-shop.com/zh-CN/",
-        "https://m.unionpayintl.com/cardholderServ/serviceCenter/wap/merchant/12176438410612?type=1",
-        "https://www.fasola.jp/zh-CN/knowledge.aspx"
-      ],
-      "rules": [
-        "适用于从成田机场搭国际航班出发的旅客。在 Fa-So-La 预约站选择出发日期和商品，当天完成出境检查后到对应航站楼的指定柜台取货，刷银联卡支付日元。银联公告列明各地发行的银联卡均可参加。",
-        "部分品牌和商品不享折扣，个别商品有限购。取货点和预约截止时间以预约页面为准，结账前核对价签及折扣。店方一般不受理个人原因换货，商品有瑕疵可联系 Fa-So-La 客服。"
-      ]
-    },
-    {
-      "id": "web-overseas-aeon-hk-unionpay-travel",
-      "webId": "aeon-hk-unionpay-travel",
-      "url": "/detail.html?web=aeon-hk-unionpay-travel&topic=travel-card-offers",
-      "title": "香港 AEON 银联信用卡 · 境外及外币消费合共赚 15 倍积分",
-      "institution": "香港 AEON",
-      "region": "境外及外幣交易 · 香港 AEON 發行銀聯信用卡",
-      "summary": "香港 AEON 银联信用卡主卡在 App 登记后刷合资格境外或外币交易，合共赚 15 倍积分。",
-      "validFrom": "2026-11-01",
-      "validTo": "2026-12-31",
-      "channel": "AEON HK App 登記、合資格銀聯簽賬",
-      "createdAt": null,
-      "distributionScope": "web_only",
-      "sources": [
-        "https://www.aeon.com.hk/en/privilege/promotion_upi_0226.html"
-      ],
-      "rules": [
-        "适用 AEON Card Premium 银联卡、AEON 银联信用卡及苗圃行动银联信用卡。主卡须于 12 月 31 日前逐卡登记，从登记当月起计算，参加过上一轮也要重登。",
-        "指定内地、澳门及台湾交易每卡每月额外积分上限 25,000，其他合资格境外或外币交易每卡每月上限 50,000。总积分 15 倍按指定兑换比例相当于最多约 6% 回赠，两类额外积分每月合计最多相当于 HK$300。按条款预计 2027 年 2 月或之前入账。"
-      ]
-    },
-    {
-      "id": "web-overseas-aeon-jp-kura-waon",
-      "webId": "aeon-jp-kura-waon",
-      "url": "/detail.html?web=aeon-jp-kura-waon&topic=travel-card-offers",
-      "title": "日本藏寿司用 AEON Pay 扫码 · WAON POINT 基本积分 10 倍",
-      "institution": "日本藏寿司用 AEON Pay 扫码",
-      "region": "日本 AEON Pay 账户及参与的日本藏寿司门店 · 2026-10-30 至 2026-11-26",
-      "summary": "日本 AEON Pay 用户在参与藏寿司门店用二维码结账，可获合计 10 倍 WAON 积分。",
-      "validFrom": "2026-10-30",
-      "validTo": "2026-11-26",
-      "channel": "官网 / App",
-      "createdAt": null,
-      "distributionScope": "web_only",
-      "sources": [
-        "https://www.aeon.co.jp/campaign/member/202610-26"
-      ],
-      "rules": [
-        "10 倍积分含基本积分，基本为每满 200 日元（含税）积 1 点，预计 2027 年 1 月下旬发放，积分无需报名。仅限二维码支付，WAON Touch、网站预付及使用积分抵扣的金额不计。",
-        "另有独立抽奖，活动期间合资格支付满 1,000 日元且报名，有机会获 500 日元餐券，共 1,000 名。积分奖励无需参加抽奖。"
-      ]
-    },
-    {
-      "id": "web-overseas-aeon-jp-topvalu-waon",
-      "webId": "aeon-jp-topvalu-waon",
-      "url": "/detail.html?web=aeon-jp-topvalu-waon&topic=travel-card-offers",
-      "title": "日本永旺 TOPVALU 指定商品 · AEON Pay 扫码返 3% 积分",
-      "institution": "日本永旺 TOPVALU 指定商品",
-      "region": "日本 AEON Pay 账户及参与门店 · 2026-11-01 至 2027-01-10",
-      "summary": "日本 AEON Pay 用户在参与门店扫码购指定 TOPVALU 商品，可获 3% WAON 积分。",
-      "validFrom": "2026-11-01",
-      "validTo": "2027-01-10",
-      "channel": "官网 / App",
-      "createdAt": null,
-      "distributionScope": "web_only",
-      "sources": [
-        "https://www.aeon.co.jp/campaign/member/202610-25/"
-      ],
-      "rules": [
-        "限有标记的 TOPVALU 系列指定商品，WAON Touch 不适用。在 Welcia 集团参与店，还要出示可积 WAON POINT 的卡或会员码。",
-        "11 月 11 日至 12 月 10 日合资格交易预计于 2027 年 1 月 25 日左右发积分，12 月 11 日至 1 月 10 日的交易预计于 2 月 25 日左右发放。积分在参与门店按 1 点抵 1 日元使用。"
-      ]
-    },
-    {
-      "id": "web-overseas-aeon-hk-jcb-jpy-37-5x",
-      "webId": "aeon-hk-jcb-jpy-37-5x",
-      "url": "/detail.html?web=aeon-hk-jcb-jpy-37-5x&topic=travel-card-offers",
-      "title": "香港 AEON JCB 信用卡 · 合资格日圆签账共 37.5 倍积分",
-      "institution": "香港 AEON JCB 信用卡",
-      "region": "香港 AEON 发卡 · 日圆签账 · 2026-10-01 至 2026-12-31",
-      "summary": "香港 AEON JCB 主卡在 App 登记后刷合资格日圆交易，可合计赚 37.5 倍积分。",
-      "validFrom": "2026-10-01",
-      "validTo": "2026-12-31",
-      "channel": "官网 / App",
-      "createdAt": null,
-      "distributionScope": "web_only",
-      "sources": [
-        "https://www.aeon.com.hk/en/privilege/promotion_purplejcb.html"
-      ],
-      "rules": [
-        "在 AEON HK App 登记「快闪 15% 回赠」。基本 1 倍加额外 36.5 倍，每张已登记卡整期额外积分最多 75,000 分，按指定兑换比例约 HK$300。港币结算不参加，附属卡签账并入主卡。",
-        "这是积分奖励，等值回赠按兑换选项计算。名额有限，预计 2027 年 2 月入账。同页的日圆常规回赠须另行登记。"
-      ]
-    },
-    {
-      "id": "web-overseas-taishin-applecare-dataexpress",
-      "webId": "taishin-applecare-dataexpress",
-      "url": "/detail.html?web=taishin-applecare-dataexpress&topic=travel-card-offers",
-      "title": "台湾台新信用卡买指定 Apple 产品加购 AppleCare+ · 赠 NT$300 配件券",
-      "institution": "台湾台新信用卡买指定 Apple 产品加购 AppleCare+",
-      "region": "中国台湾德谊数位实体店 · 2026-11-04 至 2026-12-31",
-      "summary": "台湾台新信用卡持卡人在德谊购指定 Apple 产品并加购 AppleCare+，可领 300 元配件券。",
-      "validFrom": "2026-11-04",
-      "validTo": "2026-12-31",
-      "channel": "官网 / App",
-      "createdAt": null,
-      "distributionScope": "web_only",
-      "sources": [
-        "https://mkpcard.taishinbank.com.tw/tscccms/promotion/detail/WM_20261029140508573"
-      ],
-      "rules": [
-        "合资格交易可享 3 期零利率并领 NT$300 配件纸券。券有效至 2027 年 3 月 31 日，单笔配件消费满 NT$1,000 才可抵用，每单限一张，不与其他券同用。",
-        "券须由门店当场确认资格并发放。AppleCare+ 费用、适用商品及纸券使用细则以德谊数位为准。"
-      ]
-    },
-    {
-      "id": "web-overseas-esun-tw-unicard-apple-45",
-      "webId": "esun-tw-unicard-apple-45",
-      "url": "/detail.html?web=esun-tw-unicard-apple-45&topic=travel-card-offers",
-      "title": "台湾玉山 Unicard · Apple Store 指定签账最高回馈 4.5% 积分",
-      "institution": "台湾玉山 Unicard",
-      "region": "台湾玉山 Unicard · Apple 台湾官方商城或直营店 · 2026-07-01 至 2026-12-31",
-      "summary": "台湾玉山 Unicard 持卡人满足 UP 选和扣缴条件，到 Apple 直营渠道一次付清可享最高 4.5% 积分。",
-      "validFrom": "2026-07-01",
-      "validTo": "2026-12-31",
-      "channel": "官网 / App",
-      "createdAt": null,
-      "distributionScope": "web_only",
-      "sources": [
-        "https://www.esunbank.com/zh-tw/personal/credit-card/discount/shopInfo?sno=0026"
-      ],
-      "rules": [
-        "最高档由一般消费 1% 和 UP 选百大指定消费加码 3.5% 组成。一般消费这一档要求开通电子账单与玉山台币账户自动扣缴。加码每账户每月最多 5,000 点，1 点玉山 e point 抵新台币 1 元。",
-        "银行示例：合资格的一次付清 NT$20,000 可得 900 点。分期按另一规则，最高 3.5%。实际积分按所选方案、消费方式和剩余上限计算。"
-      ]
-    },
-    {
-      "id": "web-overseas-aeon-hk-godiva-christmas-points-2026",
-      "webId": "aeon-hk-godiva-christmas-points-2026",
-      "url": "/detail.html?web=aeon-hk-godiva-christmas-points-2026&topic=travel-card-offers",
-      "title": "香港 AEON 信用卡积分 · 26,500 分可换 GODIVA 圣诞巧克力礼盒",
-      "institution": "香港 AEON",
-      "region": "香港 AEON 积分计划持卡人 · 香港指定 GODIVA 门店",
-      "summary": "香港 AEON 持卡人用 26,500 分，或 5,000 分加 HK$90，可换两盒三颗装礼盒券。",
-      "validFrom": "2026-11-05",
-      "validTo": "2026-12-20",
-      "channel": "官网 / App",
-      "createdAt": null,
-      "distributionScope": "web_only",
-      "sources": [
-        "https://www.aeon.com.hk/tc/privilege/promotion-godiva-1126.html"
-      ],
-      "rules": [
-        "在 AEON HK App 或网上客户服务的积分专区兑换，补款用 AEON 信用卡。AEON Card JAL 和 WAKUWAKU 不参加积分计划。",
-        "兑换截至 12 月 20 日，领货截至 12 月 23 日。持 App「我的奖赏」里的电子券到指定 GODIVA 门店领取。礼券不可换现金或叠加其他优惠，指定礼盒缺货时可换同等价值商品。"
-      ]
-    },
-    {
-      "id": "web-overseas-aeon-hk-forever-pets-points-2026",
-      "webId": "aeon-hk-forever-pets-points-2026",
-      "url": "/detail.html?web=aeon-hk-forever-pets-points-2026&topic=travel-card-offers",
-      "title": "香港 AEON 信用卡积分 · Forever Pets 指定宠物用品兑换",
-      "institution": "香港 AEON",
-      "region": "香港 AEON 积分计划持卡人 · 香港指定送货地址",
-      "summary": "香港 AEON 持卡人可用积分，或积分加指定金额，兑换猫狗用品。",
-      "validFrom": "2026-09-30",
-      "validTo": "2026-11-30",
-      "channel": "官网 / App",
-      "createdAt": null,
-      "distributionScope": "web_only",
-      "sources": [
-        "https://www.aeon.com.hk/tc/privilege/promotion-forever-pets-0926.html"
-      ],
-      "rules": [
-        "在 AEON HK App 或网上客户服务的积分专区选产品。例如 60 克猫用吞拿鱼湿粮 40 包可用 65,000 分，或 5,000 分加 HK$230。补款用 AEON 信用卡。AEON Card JAL 和 WAKUWAKU 不参加积分计划。",
-        "银行预计 2 至 4 周送至已登记地址，提供一次免费送货，邮政信箱、离岛和边境禁区除外。"
-      ]
-    },
-    {
-      "id": "web-overseas-dbs-hk-apple-flexi-110",
-      "webId": "dbs-hk-apple-flexi-110",
-      "url": "/detail.html?web=dbs-hk-apple-flexi-110&topic=travel-card-offers",
-      "title": "香港 DBS 信用卡 · Apple Store 合资格分期费用回赠最高 HK$110",
-      "institution": "香港 DBS 信用卡",
-      "region": "香港 DBS 指定信用卡 · 香港 Apple Store · 2026-09-01 至 2027-01-15",
-      "summary": "香港 DBS 指定主卡在 Apple Store 消费后用 App 办合资格分期，最高返 HK$110 费用。",
-      "validFrom": "2026-09-01",
-      "validTo": "2027-01-15",
-      "channel": "官网 / App",
-      "createdAt": null,
-      "distributionScope": "web_only",
-      "sources": [
-        "https://www.dbs.com.hk/personal/promotion/flexishopping-apple-2026Q3"
-      ],
-      "rules": [
-        "适用香港 Apple 门店、网店或 Apple Store App。单笔满 HK$500 可申请有一次性手续费的 6 或 12 期，按月收息的 18 至 60 期另有单笔 HK$2,000 门槛。DBS Live Fresh、商业卡及私人品牌卡除外。",
-        "只计活动期内首次成功申请涉及的最高单笔合资格交易，费用回赠最迟 2027 年 3 月 31 日入账。分期仍按银行批准的手续费或利率收费。"
-      ]
-    },
-    {
-      "id": "web-overseas-citybus-hkmm-ticket-discount-2026",
-      "webId": "citybus-hkmm-ticket-discount-2026",
-      "url": "/detail.html?web=citybus-hkmm-ticket-discount-2026&topic=travel-card-offers",
-      "title": "香港城巴巴士通票 · 凭海事博物馆票尾减 HK$10",
-      "institution": "城巴 / 香港海事博物馆",
-      "region": "香港中环天星码头观光城巴服务站、香港海事博物馆",
-      "summary": "持香港海事博物馆票尾到中环城巴服务站，购买全港游巴士通票可减 HK$10。",
-      "validFrom": "2026-04-17",
-      "validTo": "2026-12-31",
-      "channel": "中环服务站／博物馆售票处",
-      "createdAt": "2026-11-22",
-      "distributionScope": "web_only",
-      "sources": [
-        "https://www.hkmaritimemuseum.org/special-ann-12-citybus-promotion/details?lang=zh",
-        "https://www.citybus.com.hk/tc/uploadedPressRelease/22224_20260427_CHI.pdf"
-      ],
-      "rules": [
-        "先参观博物馆：购票日起 7 天内，带门票存根到中环天星码头观光城巴服务站，购买 24、48 或 72 小时城巴全港游通票时减 HK$10。",
-        "先买巴士通票：购票日起 7 天内，到中环 8 号码头的香港海事博物馆售票处出示有效通票二维码，成人门票半价，减 HK$15。",
-        "购票当天计作第 1 天，须在活动结束前兑换。每张票尾限用一次，且不可叠加其他优惠。购票前可向售票处确认票种和退改条件。"
-      ]
-    },
-    {
-      "id": "web-overseas-hsbc-sg-expedia-16-2026",
-      "webId": "hsbc-sg-expedia-16-2026",
-      "url": "/detail.html?web=hsbc-sg-expedia-16-2026&topic=travel-card-offers",
-      "title": "新加坡汇丰信用卡 · Expedia 指定酒店 84 折，最多减 S$55",
-      "institution": "新加坡汇丰 / Expedia",
-      "region": "全球参与酒店 · 新加坡发行的汇丰信用卡",
-      "summary": "新加坡汇丰信用卡持卡人经 Expedia 专页订指定酒店，输入 HSBCSG16 可减 16%。",
-      "validFrom": "2026-10-06",
-      "validTo": "2026-12-31",
-      "channel": "Expedia 新加坡指定网页",
-      "createdAt": "2026-11-22",
-      "distributionScope": "web_only",
-      "sources": [
-        "https://www.expedia.com.sg/hsbc",
-        "https://www.hsbc.com.sg/card-promotions/travel-leisure/expedia16/",
-        "https://www.expedia.com.sg/lp/b/sghsbcpub1620261006"
-      ],
-      "rules": [
-        "经指定网页预付至少一晚，单笔税费前满 S$1，折扣最多 S$55。活动按新加坡时间 12 月 31 日 23:59 截止，入住日期须在 2026 年 10 月 6 日至 2027 年 3 月 31 日内。汇丰说明每月 16 日刷新名额，先到先得。",
-        "仅限指定酒店单订、单间、网上预付。App、电话、机酒套餐及第三方供应的住宿不适用。每券限用一次，税费另计，取消和退款按所选房型及优惠券条款。"
-      ]
-    },
-    {
-      "id": "web-overseas-taishin-richart-agoda-2026",
-      "webId": "taishin-richart-agoda-2026",
-      "url": "/detail.html?web=taishin-richart-agoda-2026&topic=travel-card-offers",
-      "title": "台湾台新 Richart 信用卡 · Agoda 指定房型最高减 8%",
-      "institution": "台湾台新 Richart 信用卡",
-      "region": "台湾台新 Richart 卡 · 2026-01-01 至 2026-12-31",
-      "summary": "指定房型经 Richart 专页预订，刷台湾台新 Richart 卡结账最高现减 8%。",
-      "validFrom": "2026-01-01",
-      "validTo": "2026-12-31",
-      "channel": "官网 / App",
-      "createdAt": null,
-      "distributionScope": "web_only",
-      "sources": [
-        "https://www.agoda.com/zh-tw/taishinpromo",
-        "https://mkpcard.taishinbank.com.tw/tscccms/promotion/detail/WM_20251226092735504"
-      ],
-      "rules": [
-        "入住截至 2027 年 3 月 31 日。请选带「已套用 Taishin Bank」标记的酒店和房型，结账时核对房费优惠和退改条件。页面另列一般卡和联名卡方案，各自适用独立条款。"
-      ]
-    },
-    {
-      "id": "web-overseas-ocbc-hk-hutchgo-2026",
-      "webId": "ocbc-hk-hutchgo-2026",
-      "url": "/detail.html?web=ocbc-hk-hutchgo-2026&topic=travel-card-offers",
-      "title": "香港华侨银行信用卡 · hutchgo 指定酒店 94 折",
-      "institution": "香港华侨银行信用卡",
-      "region": "香港华侨银行发卡 · 2026-01-01 至 2026-12-31",
-      "summary": "香港华侨银行信用卡持卡人在 hutchgo 订指定酒店，结账用 OCBC2026 享 94 折。",
-      "validFrom": "2026-01-01",
-      "validTo": "2026-12-31",
-      "channel": "官网 / App",
-      "createdAt": null,
-      "distributionScope": "web_only",
-      "sources": [
-        "https://www.hutchgo.com.hk/zh-hk/promotion/credit-card/",
-        "https://www.ocbc.com.hk/personal-banking/zh/cards/card-promotions.page"
-      ],
-      "rules": [
-        "覆盖日本、韩国、新加坡、英国等指定目的地。按商家通用条款，入住截至 2027 年 1 月 10 日。税费、服务费、到店付款及需人工确认的预订除外。每单限用一码，取消或改订可能收行政费。"
-      ]
-    },
-    {
-      "id": "web-overseas-wewa-hk-hutchgo-2026",
-      "webId": "wewa-hk-hutchgo-2026",
-      "url": "/detail.html?web=wewa-hk-hutchgo-2026&topic=travel-card-offers",
-      "title": "香港安信 WeWa 信用卡 · hutchgo 指定酒店 94 折",
-      "institution": "香港安信 WeWa 信用卡",
-      "region": "香港安信 WeWa 信用卡 · 2026-01-01 至 2026-12-31",
-      "summary": "香港 WeWa 信用卡持卡人在 hutchgo 订指定酒店，结账用 WEWA2026 可减 6%。",
-      "validFrom": "2026-01-01",
-      "validTo": "2026-12-31",
-      "channel": "官网 / App",
-      "createdAt": null,
-      "distributionScope": "web_only",
-      "sources": [
-        "https://www.hutchgo.com.hk/zh-hk/promotion/credit-card/"
-      ],
-      "rules": [
-        "官方名单包含日本、韩国、英国、澳大利亚、越南、意大利等。按商家通用条款，入住截至 2027 年 1 月 10 日。折扣只计合资格房费，结账前须用码，当场核对金额，退改按对应房型和平台费用执行。"
-      ]
-    },
-    {
-      "id": "web-overseas-aeon-hk-klook-hotels-100",
-      "webId": "aeon-hk-klook-hotels-100",
-      "url": "/detail.html?web=aeon-hk-klook-hotels-100&topic=travel-card-offers",
-      "title": "香港 AEON 信用卡 · Klook 指定酒店满 HK$1,000 减 HK$100",
-      "institution": "香港 AEON 信用卡",
-      "region": "香港 AEON 信用卡及联营卡 · 2026-06-01 至 2026-12-31",
-      "summary": "香港 AEON 卡持卡人在 Klook 订指定纯住宿，单笔净额满千港元用码即减 100 港元。",
-      "validFrom": "2026-06-01",
-      "validTo": "2026-12-31",
-      "channel": "官网 / App",
-      "createdAt": null,
-      "distributionScope": "web_only",
-      "sources": [
-        "https://www.aeon.com.hk/en/privilege/promotion-klook-1026.html"
-      ],
-      "rules": [
-        "适用优惠码 AEON26HT100，Klook 香港站官网或 App 结账前输入。每个账户限用一次，名额先到先得。合资格金额扣除其他费用和折扣后计算，电子钱包和第三方支付不适用。"
-      ]
-    },
-    {
-      "id": "web-overseas-agoda-tw-mastercard-world-2027",
-      "webId": "agoda-tw-mastercard-world-2027",
-      "url": "/detail.html?web=agoda-tw-mastercard-world-2027&topic=travel-card-offers",
-      "title": "Agoda 台湾万事达世界卡 · 指定酒店满 150 美元享 88 折",
-      "institution": "Agoda 台湾万事达世界卡",
-      "region": "台湾发行合资格万事达个人信用卡或签账金融卡 · 2026-04-01 至 2027-03-31",
-      "summary": "持台湾万事达世界卡经 Agoda 专页预订指定房，满 150 美元享 88 折，最多减 45 美元。",
-      "validFrom": "2026-04-01",
-      "validTo": "2027-03-31",
-      "channel": "官网 / App",
-      "createdAt": null,
-      "distributionScope": "web_only",
-      "sources": [
-        "https://www.agoda.com/zh-tw/twmastercard"
-      ],
-      "rules": [
-        "台湾世界之极卡满 200 美元享 84 折，最多减 60 美元。世界卡满 150 美元享 88 折，最多减 45 美元。其他合资格万事达个人卡满 100 美元享 92 折，最多减 25 美元。",
-        "入住截至 2027 年 12 月 31 日。选有 Mastercard_YRO_TW 标签的合资格预付、即付或先订后付房型，到店付款除外。税费不计入房费折扣，经指定页跳转 App 须在两小时内结账。"
-      ]
-    },
-    {
-      "id": "web-overseas-agoda-apac-world-legend-2027",
-      "webId": "agoda-apac-world-legend-2027",
-      "url": "/detail.html?web=agoda-apac-world-legend-2027&topic=travel-card-offers",
-      "title": "Agoda 亚太万事达世界传奇卡 · 指定酒店满 250 美元减 20%",
-      "institution": "Agoda 亚太万事达世界传奇卡",
-      "region": "包括中国香港、中国大陆及新加坡等指定发卡市场 · 2026-11-10 至 2027-03-31",
-      "summary": "指定亚太市场的万事达世界传奇卡持卡人经 Agoda 专页订指定房，满 250 美元享 8 折。",
-      "validFrom": "2026-11-10",
-      "validTo": "2027-03-31",
-      "channel": "官网 / App",
-      "createdAt": null,
-      "distributionScope": "web_only",
-      "sources": [
-        "https://www.agoda.com/en-sg/sgmastercard"
-      ],
-      "rules": [
-        "此档仅限合资格 Mastercard World Legend（世界传奇卡）。房费满 250 美元减 20%，每单最多减 80 美元。官方列出的发卡市场包括中国内地、香港、澳门、台湾、澳大利亚、文莱、柬埔寨、印尼、日本、韩国、老挝、马来西亚、缅甸、新西兰、新加坡、泰国和越南。",
-        "入住截至 2027 年 12 月 31 日。选择有 Promotion Eligible 标记的合资格预付、即付或先订后付房型，到店付款除外。折扣仅计房费，跳转 App 后须在两小时内完成结账。"
-      ]
-    },
-    {
-      "id": "web-overseas-bochk-agoda-7pct-2028",
-      "webId": "bochk-agoda-7pct-2028",
-      "url": "/detail.html?web=bochk-agoda-7pct-2028&topic=travel-card-offers",
-      "title": "中银香港信用卡 · Agoda 指定境外预付酒店 93 折",
-      "institution": "中银香港信用卡",
-      "region": "香港发行的合资格中银信用卡或双币信用卡 · 2026-04-01 至 2028-03-31",
-      "summary": "香港中银合资格信用卡持卡人经 Agoda 专页预付指定境外酒店，享 93 折。",
-      "validFrom": "2026-04-01",
-      "validTo": "2028-03-31",
-      "channel": "官网 / App",
-      "createdAt": null,
-      "distributionScope": "web_only",
-      "sources": [
-        "https://www.agoda.com/bochk",
-        "https://bochk.com/dam/boccreditcard/agoda2026/tnc_sc.pdf"
-      ],
-      "rules": [
-        "选择带「中银信用卡全年 93 折优惠」标记的境外预付房。税费及服务费不计入折扣，每笔最多减 HK$780，中文条款同时列明每位客户整期最高总折扣 HK$780。入住截至 2028 年 9 月 30 日。",
-        "用香港发行、印有中银标志的合资格信用卡或双币信用卡，以港币直接付款。内地或澳门发行卡、指定非消费卡及电子钱包交易排除。香港本地酒店、到店付款、已确认订单不适用。"
-      ]
-    },
-    {
-      "id": "web-overseas-dbs-sg-agoda-sunday-2026",
-      "webId": "dbs-sg-agoda-sunday-2026",
-      "url": "/detail.html?web=dbs-sg-agoda-sunday-2026&topic=travel-card-offers",
-      "title": "新加坡星展／POSB 卡 · Agoda 周日酒店满 S$200 减 50%，最高减 S$100",
-      "institution": "新加坡星展／POSB 卡",
-      "region": "新加坡发行的合资格 DBS／POSB 卡 · Agoda 周日订房专页 · 2026-01-25 至 2026-12-27",
-      "summary": "新加坡星展或 POSB 指定卡周日经 Agoda 专页订房满 S$200，最多减 S$100。",
-      "validFrom": "2026-01-25",
-      "validTo": "2026-12-27",
-      "channel": "官网 / App",
-      "createdAt": null,
-      "distributionScope": "web_only",
-      "sources": [
-        "https://www.agoda.com/dbssunday",
-        "https://www.dbs.com.sg/personal/promotion/card-privileges-ylagoda2"
-      ],
-      "rules": [
-        "每周日 01:00（新加坡时间）在活动专页顶部更新当周券码。选标有可用券的酒店及房型，在优惠区输入或选用当周券码并用合资格星展／POSB 卡结账。限量先到先得。",
-        "可留在网页预订，也可从专页跳转 Agoda App，直接打开 App 预订不参加此优惠。入住须在 2027 年 6 月 30 日或之前。"
-      ]
-    },
-    {
-      "id": "web-overseas-dbs-sg-agoda-nov-sale-2026",
-      "webId": "dbs-sg-agoda-nov-sale-2026",
-      "url": "/detail.html?web=dbs-sg-agoda-nov-sale-2026&topic=travel-card-offers",
-      "title": "新加坡星展／POSB 卡 · Agoda 11 月指定酒店额外减 15%",
-      "institution": "新加坡星展／POSB 卡",
-      "region": "新加坡发行的合资格 DBS／POSB 卡 · Agoda 11 月公开订房活动 · 2026-11-16 至 2026-11-30",
-      "summary": "公开活动期间用指定星展或 POSB 卡订 Agoda 酒店，额外减 15%，最多减 S$30。",
-      "validFrom": "2026-11-16",
-      "validTo": "2026-11-30",
-      "channel": "官网 / App",
-      "createdAt": null,
-      "distributionScope": "web_only",
-      "sources": [
-        "https://www.dbs.com.sg/personal/promotion/card-privileges-ylagoda2",
-        "https://www.agoda.com/dbs"
-      ],
-      "rules": [
-        "11 月 16 日至 30 日向所有 Agoda 用户开放，选指定酒店后用合资格新加坡星展／POSB 卡付款。额外 15% 达到名额上限后，银行说明会恢复为无折扣金额上限的 7% 基础优惠。",
-        "住宿须在 2027 年 6 月 30 日或之前。平台的房价促销幅度因酒店和日期而异，以结账时实际展示的价格及优惠为准。"
-      ]
-    },
-    {
-      "id": "web-overseas-ihg-global-cyber-sale-2026",
-      "webId": "ihg-global-cyber-sale-2026",
-      "url": "/detail.html?web=ihg-global-cyber-sale-2026&topic=travel-card-offers",
-      "title": "洲际 IHG 年末订房 · 非会员 8 折，会员最高 7 折",
-      "institution": "洲际酒店集团 IHG",
-      "region": "北美、拉美、欧洲、亚太等指定酒店",
-      "summary": "官网直订指定酒店，非会员房价 8 折，会员在欧洲、亚太等市场部分酒店可享 7 折。",
-      "validFrom": "2026-11-17",
-      "validTo": "2026-12-03",
-      "channel": "IHG 官网或 App 直订",
-      "createdAt": null,
-      "distributionScope": "web_only",
-      "sources": [
-        "https://www.ihg.com/content/us/en/deals/hotel-offers/cybersale"
-      ],
-      "rules": [
-        "在 IHG 官网或 App 选 Cyber Sale 房价。欧洲、亚洲、大洋洲、中东及非洲的指定酒店，IHG One Rewards 会员房价 7 折；美国、加拿大、墨西哥、拉美与加勒比指定酒店的会员价 75 折。非会员为 8 折，订房时加入会员也可查看会员价。优惠按参与酒店的最优灵活房价计算，税费另计，部分日期或房型不参加。",
-        "11 月 17 日至 12 月 3 日预订，适用入住时段为 11 月 21 日至 2027 年 4 月 30 日，须至少提前 4 天订房。一般订房时收取首晚不可退押金，参与活动的 Ruby 酒店须全额预付。美国加州有单独的限时取消退款条款，取消、押金和离店费用以所选酒店价规为准。"
-      ]
-    },
-    {
-      "id": "web-overseas-hsbc-hk-trip-annual-2026",
-      "webId": "hsbc-hk-trip-annual-2026",
-      "url": "/detail.html?web=hsbc-hk-trip-annual-2026&topic=travel-card-offers",
-      "title": "香港汇丰信用卡 · Trip.com 全年指定酒店最高减 8%",
-      "institution": "香港汇丰信用卡",
-      "region": "香港汇丰合资格信用卡 · Trip.com 香港站 · 2026-01-01 至 2026-12-31",
-      "summary": "香港汇丰持卡人经 Trip.com 指定页订预付酒店，用 HSBC26H 最低 92 折。",
-      "validFrom": "2026-01-01",
-      "validTo": "2026-12-31",
-      "channel": "官网 / App",
-      "createdAt": null,
-      "distributionScope": "web_only",
-      "sources": [
-        "https://hk.trip.com/sale/w/5573/hsbc.html",
-        "https://www.redhotoffers.hsbc.com.hk/media/104058021/tnc_YRO2026_Batch1_Tripcom_SC.pdf"
-      ],
-      "rules": [
-        "指定房费税前不足 HK$2,500 享 94 折，HK$2,500 至 HK$3,499 享 93 折，满 HK$3,500 享 92 折。香港站登录后用合资格汇丰卡以港币结账，入住、出发或取车截至 2027 年 1 月 15 日。",
-        "机票旧客用 HSBC26F，满 HK$2,000 起减 HK$50，最高减 HK$200。首次订机票用 HSBC26FN 享 97 折。预付租车旧客用 HSBC26CR 享 95 折，首次订租车用 HSBC26CRN 享 92 折。每单限一码，不与优惠券、Trip Coins 或礼品卡叠加。"
-      ]
-    },
-    {
-      "id": "web-overseas-bea-hk-trip-annual-2026",
-      "webId": "bea-hk-trip-annual-2026",
-      "url": "/detail.html?web=bea-hk-trip-annual-2026&topic=travel-card-offers",
-      "title": "香港东亚银行信用卡 · Trip.com 指定酒店低至 92 折",
-      "institution": "香港东亚银行信用卡",
-      "region": "香港东亚银行合资格信用卡 · Trip.com 香港站 · 2026-01-01 至 2026-12-31",
-      "summary": "香港东亚银行持卡人从 Trip.com 指定页订预付酒店，刷卡用 BEA26H 最低 92 折。",
-      "validFrom": "2026-01-01",
-      "validTo": "2026-12-31",
-      "channel": "官网 / App",
-      "createdAt": null,
-      "distributionScope": "web_only",
-      "sources": [
-        "https://hk.trip.com/sale/w/5105/hk-bea.html"
-      ],
-      "rules": [
-        "合资格指定酒店税前不足 HK$2,500 享 94 折，HK$2,500 至 HK$3,499 享 93 折，满 HK$3,500 享 92 折。须登录会员并用指定东亚卡付港币，入住、航班出发或取车截至 2027 年 1 月 15 日。",
-        "首次在 Trip.com 订机票可用 BEA26FN 享 97 折。机票旧客用 BEA26F，满 HK$2,000 起减 HK$50，最高减 HK$200。首次租车或旧客用 BEA26CRN 或 BEA26CR，分别享 92 折或 95 折。每单限一码，套票及指定航班除外。"
-      ]
-    },
-    {
-      "id": "web-overseas-citi-hk-trip-monthly-2027",
-      "webId": "citi-hk-trip-monthly-2027",
-      "url": "/detail.html?web=citi-hk-trip-monthly-2027&topic=travel-card-offers",
-      "title": "香港花旗卡 · Trip.com 每月指定酒店满 HK$1,200 减 HK$180",
-      "institution": "香港花旗卡",
-      "region": "香港花旗信用卡、扣账卡或商务卡 · Trip.com 香港站 · 2026-09-01 至 2027-02-28",
-      "summary": "香港花旗合资格卡在 Trip.com 用当月券，指定预付酒店满 HK$1,200 减 HK$180。",
-      "validFrom": "2026-09-01",
-      "validTo": "2027-02-28",
-      "channel": "官网 / App",
-      "createdAt": null,
-      "distributionScope": "web_only",
-      "sources": [
-        "https://hk.trip.com/t/citibank-hk-tc"
-      ],
-      "rules": [
-        "普通合资格卡的机票净价满 HK$1,800 减 HK$180，指定高铁、火车票、门票或体验各满 HK$400 减 HK$40。Prestige 信用卡专属档：指定机票或预付酒店净额各满 HK$2,500 减 HK$500。",
-        "每月 1 日香港时间 00:00 至 00:30 更新优惠码，普通酒店、机票档分别限 700、650 份，Prestige 两档各限 80 份。登录香港站或香港版 App，领当月码并直接付港币。每人每月每项普通优惠至多用 2 次，Prestige 每项 1 次。酒店和机票最晚 2027 年 6 月 30 日入住或出发。部分航班、税费、Trip Coins 等不适用。"
-      ]
-    },
-    {
       "id": "web-overseas-trip-visa-greater-china-2026",
       "webId": "trip-visa-greater-china-2026",
-      "url": "/detail.html?web=trip-visa-greater-china-2026&topic=travel-card-offers",
+      "url": "/activities/topics/travel-card-offers.html#trip-visa-greater-china-2026",
       "title": "Trip.com × Visa · 指定预付酒店 95 折，指定航班 98 折",
       "institution": "Trip.com × Visa",
       "region": "中国内地、港澳台发行的合资格 Visa 卡 · Trip.com 香港站",
@@ -765,7 +242,7 @@
     {
       "id": "web-overseas-hsbc-tw-trip-2026",
       "webId": "hsbc-tw-trip-2026",
-      "url": "/detail.html?web=hsbc-tw-trip-2026&topic=travel-card-offers",
+      "url": "/activities/topics/travel-card-offers.html#hsbc-tw-trip-2026",
       "title": "台湾汇丰信用卡 · Trip.com 指定酒店最高 93 折，机票最高减 NT$400",
       "institution": "台湾汇丰银行",
       "region": "台湾汇丰信用卡 · Trip.com 台湾站",
@@ -786,7 +263,7 @@
     {
       "id": "web-overseas-bnu-mo-trip-2026",
       "webId": "bnu-mo-trip-2026",
-      "url": "/detail.html?web=bnu-mo-trip-2026&topic=travel-card-offers",
+      "url": "/activities/topics/travel-card-offers.html#bnu-mo-trip-2026",
       "title": "澳门大西洋银行 · Trip.com 指定酒店 94 折，机票最高减 MOP 200",
       "institution": "澳门大西洋银行（BNU）",
       "region": "澳门大西洋银行借记卡或信用卡 · Trip.com 香港站",
@@ -808,7 +285,7 @@
     {
       "id": "web-overseas-hsbc-sg-travelone-trip",
       "webId": "hsbc-sg-travelone-trip",
-      "url": "/detail.html?web=hsbc-sg-travelone-trip&topic=travel-card-offers",
+      "url": "/activities/topics/travel-card-offers.html#hsbc-sg-travelone-trip",
       "title": "新加坡汇丰 TravelOne 信用卡 · Trip.com 周四机票满 S$1,000 减 S$120",
       "institution": "新加坡汇丰 TravelOne 信用卡",
       "region": "Trip.com 新加坡站（新加坡发行指定卡） · 2026-01-15 至 2026-12-31",
@@ -830,7 +307,7 @@
     {
       "id": "web-overseas-hsbc-my-visa-trip-2026",
       "webId": "hsbc-my-visa-trip-2026",
-      "url": "/detail.html?web=hsbc-my-visa-trip-2026&topic=travel-card-offers",
+      "url": "/activities/topics/travel-card-offers.html#hsbc-my-visa-trip-2026",
       "title": "马来西亚汇丰 Visa 信用卡 · Trip.com 酒店减 8%、机票减 3%",
       "institution": "马来西亚汇丰 Visa 信用卡",
       "region": "马来西亚汇丰及 HSBC Amanah Visa 信用卡 · Trip.com 马来西亚站 · 2025-05-01 至 2026-12-31",
@@ -851,7 +328,7 @@
     {
       "id": "web-overseas-hang-seng-hk-visa-trip-q4-2026",
       "webId": "hang-seng-hk-visa-trip-q4-2026",
-      "url": "/detail.html?web=hang-seng-hk-visa-trip-q4-2026&topic=travel-card-offers",
+      "url": "/activities/topics/travel-card-offers.html#hang-seng-hk-visa-trip-q4-2026",
       "title": "香港恒生 Visa 信用卡 · Trip.com 指定酒店或机票满 HK$2,000 减 HK$180",
       "institution": "香港恒生 Visa 信用卡",
       "region": "香港恒生合资格 Visa 信用卡 · Trip.com 香港站 · 2026-11-11 至 2027-01-05",
@@ -872,7 +349,7 @@
     {
       "id": "web-overseas-hsbc-sg-trip-friday-2026",
       "webId": "hsbc-sg-trip-friday-2026",
-      "url": "/detail.html?web=hsbc-sg-trip-friday-2026&topic=travel-card-offers",
+      "url": "/activities/topics/travel-card-offers.html#hsbc-sg-trip-friday-2026",
       "title": "新加坡汇丰卡 · Trip.com 周五指定机票或酒店满 S$500 减 S$50",
       "institution": "新加坡汇丰卡",
       "region": "新加坡发行的合资格汇丰信用卡或扣账卡 · Trip.com 新加坡 App · 2026-01-02 至 2026-12-31",
@@ -894,7 +371,7 @@
     {
       "id": "web-overseas-boc-macau-taobao-trip-2026",
       "webId": "boc-macau-taobao-trip-2026",
-      "url": "/detail.html?web=boc-macau-taobao-trip-2026&topic=travel-card-offers",
+      "url": "/activities/topics/travel-card-offers.html#boc-macau-taobao-trip-2026",
       "title": "澳門中銀淘寶卡 · Trip.com 滿 HK$2,000 減機票 HK$200 或酒店 HK$250",
       "institution": "澳門中銀 / Trip.com",
       "region": "港澳往返指定航班及指定預付酒店 · 澳門發行中銀淘寶卡",
@@ -916,7 +393,7 @@
     {
       "id": "web-overseas-mastercard-hk-mo-trip-2027",
       "webId": "mastercard-hk-mo-trip-2027",
-      "url": "/detail.html?web=mastercard-hk-mo-trip-2027&topic=travel-card-offers",
+      "url": "/activities/topics/travel-card-offers.html#mastercard-hk-mo-trip-2027",
       "title": "香港澳门万事达卡 · Trip.com 指定机票或预付酒店满 HK$3,000 减 HK$100",
       "institution": "香港澳门万事达卡",
       "region": "香港或澳门发行的合资格万事达卡 · Trip.com 香港站 · 2026-10-12 至 2027-01-10",
@@ -935,9 +412,542 @@
       ]
     },
     {
+      "id": "web-overseas-fasola-narita-unionpay-preorder-2027",
+      "webId": "fasola-narita-unionpay-preorder-2027",
+      "url": "/activities/topics/travel-card-offers.html#fasola-narita-unionpay-preorder-2027",
+      "title": "成田机场 Fa-So-La · 免税商品官网预约，取货刷银联卡享 95 折",
+      "institution": "Fa-So-La SHOPS / 银联国际",
+      "region": "日本成田机场指定出境免税提货柜台",
+      "summary": "从成田机场出境的旅客先在线预约，出发日到店刷银联卡，合资格商品在免税价上再减 5%。",
+      "validFrom": "2026-10-01",
+      "validTo": "2027-09-30",
+      "channel": "Fa-So-La 官网预约／成田机场柜台刷卡",
+      "createdAt": "2026-11-23",
+      "distributionScope": "web_only",
+      "sources": [
+        "https://www.fasola-shop.com/zh-CN/",
+        "https://m.unionpayintl.com/cardholderServ/serviceCenter/wap/merchant/12176438410612?type=1",
+        "https://www.fasola.jp/zh-CN/knowledge.aspx"
+      ],
+      "rules": [
+        "适用于从成田机场搭国际航班出发的旅客。在 Fa-So-La 预约站选择出发日期和商品，当天完成出境检查后到对应航站楼的指定柜台取货，刷银联卡支付日元。银联公告列明各地发行的银联卡均可参加。",
+        "部分品牌和商品不享折扣，个别商品有限购。取货点和预约截止时间以预约页面为准，结账前核对价签及折扣。店方一般不受理个人原因换货，商品有瑕疵可联系 Fa-So-La 客服。"
+      ]
+    },
+    {
+      "id": "web-overseas-aeon-hk-unionpay-travel",
+      "webId": "aeon-hk-unionpay-travel",
+      "url": "/activities/topics/travel-card-offers.html#aeon-hk-unionpay-travel",
+      "title": "香港 AEON 银联信用卡 · 境外及外币消费合共赚 15 倍积分",
+      "institution": "香港 AEON",
+      "region": "境外及外幣交易 · 香港 AEON 發行銀聯信用卡",
+      "summary": "香港 AEON 银联信用卡主卡在 App 登记后刷合资格境外或外币交易，合共赚 15 倍积分。",
+      "validFrom": "2026-11-01",
+      "validTo": "2026-12-31",
+      "channel": "AEON HK App 登記、合資格銀聯簽賬",
+      "createdAt": null,
+      "distributionScope": "web_only",
+      "sources": [
+        "https://www.aeon.com.hk/en/privilege/promotion_upi_0226.html"
+      ],
+      "rules": [
+        "适用 AEON Card Premium 银联卡、AEON 银联信用卡及苗圃行动银联信用卡。主卡须于 12 月 31 日前逐卡登记，从登记当月起计算，参加过上一轮也要重登。",
+        "指定内地、澳门及台湾交易每卡每月额外积分上限 25,000，其他合资格境外或外币交易每卡每月上限 50,000。总积分 15 倍按指定兑换比例相当于最多约 6% 回赠，两类额外积分每月合计最多相当于 HK$300。按条款预计 2027 年 2 月或之前入账。"
+      ]
+    },
+    {
+      "id": "web-overseas-aeon-jp-kura-waon",
+      "webId": "aeon-jp-kura-waon",
+      "url": "/activities/topics/travel-card-offers.html#aeon-jp-kura-waon",
+      "title": "日本藏寿司用 AEON Pay 扫码 · WAON POINT 基本积分 10 倍",
+      "institution": "日本藏寿司用 AEON Pay 扫码",
+      "region": "日本 AEON Pay 账户及参与的日本藏寿司门店 · 2026-10-30 至 2026-11-26",
+      "summary": "日本 AEON Pay 用户在参与藏寿司门店用二维码结账，可获合计 10 倍 WAON 积分。",
+      "validFrom": "2026-10-30",
+      "validTo": "2026-11-26",
+      "channel": "官网 / App",
+      "createdAt": null,
+      "distributionScope": "web_only",
+      "sources": [
+        "https://www.aeon.co.jp/campaign/member/202610-26"
+      ],
+      "rules": [
+        "10 倍积分含基本积分，基本为每满 200 日元（含税）积 1 点，预计 2027 年 1 月下旬发放，积分无需报名。仅限二维码支付，WAON Touch、网站预付及使用积分抵扣的金额不计。",
+        "另有独立抽奖，活动期间合资格支付满 1,000 日元且报名，有机会获 500 日元餐券，共 1,000 名。积分奖励无需参加抽奖。"
+      ]
+    },
+    {
+      "id": "web-overseas-aeon-jp-topvalu-waon",
+      "webId": "aeon-jp-topvalu-waon",
+      "url": "/activities/topics/travel-card-offers.html#aeon-jp-topvalu-waon",
+      "title": "日本永旺 TOPVALU 指定商品 · AEON Pay 扫码返 3% 积分",
+      "institution": "日本永旺 TOPVALU 指定商品",
+      "region": "日本 AEON Pay 账户及参与门店 · 2026-11-01 至 2027-01-10",
+      "summary": "日本 AEON Pay 用户在参与门店扫码购指定 TOPVALU 商品，可获 3% WAON 积分。",
+      "validFrom": "2026-11-01",
+      "validTo": "2027-01-10",
+      "channel": "官网 / App",
+      "createdAt": null,
+      "distributionScope": "web_only",
+      "sources": [
+        "https://www.aeon.co.jp/campaign/member/202610-25/"
+      ],
+      "rules": [
+        "限有标记的 TOPVALU 系列指定商品，WAON Touch 不适用。在 Welcia 集团参与店，还要出示可积 WAON POINT 的卡或会员码。",
+        "11 月 11 日至 12 月 10 日合资格交易预计于 2027 年 1 月 25 日左右发积分，12 月 11 日至 1 月 10 日的交易预计于 2 月 25 日左右发放。积分在参与门店按 1 点抵 1 日元使用。"
+      ]
+    },
+    {
+      "id": "web-overseas-aeon-hk-jcb-jpy-37-5x",
+      "webId": "aeon-hk-jcb-jpy-37-5x",
+      "url": "/activities/topics/travel-card-offers.html#aeon-hk-jcb-jpy-37-5x",
+      "title": "香港 AEON JCB 信用卡 · 合资格日圆签账共 37.5 倍积分",
+      "institution": "香港 AEON JCB 信用卡",
+      "region": "香港 AEON 发卡 · 日圆签账 · 2026-10-01 至 2026-12-31",
+      "summary": "香港 AEON JCB 主卡在 App 登记后刷合资格日圆交易，可合计赚 37.5 倍积分。",
+      "validFrom": "2026-10-01",
+      "validTo": "2026-12-31",
+      "channel": "官网 / App",
+      "createdAt": null,
+      "distributionScope": "web_only",
+      "sources": [
+        "https://www.aeon.com.hk/en/privilege/promotion_purplejcb.html"
+      ],
+      "rules": [
+        "在 AEON HK App 登记「快闪 15% 回赠」。基本 1 倍加额外 36.5 倍，每张已登记卡整期额外积分最多 75,000 分，按指定兑换比例约 HK$300。港币结算不参加，附属卡签账并入主卡。",
+        "这是积分奖励，等值回赠按兑换选项计算。名额有限，预计 2027 年 2 月入账。同页的日圆常规回赠须另行登记。"
+      ]
+    },
+    {
+      "id": "web-overseas-taishin-applecare-dataexpress",
+      "webId": "taishin-applecare-dataexpress",
+      "url": "/activities/topics/travel-card-offers.html#taishin-applecare-dataexpress",
+      "title": "台湾台新信用卡买指定 Apple 产品加购 AppleCare+ · 赠 NT$300 配件券",
+      "institution": "台湾台新信用卡买指定 Apple 产品加购 AppleCare+",
+      "region": "中国台湾德谊数位实体店 · 2026-11-04 至 2026-12-31",
+      "summary": "台湾台新信用卡持卡人在德谊购指定 Apple 产品并加购 AppleCare+，可领 300 元配件券。",
+      "validFrom": "2026-11-04",
+      "validTo": "2026-12-31",
+      "channel": "官网 / App",
+      "createdAt": null,
+      "distributionScope": "web_only",
+      "sources": [
+        "https://mkpcard.taishinbank.com.tw/tscccms/promotion/detail/WM_20261029140508573"
+      ],
+      "rules": [
+        "合资格交易可享 3 期零利率并领 NT$300 配件纸券。券有效至 2027 年 3 月 31 日，单笔配件消费满 NT$1,000 才可抵用，每单限一张，不与其他券同用。",
+        "券须由门店当场确认资格并发放。AppleCare+ 费用、适用商品及纸券使用细则以德谊数位为准。"
+      ]
+    },
+    {
+      "id": "web-overseas-esun-tw-unicard-apple-45",
+      "webId": "esun-tw-unicard-apple-45",
+      "url": "/activities/topics/travel-card-offers.html#esun-tw-unicard-apple-45",
+      "title": "台湾玉山 Unicard · Apple Store 指定签账最高回馈 4.5% 积分",
+      "institution": "台湾玉山 Unicard",
+      "region": "台湾玉山 Unicard · Apple 台湾官方商城或直营店 · 2026-07-01 至 2026-12-31",
+      "summary": "台湾玉山 Unicard 持卡人满足 UP 选和扣缴条件，到 Apple 直营渠道一次付清可享最高 4.5% 积分。",
+      "validFrom": "2026-07-01",
+      "validTo": "2026-12-31",
+      "channel": "官网 / App",
+      "createdAt": null,
+      "distributionScope": "web_only",
+      "sources": [
+        "https://www.esunbank.com/zh-tw/personal/credit-card/discount/shopInfo?sno=0026"
+      ],
+      "rules": [
+        "最高档由一般消费 1% 和 UP 选百大指定消费加码 3.5% 组成。一般消费这一档要求开通电子账单与玉山台币账户自动扣缴。加码每账户每月最多 5,000 点，1 点玉山 e point 抵新台币 1 元。",
+        "银行示例：合资格的一次付清 NT$20,000 可得 900 点。分期按另一规则，最高 3.5%。实际积分按所选方案、消费方式和剩余上限计算。"
+      ]
+    },
+    {
+      "id": "web-overseas-hsbc-sg-expedia-16-2026",
+      "webId": "hsbc-sg-expedia-16-2026",
+      "url": "/activities/topics/travel-card-offers.html#hsbc-sg-expedia-16-2026",
+      "title": "新加坡汇丰信用卡 · Expedia 指定酒店 84 折，最多减 S$55",
+      "institution": "新加坡汇丰 / Expedia",
+      "region": "全球参与酒店 · 新加坡发行的汇丰信用卡",
+      "summary": "新加坡汇丰信用卡持卡人经 Expedia 专页订指定酒店，输入 HSBCSG16 可减 16%。",
+      "validFrom": "2026-10-06",
+      "validTo": "2026-12-31",
+      "channel": "Expedia 新加坡指定网页",
+      "createdAt": "2026-11-22",
+      "distributionScope": "web_only",
+      "sources": [
+        "https://www.expedia.com.sg/hsbc",
+        "https://www.hsbc.com.sg/card-promotions/travel-leisure/expedia16/",
+        "https://www.expedia.com.sg/lp/b/sghsbcpub1620261006"
+      ],
+      "rules": [
+        "经指定网页预付至少一晚，单笔税费前满 S$1，折扣最多 S$55。活动按新加坡时间 12 月 31 日 23:59 截止，入住日期须在 2026 年 10 月 6 日至 2027 年 3 月 31 日内。汇丰说明每月 16 日刷新名额，先到先得。",
+        "仅限指定酒店单订、单间、网上预付。App、电话、机酒套餐及第三方供应的住宿不适用。每券限用一次，税费另计，取消和退款按所选房型及优惠券条款。"
+      ]
+    },
+    {
+      "id": "web-overseas-taishin-richart-agoda-2026",
+      "webId": "taishin-richart-agoda-2026",
+      "url": "/activities/topics/travel-card-offers.html#taishin-richart-agoda-2026",
+      "title": "台湾台新 Richart 信用卡 · Agoda 指定房型最高减 8%",
+      "institution": "台湾台新 Richart 信用卡",
+      "region": "台湾台新 Richart 卡 · 2026-01-01 至 2026-12-31",
+      "summary": "指定房型经 Richart 专页预订，刷台湾台新 Richart 卡结账最高现减 8%。",
+      "validFrom": "2026-01-01",
+      "validTo": "2026-12-31",
+      "channel": "官网 / App",
+      "createdAt": null,
+      "distributionScope": "web_only",
+      "sources": [
+        "https://www.agoda.com/zh-tw/taishinpromo",
+        "https://mkpcard.taishinbank.com.tw/tscccms/promotion/detail/WM_20251226092735504"
+      ],
+      "rules": [
+        "入住截至 2027 年 3 月 31 日。请选带「已套用 Taishin Bank」标记的酒店和房型，结账时核对房费优惠和退改条件。页面另列一般卡和联名卡方案，各自适用独立条款。"
+      ]
+    },
+    {
+      "id": "web-overseas-ocbc-hk-hutchgo-2026",
+      "webId": "ocbc-hk-hutchgo-2026",
+      "url": "/activities/topics/travel-card-offers.html#ocbc-hk-hutchgo-2026",
+      "title": "香港华侨银行信用卡 · hutchgo 指定酒店 94 折",
+      "institution": "香港华侨银行信用卡",
+      "region": "香港华侨银行发卡 · 2026-01-01 至 2026-12-31",
+      "summary": "香港华侨银行信用卡持卡人在 hutchgo 订指定酒店，结账用 OCBC2026 享 94 折。",
+      "validFrom": "2026-01-01",
+      "validTo": "2026-12-31",
+      "channel": "官网 / App",
+      "createdAt": null,
+      "distributionScope": "web_only",
+      "sources": [
+        "https://www.hutchgo.com.hk/zh-hk/promotion/credit-card/",
+        "https://www.ocbc.com.hk/personal-banking/zh/cards/card-promotions.page"
+      ],
+      "rules": [
+        "覆盖日本、韩国、新加坡、英国等指定目的地。按商家通用条款，入住截至 2027 年 1 月 10 日。税费、服务费、到店付款及需人工确认的预订除外。每单限用一码，取消或改订可能收行政费。"
+      ]
+    },
+    {
+      "id": "web-overseas-wewa-hk-hutchgo-2026",
+      "webId": "wewa-hk-hutchgo-2026",
+      "url": "/activities/topics/travel-card-offers.html#wewa-hk-hutchgo-2026",
+      "title": "香港安信 WeWa 信用卡 · hutchgo 指定酒店 94 折",
+      "institution": "香港安信 WeWa 信用卡",
+      "region": "香港安信 WeWa 信用卡 · 2026-01-01 至 2026-12-31",
+      "summary": "香港 WeWa 信用卡持卡人在 hutchgo 订指定酒店，结账用 WEWA2026 可减 6%。",
+      "validFrom": "2026-01-01",
+      "validTo": "2026-12-31",
+      "channel": "官网 / App",
+      "createdAt": null,
+      "distributionScope": "web_only",
+      "sources": [
+        "https://www.hutchgo.com.hk/zh-hk/promotion/credit-card/"
+      ],
+      "rules": [
+        "官方名单包含日本、韩国、英国、澳大利亚、越南、意大利等。按商家通用条款，入住截至 2027 年 1 月 10 日。折扣只计合资格房费，结账前须用码，当场核对金额，退改按对应房型和平台费用执行。"
+      ]
+    },
+    {
+      "id": "web-overseas-aeon-hk-klook-hotels-100",
+      "webId": "aeon-hk-klook-hotels-100",
+      "url": "/activities/topics/travel-card-offers.html#aeon-hk-klook-hotels-100",
+      "title": "香港 AEON 信用卡 · Klook 指定酒店满 HK$1,000 减 HK$100",
+      "institution": "香港 AEON 信用卡",
+      "region": "香港 AEON 信用卡及联营卡 · 2026-06-01 至 2026-12-31",
+      "summary": "香港 AEON 卡持卡人在 Klook 订指定纯住宿，单笔净额满千港元用码即减 100 港元。",
+      "validFrom": "2026-06-01",
+      "validTo": "2026-12-31",
+      "channel": "官网 / App",
+      "createdAt": null,
+      "distributionScope": "web_only",
+      "sources": [
+        "https://www.aeon.com.hk/en/privilege/promotion-klook-1026.html"
+      ],
+      "rules": [
+        "适用优惠码 AEON26HT100，Klook 香港站官网或 App 结账前输入。每个账户限用一次，名额先到先得。合资格金额扣除其他费用和折扣后计算，电子钱包和第三方支付不适用。"
+      ]
+    },
+    {
+      "id": "web-overseas-agoda-tw-mastercard-world-2027",
+      "webId": "agoda-tw-mastercard-world-2027",
+      "url": "/activities/topics/travel-card-offers.html#agoda-tw-mastercard-world-2027",
+      "title": "Agoda 台湾万事达世界卡 · 指定酒店满 150 美元享 88 折",
+      "institution": "Agoda 台湾万事达世界卡",
+      "region": "台湾发行合资格万事达个人信用卡或签账金融卡 · 2026-04-01 至 2027-03-31",
+      "summary": "持台湾万事达世界卡经 Agoda 专页预订指定房，满 150 美元享 88 折，最多减 45 美元。",
+      "validFrom": "2026-04-01",
+      "validTo": "2027-03-31",
+      "channel": "官网 / App",
+      "createdAt": null,
+      "distributionScope": "web_only",
+      "sources": [
+        "https://www.agoda.com/zh-tw/twmastercard"
+      ],
+      "rules": [
+        "台湾世界之极卡满 200 美元享 84 折，最多减 60 美元。世界卡满 150 美元享 88 折，最多减 45 美元。其他合资格万事达个人卡满 100 美元享 92 折，最多减 25 美元。",
+        "入住截至 2027 年 12 月 31 日。选有 Mastercard_YRO_TW 标签的合资格预付、即付或先订后付房型，到店付款除外。税费不计入房费折扣，经指定页跳转 App 须在两小时内结账。"
+      ]
+    },
+    {
+      "id": "web-overseas-agoda-apac-world-legend-2027",
+      "webId": "agoda-apac-world-legend-2027",
+      "url": "/activities/topics/travel-card-offers.html#agoda-apac-world-legend-2027",
+      "title": "Agoda 亚太万事达世界传奇卡 · 指定酒店满 250 美元减 20%",
+      "institution": "Agoda 亚太万事达世界传奇卡",
+      "region": "包括中国香港、中国大陆及新加坡等指定发卡市场 · 2026-11-10 至 2027-03-31",
+      "summary": "指定亚太市场的万事达世界传奇卡持卡人经 Agoda 专页订指定房，满 250 美元享 8 折。",
+      "validFrom": "2026-11-10",
+      "validTo": "2027-03-31",
+      "channel": "官网 / App",
+      "createdAt": null,
+      "distributionScope": "web_only",
+      "sources": [
+        "https://www.agoda.com/en-sg/sgmastercard"
+      ],
+      "rules": [
+        "此档仅限合资格 Mastercard World Legend（世界传奇卡）。房费满 250 美元减 20%，每单最多减 80 美元。官方列出的发卡市场包括中国内地、香港、澳门、台湾、澳大利亚、文莱、柬埔寨、印尼、日本、韩国、老挝、马来西亚、缅甸、新西兰、新加坡、泰国和越南。",
+        "入住截至 2027 年 12 月 31 日。选择有 Promotion Eligible 标记的合资格预付、即付或先订后付房型，到店付款除外。折扣仅计房费，跳转 App 后须在两小时内完成结账。"
+      ]
+    },
+    {
+      "id": "web-overseas-bochk-agoda-7pct-2028",
+      "webId": "bochk-agoda-7pct-2028",
+      "url": "/activities/topics/travel-card-offers.html#bochk-agoda-7pct-2028",
+      "title": "中银香港信用卡 · Agoda 指定境外预付酒店 93 折",
+      "institution": "中银香港信用卡",
+      "region": "香港发行的合资格中银信用卡或双币信用卡 · 2026-04-01 至 2028-03-31",
+      "summary": "香港中银合资格信用卡持卡人经 Agoda 专页预付指定境外酒店，享 93 折。",
+      "validFrom": "2026-04-01",
+      "validTo": "2028-03-31",
+      "channel": "官网 / App",
+      "createdAt": null,
+      "distributionScope": "web_only",
+      "sources": [
+        "https://www.agoda.com/bochk",
+        "https://bochk.com/dam/boccreditcard/agoda2026/tnc_sc.pdf"
+      ],
+      "rules": [
+        "选择带「中银信用卡全年 93 折优惠」标记的境外预付房。税费及服务费不计入折扣，每笔最多减 HK$780，中文条款同时列明每位客户整期最高总折扣 HK$780。入住截至 2028 年 9 月 30 日。",
+        "用香港发行、印有中银标志的合资格信用卡或双币信用卡，以港币直接付款。内地或澳门发行卡、指定非消费卡及电子钱包交易排除。香港本地酒店、到店付款、已确认订单不适用。"
+      ]
+    },
+    {
+      "id": "web-overseas-dbs-sg-agoda-sunday-2026",
+      "webId": "dbs-sg-agoda-sunday-2026",
+      "url": "/activities/topics/travel-card-offers.html#dbs-sg-agoda-sunday-2026",
+      "title": "新加坡星展／POSB 卡 · Agoda 周日酒店满 S$200 减 50%，最高减 S$100",
+      "institution": "新加坡星展／POSB 卡",
+      "region": "新加坡发行的合资格 DBS／POSB 卡 · Agoda 周日订房专页 · 2026-01-25 至 2026-12-27",
+      "summary": "新加坡星展或 POSB 指定卡周日经 Agoda 专页订房满 S$200，最多减 S$100。",
+      "validFrom": "2026-01-25",
+      "validTo": "2026-12-27",
+      "channel": "官网 / App",
+      "createdAt": null,
+      "distributionScope": "web_only",
+      "sources": [
+        "https://www.agoda.com/dbssunday",
+        "https://www.dbs.com.sg/personal/promotion/card-privileges-ylagoda2"
+      ],
+      "rules": [
+        "每周日 01:00（新加坡时间）在活动专页顶部更新当周券码。选标有可用券的酒店及房型，在优惠区输入或选用当周券码并用合资格星展／POSB 卡结账。限量先到先得。",
+        "可留在网页预订，也可从专页跳转 Agoda App，直接打开 App 预订不参加此优惠。入住须在 2027 年 6 月 30 日或之前。"
+      ]
+    },
+    {
+      "id": "web-overseas-dbs-sg-agoda-nov-sale-2026",
+      "webId": "dbs-sg-agoda-nov-sale-2026",
+      "url": "/activities/topics/travel-card-offers.html#dbs-sg-agoda-nov-sale-2026",
+      "title": "新加坡星展／POSB 卡 · Agoda 11 月指定酒店额外减 15%",
+      "institution": "新加坡星展／POSB 卡",
+      "region": "新加坡发行的合资格 DBS／POSB 卡 · Agoda 11 月公开订房活动 · 2026-11-16 至 2026-11-30",
+      "summary": "公开活动期间用指定星展或 POSB 卡订 Agoda 酒店，额外减 15%，最多减 S$30。",
+      "validFrom": "2026-11-16",
+      "validTo": "2026-11-30",
+      "channel": "官网 / App",
+      "createdAt": null,
+      "distributionScope": "web_only",
+      "sources": [
+        "https://www.dbs.com.sg/personal/promotion/card-privileges-ylagoda2",
+        "https://www.agoda.com/dbs"
+      ],
+      "rules": [
+        "11 月 16 日至 30 日向所有 Agoda 用户开放，选指定酒店后用合资格新加坡星展／POSB 卡付款。额外 15% 达到名额上限后，银行说明会恢复为无折扣金额上限的 7% 基础优惠。",
+        "住宿须在 2027 年 6 月 30 日或之前。平台的房价促销幅度因酒店和日期而异，以结账时实际展示的价格及优惠为准。"
+      ]
+    },
+    {
+      "id": "web-overseas-ihg-global-cyber-sale-2026",
+      "webId": "ihg-global-cyber-sale-2026",
+      "url": "/activities/topics/travel-card-offers.html#ihg-global-cyber-sale-2026",
+      "title": "洲际 IHG 年末订房 · 非会员 8 折，会员最高 7 折",
+      "institution": "洲际酒店集团 IHG",
+      "region": "北美、拉美、欧洲、亚太等指定酒店",
+      "summary": "官网直订指定酒店，非会员房价 8 折，会员在欧洲、亚太等市场部分酒店可享 7 折。",
+      "validFrom": "2026-11-17",
+      "validTo": "2026-12-03",
+      "channel": "IHG 官网或 App 直订",
+      "createdAt": null,
+      "distributionScope": "web_only",
+      "sources": [
+        "https://www.ihg.com/content/us/en/deals/hotel-offers/cybersale"
+      ],
+      "rules": [
+        "在 IHG 官网或 App 选 Cyber Sale 房价。欧洲、亚洲、大洋洲、中东及非洲的指定酒店，IHG One Rewards 会员房价 7 折；美国、加拿大、墨西哥、拉美与加勒比指定酒店的会员价 75 折。非会员为 8 折，订房时加入会员也可查看会员价。优惠按参与酒店的最优灵活房价计算，税费另计，部分日期或房型不参加。",
+        "11 月 17 日至 12 月 3 日预订，适用入住时段为 11 月 21 日至 2027 年 4 月 30 日，须至少提前 4 天订房。一般订房时收取首晚不可退押金，参与活动的 Ruby 酒店须全额预付。美国加州有单独的限时取消退款条款，取消、押金和离店费用以所选酒店价规为准。"
+      ]
+    },
+    {
+      "id": "web-overseas-hsbc-hk-trip-annual-2026",
+      "webId": "hsbc-hk-trip-annual-2026",
+      "url": "/activities/topics/travel-card-offers.html#hsbc-hk-trip-annual-2026",
+      "title": "香港汇丰信用卡 · Trip.com 全年指定酒店最高减 8%",
+      "institution": "香港汇丰信用卡",
+      "region": "香港汇丰合资格信用卡 · Trip.com 香港站 · 2026-01-01 至 2026-12-31",
+      "summary": "香港汇丰持卡人经 Trip.com 指定页订预付酒店，用 HSBC26H 最低 92 折。",
+      "validFrom": "2026-01-01",
+      "validTo": "2026-12-31",
+      "channel": "官网 / App",
+      "createdAt": null,
+      "distributionScope": "web_only",
+      "sources": [
+        "https://hk.trip.com/sale/w/5573/hsbc.html",
+        "https://www.redhotoffers.hsbc.com.hk/media/104058021/tnc_YRO2026_Batch1_Tripcom_SC.pdf"
+      ],
+      "rules": [
+        "指定房费税前不足 HK$2,500 享 94 折，HK$2,500 至 HK$3,499 享 93 折，满 HK$3,500 享 92 折。香港站登录后用合资格汇丰卡以港币结账，入住、出发或取车截至 2027 年 1 月 15 日。",
+        "机票旧客用 HSBC26F，满 HK$2,000 起减 HK$50，最高减 HK$200。首次订机票用 HSBC26FN 享 97 折。预付租车旧客用 HSBC26CR 享 95 折，首次订租车用 HSBC26CRN 享 92 折。每单限一码，不与优惠券、Trip Coins 或礼品卡叠加。"
+      ]
+    },
+    {
+      "id": "web-overseas-bea-hk-trip-annual-2026",
+      "webId": "bea-hk-trip-annual-2026",
+      "url": "/activities/topics/travel-card-offers.html#bea-hk-trip-annual-2026",
+      "title": "香港东亚银行信用卡 · Trip.com 指定酒店低至 92 折",
+      "institution": "香港东亚银行信用卡",
+      "region": "香港东亚银行合资格信用卡 · Trip.com 香港站 · 2026-01-01 至 2026-12-31",
+      "summary": "香港东亚银行持卡人从 Trip.com 指定页订预付酒店，刷卡用 BEA26H 最低 92 折。",
+      "validFrom": "2026-01-01",
+      "validTo": "2026-12-31",
+      "channel": "官网 / App",
+      "createdAt": null,
+      "distributionScope": "web_only",
+      "sources": [
+        "https://hk.trip.com/sale/w/5105/hk-bea.html"
+      ],
+      "rules": [
+        "合资格指定酒店税前不足 HK$2,500 享 94 折，HK$2,500 至 HK$3,499 享 93 折，满 HK$3,500 享 92 折。须登录会员并用指定东亚卡付港币，入住、航班出发或取车截至 2027 年 1 月 15 日。",
+        "首次在 Trip.com 订机票可用 BEA26FN 享 97 折。机票旧客用 BEA26F，满 HK$2,000 起减 HK$50，最高减 HK$200。首次租车或旧客用 BEA26CRN 或 BEA26CR，分别享 92 折或 95 折。每单限一码，套票及指定航班除外。"
+      ]
+    },
+    {
+      "id": "web-overseas-citi-hk-trip-monthly-2027",
+      "webId": "citi-hk-trip-monthly-2027",
+      "url": "/activities/topics/travel-card-offers.html#citi-hk-trip-monthly-2027",
+      "title": "香港花旗卡 · Trip.com 每月指定酒店满 HK$1,200 减 HK$180",
+      "institution": "香港花旗卡",
+      "region": "香港花旗信用卡、扣账卡或商务卡 · Trip.com 香港站 · 2026-09-01 至 2027-02-28",
+      "summary": "香港花旗合资格卡在 Trip.com 用当月券，指定预付酒店满 HK$1,200 减 HK$180。",
+      "validFrom": "2026-09-01",
+      "validTo": "2027-02-28",
+      "channel": "官网 / App",
+      "createdAt": null,
+      "distributionScope": "web_only",
+      "sources": [
+        "https://hk.trip.com/t/citibank-hk-tc"
+      ],
+      "rules": [
+        "普通合资格卡的机票净价满 HK$1,800 减 HK$180，指定高铁、火车票、门票或体验各满 HK$400 减 HK$40。Prestige 信用卡专属档：指定机票或预付酒店净额各满 HK$2,500 减 HK$500。",
+        "每月 1 日香港时间 00:00 至 00:30 更新优惠码，普通酒店、机票档分别限 700、650 份，Prestige 两档各限 80 份。登录香港站或香港版 App，领当月码并直接付港币。每人每月每项普通优惠至多用 2 次，Prestige 每项 1 次。酒店和机票最晚 2027 年 6 月 30 日入住或出发。部分航班、税费、Trip Coins 等不适用。"
+      ]
+    },
+    {
+      "id": "web-overseas-aeon-hk-godiva-christmas-points-2026",
+      "webId": "aeon-hk-godiva-christmas-points-2026",
+      "url": "/activities/topics/travel-card-offers.html#aeon-hk-godiva-christmas-points-2026",
+      "title": "香港 AEON 信用卡积分 · 26,500 分可换 GODIVA 圣诞巧克力礼盒",
+      "institution": "香港 AEON",
+      "region": "香港 AEON 积分计划持卡人 · 香港指定 GODIVA 门店",
+      "summary": "香港 AEON 持卡人用 26,500 分，或 5,000 分加 HK$90，可换两盒三颗装礼盒券。",
+      "validFrom": "2026-11-05",
+      "validTo": "2026-12-20",
+      "channel": "官网 / App",
+      "createdAt": null,
+      "distributionScope": "web_only",
+      "sources": [
+        "https://www.aeon.com.hk/tc/privilege/promotion-godiva-1126.html"
+      ],
+      "rules": [
+        "在 AEON HK App 或网上客户服务的积分专区兑换，补款用 AEON 信用卡。AEON Card JAL 和 WAKUWAKU 不参加积分计划。",
+        "兑换截至 12 月 20 日，领货截至 12 月 23 日。持 App「我的奖赏」里的电子券到指定 GODIVA 门店领取。礼券不可换现金或叠加其他优惠，指定礼盒缺货时可换同等价值商品。"
+      ]
+    },
+    {
+      "id": "web-overseas-aeon-hk-forever-pets-points-2026",
+      "webId": "aeon-hk-forever-pets-points-2026",
+      "url": "/activities/topics/travel-card-offers.html#aeon-hk-forever-pets-points-2026",
+      "title": "香港 AEON 信用卡积分 · Forever Pets 指定宠物用品兑换",
+      "institution": "香港 AEON",
+      "region": "香港 AEON 积分计划持卡人 · 香港指定送货地址",
+      "summary": "香港 AEON 持卡人可用积分，或积分加指定金额，兑换猫狗用品。",
+      "validFrom": "2026-09-30",
+      "validTo": "2026-11-30",
+      "channel": "官网 / App",
+      "createdAt": null,
+      "distributionScope": "web_only",
+      "sources": [
+        "https://www.aeon.com.hk/tc/privilege/promotion-forever-pets-0926.html"
+      ],
+      "rules": [
+        "在 AEON HK App 或网上客户服务的积分专区选产品。例如 60 克猫用吞拿鱼湿粮 40 包可用 65,000 分，或 5,000 分加 HK$230。补款用 AEON 信用卡。AEON Card JAL 和 WAKUWAKU 不参加积分计划。",
+        "银行预计 2 至 4 周送至已登记地址，提供一次免费送货，邮政信箱、离岛和边境禁区除外。"
+      ]
+    },
+    {
+      "id": "web-overseas-dbs-hk-apple-flexi-110",
+      "webId": "dbs-hk-apple-flexi-110",
+      "url": "/activities/topics/travel-card-offers.html#dbs-hk-apple-flexi-110",
+      "title": "香港 DBS 信用卡 · Apple Store 合资格分期费用回赠最高 HK$110",
+      "institution": "香港 DBS 信用卡",
+      "region": "香港 DBS 指定信用卡 · 香港 Apple Store · 2026-09-01 至 2027-01-15",
+      "summary": "香港 DBS 指定主卡在 Apple Store 消费后用 App 办合资格分期，最高返 HK$110 费用。",
+      "validFrom": "2026-09-01",
+      "validTo": "2027-01-15",
+      "channel": "官网 / App",
+      "createdAt": null,
+      "distributionScope": "web_only",
+      "sources": [
+        "https://www.dbs.com.hk/personal/promotion/flexishopping-apple-2026Q3"
+      ],
+      "rules": [
+        "适用香港 Apple 门店、网店或 Apple Store App。单笔满 HK$500 可申请有一次性手续费的 6 或 12 期，按月收息的 18 至 60 期另有单笔 HK$2,000 门槛。DBS Live Fresh、商业卡及私人品牌卡除外。",
+        "只计活动期内首次成功申请涉及的最高单笔合资格交易，费用回赠最迟 2027 年 3 月 31 日入账。分期仍按银行批准的手续费或利率收费。"
+      ]
+    },
+    {
+      "id": "web-overseas-citybus-hkmm-ticket-discount-2026",
+      "webId": "citybus-hkmm-ticket-discount-2026",
+      "url": "/activities/topics/travel-card-offers.html#citybus-hkmm-ticket-discount-2026",
+      "title": "香港城巴巴士通票 · 凭海事博物馆票尾减 HK$10",
+      "institution": "城巴 / 香港海事博物馆",
+      "region": "香港中环天星码头观光城巴服务站、香港海事博物馆",
+      "summary": "持香港海事博物馆票尾到中环城巴服务站，购买全港游巴士通票可减 HK$10。",
+      "validFrom": "2026-04-17",
+      "validTo": "2026-12-31",
+      "channel": "中环服务站／博物馆售票处",
+      "createdAt": "2026-11-22",
+      "distributionScope": "web_only",
+      "sources": [
+        "https://www.hkmaritimemuseum.org/special-ann-12-citybus-promotion/details?lang=zh",
+        "https://www.citybus.com.hk/tc/uploadedPressRelease/22224_20260427_CHI.pdf"
+      ],
+      "rules": [
+        "先参观博物馆：购票日起 7 天内，带门票存根到中环天星码头观光城巴服务站，购买 24、48 或 72 小时城巴全港游通票时减 HK$10。",
+        "先买巴士通票：购票日起 7 天内，到中环 8 号码头的香港海事博物馆售票处出示有效通票二维码，成人门票半价，减 HK$15。",
+        "购票当天计作第 1 天，须在活动结束前兑换。每张票尾限用一次，且不可叠加其他优惠。购票前可向售票处确认票种和退改条件。"
+      ]
+    },
+    {
       "id": "web-overseas-bea-hk-jcb-contactless-10pct-2027",
       "webId": "bea-hk-jcb-contactless-10pct-2027",
-      "url": "/detail.html?web=bea-hk-jcb-contactless-10pct-2027&topic=travel-card-offers",
+      "url": "/activities/topics/travel-card-offers.html#bea-hk-jcb-contactless-10pct-2027",
       "title": "香港东亚银行 JCB 白金卡 · 港澳实体店非接触式付款满 HK$500 回赠 10%",
       "institution": "香港东亚银行 JCB 白金卡",
       "region": "香港东亚银行 JCB 非接触式白金卡 · 香港及澳门实体店 · 2026-10-15 至 2027-03-31",
@@ -959,7 +969,7 @@
     {
       "id": "web-overseas-hk-tsim-sha-tsui-empire-dining-2026",
       "webId": "hk-tsim-sha-tsui-empire-dining-2026",
-      "url": "/detail.html?web=hk-tsim-sha-tsui-empire-dining-2026&topic=travel-card-offers",
+      "url": "/activities/topics/travel-card-offers.html#hk-tsim-sha-tsui-empire-dining-2026",
       "title": "香港尖沙咀中心及帝国中心 · 指定餐饮满 HK$500 换 HK$50 餐饮券",
       "institution": "尖沙咀中心 / 帝国中心",
       "region": "香港尖沙咀中心及帝国中心指定餐饮商户",
@@ -981,7 +991,7 @@
     {
       "id": "web-overseas-hktb-mcdonalds-big-mac-winter-2026",
       "webId": "hktb-mcdonalds-big-mac-winter-2026",
-      "url": "/detail.html?web=hktb-mcdonalds-big-mac-winter-2026&topic=travel-card-offers",
+      "url": "/activities/topics/travel-card-offers.html#hktb-mcdonalds-big-mac-winter-2026",
       "title": "香港麦当劳冬日赏 · 巨无霸套餐买一送一，HK$44.50",
       "institution": "香港麦当劳 / 香港旅游发展局",
       "region": "香港指定麦当劳餐厅 · 香港居民及访港旅客",
@@ -1003,7 +1013,7 @@
     {
       "id": "web-overseas-hktb-alipayplus-qts-winter-2026",
       "webId": "hktb-alipayplus-qts-winter-2026",
-      "url": "/detail.html?web=hktb-alipayplus-qts-winter-2026&topic=travel-card-offers",
+      "url": "/activities/topics/travel-card-offers.html#hktb-alipayplus-qts-winter-2026",
       "title": "香港冬日優惠 · Alipay+ 合作錢包到店消費八折，最多減 HK$100",
       "institution": "香港旅遊發展局 / Alipay+",
       "region": "香港指定 QTS 餐飲及零售門店 · 訪港旅客",
@@ -1026,7 +1036,7 @@
     {
       "id": "web-overseas-macau-zape-first-stay-vouchers-2026",
       "webId": "macau-zape-first-stay-vouchers-2026",
-      "url": "/detail.html?web=macau-zape-first-stay-vouchers-2026&topic=travel-card-offers",
+      "url": "/activities/topics/travel-card-offers.html#macau-zape-first-stay-vouchers-2026",
       "title": "澳门新口岸消费节 · 首次入住合作酒店，每房领两张 MOP 50 消费券",
       "institution": "澳门中小型企业联合总商会 / 发现澳门",
       "region": "澳门指定新口岸酒店及合作商户",

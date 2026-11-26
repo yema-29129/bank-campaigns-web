@@ -6,7 +6,7 @@
   <title>银行优惠活动详情：领取入口、名额限制与参与步骤说明 | 羊毛助手·羊毛线报活动站</title>
   <meta name="description" content="查看羊毛助手·羊毛线报活动站单条银行优惠活动实时详情，包含优惠立减金额、最低消费门槛、有效期限、适用地区、活动海报二维码及分步参与领取路径。">
   <meta name="keywords" content="活动详情,银行立减金,微信立减金,信用卡返现,活动路径,二维码">
-  <meta name="robots" content="noindex,follow,max-image-preview:large,max-snippet:-1,max-video-preview:-1">
+  <meta id="robotsMeta" name="robots" content="noindex,follow,max-image-preview:large,max-snippet:-1,max-video-preview:-1">
   <meta name="theme-color" content="#1e4ed8">
   <meta name="msvalidate.01" content="C09F13C155CD1821058CACBCDCA96FDE">
   <link id="canonicalLink" rel="canonical" href="https://bank.vooqqqm.com/activities/">
@@ -15,13 +15,29 @@
     var p = new URLSearchParams(window.location.search);
     var id = p.get("id");
     var web = p.get("web");
-    var topic = p.get("topic") || "black-friday-2026";
+    var topicRaw = p.get("topic") || "black-friday-2026";
+    var topicMap = { "black-friday": "black-friday-2026", "black-friday-2026": "black-friday-2026", "dining-vouchers": "dining-vouchers", "travel-card-offers": "travel-card-offers" };
+    var topicSlug = topicMap[topicRaw] || "black-friday-2026";
     var link = document.getElementById("canonicalLink");
-    if (!link) return;
+    var robots = document.getElementById("robotsMeta");
+    var isInteractive = false;
+    try {
+      isInteractive = Boolean(id && sessionStorage.getItem("ym_interactive") === id);
+    } catch (_) {}
     if (id && /^[1-9][0-9]*$/.test(id)) {
-      link.href = "https://bank.vooqqqm.com/activities/" + id + ".html";
-    } else if (web && /^[a-z0-9-]+$/.test(web) && /^[a-z0-9-]+$/.test(topic)) {
-      link.href = "https://bank.vooqqqm.com/activities/topics/" + topic + ".html#" + web;
+      var targetUrl = "https://bank.vooqqqm.com/activities/" + id + ".html";
+      if (link) link.href = targetUrl;
+      if (!isInteractive) {
+        if (robots) robots.setAttribute("content", "index,follow");
+        window.location.replace(targetUrl);
+      }
+    } else if (web && /^[a-z0-9-]+$/.test(web)) {
+      var webUrl = "https://bank.vooqqqm.com/activities/topics/" + topicSlug + ".html#" + web;
+      if (link) link.href = webUrl;
+      if (!isInteractive) {
+        if (robots) robots.setAttribute("content", "index,follow");
+        window.location.replace(webUrl);
+      }
     }
   })();
   </script>
@@ -55,21 +71,20 @@
   <script defer src="/assets/mobile-back.js?v=20261118-back1"></script>
   <link rel="stylesheet" href="/assets/site-topic-menu.css?v=1">
   <script defer src="/assets/site-topic-menu.js?v=1"></script>
-  <link rel="alternate" type="application/rss+xml" href="https://bank.vooqqqm.com/rss.xml" title="银行优惠活动 RSS 订阅">
   <meta name="google-adsense-account" content="ca-pub-4665323446483162">
 </head>
 <body>
   <header class="site-header">
     <div class="site-header-inner">
       <div class="site-brand-bar">
-        <a class="site-brand" href="./index.html">
+        <a class="site-brand" href="/">
           <span class="site-brand-mark" aria-hidden="true"><img src="/assets/logo-lijianjin.png" alt="" width="42" height="42"></span>
           <span class="site-brand-copy">
             <strong>羊毛助手·羊毛线报活动站</strong>
             <small>微信立减金 / 信用卡返现 / 现金红包</small>
           </span>
         </a>
-        <a class="site-mobile-menu-btn" href="./index.html?menu=1" aria-label="打开左侧菜单栏">
+        <a class="site-mobile-menu-btn" href="/#menu" aria-label="打开左侧菜单栏">
           <svg class="site-mobile-menu-icon" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true">
             <path d="M3 5h14M3 10h14M3 15h14"></path>
           </svg>
@@ -77,8 +92,8 @@
         </a>
       </div>
       <nav class="site-nav" aria-label="主导航">
-        <a class="site-nav-link" href="./index.html">首页</a>
-        <a class="site-nav-link" href="./index.html?view=credit">信用卡活动</a>
+        <a class="site-nav-link" href="/">首页</a>
+        <a class="site-nav-link" href="/activities/topics/credit-card.html">信用卡活动</a>
         <details class="site-topic-menu">
           <summary class="site-nav-link">优惠专题</summary>
           <div class="site-topic-menu-links">

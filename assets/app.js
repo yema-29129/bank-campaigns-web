@@ -2425,7 +2425,7 @@ async function fetchWebsiteBlackFriday(signal) {
     offers.push({
       id: `web-black-friday-${id}`,
       websiteOfferId: id,
-      websiteDetailPath: `./detail.html?web=${encodeURIComponent(id)}`,
+      websiteDetailPath: `${WEBSITE_BLACK_FRIDAY_PATH}#${id}`,
       websiteTopicPath: `${WEBSITE_BLACK_FRIDAY_PATH}#${id}`,
       bankName: merchant,
       region: market,
@@ -2636,14 +2636,16 @@ function initializeCampaignPage() {
   }
 
   const params = new URLSearchParams(window.location.search);
-  const query = params.get('q');
+  const rawHash = (window.location.hash || '').replace(/^#/, '');
+  const hashParams = rawHash.includes('=') ? new URLSearchParams(rawHash) : new URLSearchParams();
+  const query = params.get('q') || hashParams.get('q');
   if (query) state.keyword = query;
-  const view = params.get('view');
+  const view = params.get('view') || hashParams.get('view');
   if (view && ['credit', 'debit'].includes(view)) state.view = view;
-  if (params.get('category') === 'overseas-deals') state.scene = '海外活动';
-  const sortMode = params.get('sort');
+  if ((params.get('category') || hashParams.get('category')) === 'overseas-deals') state.scene = '海外活动';
+  const sortMode = params.get('sort') || hashParams.get('sort');
   if (sortMode && SORT_MODES.has(sortMode)) state.sortMode = sortMode;
-  const shouldOpenMenu = params.get('menu') === '1';
+  const shouldOpenMenu = params.get('menu') === '1' || rawHash === 'menu' || hashParams.get('menu') === '1';
 
   syncFilterControls();
   updateSidebarCounts();
@@ -2651,7 +2653,8 @@ function initializeCampaignPage() {
     openMobileSidebar();
     params.delete('menu');
     const cleanSearch = params.toString();
-    const cleanUrl = `${window.location.pathname}${cleanSearch ? `?${cleanSearch}` : ''}${window.location.hash || ''}`;
+    const cleanHash = rawHash === 'menu' ? '' : (window.location.hash || '');
+    const cleanUrl = `${window.location.pathname}${cleanSearch ? `?${cleanSearch}` : ''}${cleanHash}`;
     window.history.replaceState(null, '', cleanUrl);
   }
   fetchCampaigns();

@@ -83,7 +83,7 @@ MANUAL_TOPICS = (
         "slug": "travel-card-offers",
         "h1": "海外旅行、订房与信用卡优惠",
         "desc": "查 Agoda Mastercard 万事达 88 折、WeWa 86 折、香港汇丰 HSBC Trip.com 信用卡优惠码、AEON 信用卡积分兑换与 Apple Pay 绑卡回赠，核对发卡地与截止日期。",
-        "lastmod": "2026-11-22",
+        "lastmod": "2026-11-23",
         "group": "card",
     },
     {
@@ -97,7 +97,7 @@ MANUAL_TOPICS = (
         "slug": "black-friday-2026",
         "h1": "2026 海外黑五优惠大全",
         "desc": "汇总 VPS、苹果数码、旅行 eSIM、美国百货、日本乐天、欧洲亚马逊、韩国电商等海外黑五优惠，附有效期、人民币参考价与官方入口。",
-        "lastmod": "2026-11-22",
+        "lastmod": "2026-11-26",
         "group": "platform",
     },
 )
@@ -131,10 +131,10 @@ BANK_PROFILES = (
     (re.compile(r"兴业"), "兴业银行", ("兴业银行", "兴业信用卡", "兴业生活"), "cib"),
     (re.compile(r"浦发|浦东发展"), "浦发银行", ("浦发银行", "浦发信用卡", "浦大喜奔"), "spdb"),
     (re.compile(r"民生"), "民生银行", ("中国民生银行", "民生银行", "全民生活"), "cmbc"),
-    (re.compile(r"光大"), "光大银行", ("中国光大银行", "光大银行", "阳光惠生活"), None),
-    (re.compile(r"广发"), "广发银行", ("广发银行", "广发信用卡", "发现精彩"), None),
-    (re.compile(r"平安银行|平安信用卡|^平安$"), "平安银行", ("平安银行", "平安口袋银行"), None),
-    (re.compile(r"华夏"), "华夏银行", ("华夏银行", "华彩生活"), None),
+    (re.compile(r"光大"), "光大银行", ("中国光大银行", "光大银行", "阳光惠生活"), "joint-stock"),
+    (re.compile(r"广发"), "广发银行", ("广发银行", "广发信用卡", "发现精彩"), "joint-stock"),
+    (re.compile(r"平安银行|平安信用卡|^平安$"), "平安银行", ("平安银行", "平安口袋银行"), "joint-stock"),
+    (re.compile(r"华夏"), "华夏银行", ("华夏银行", "华彩生活"), "joint-stock"),
     (re.compile(r"宁波银行|上海银行|北京银行|广州银行|江苏银行|杭州银行|南京银行"), "城商银行", ("宁波银行", "城商行优惠"), "nbcb"),
     (re.compile(r"汇丰|恒生|渣打|星展|众安|ZA\s*Bank|Mox|大新|东亚|花旗", re.I), "香港银行", ("港卡优惠", "香港信用卡", "境外返现"), "hk-overseas"),
     (re.compile(r"银联|云闪付"), "中国银联", ("中国银联", "云闪付", "银联优惠"), "unionpay"),
@@ -340,6 +340,16 @@ TOPIC_SPECS = (
         "keywords": "宁波银行优惠活动,宁波银行微信立减金,上海银行优惠,北京银行满减,广州银行信用卡优惠,城商行羊毛",
         "kind": "bank",
         "match": lambda e: bool(re.search(r"宁波银行|上海银行|北京银行|广州银行|江苏银行|杭州银行|南京银行", e["bankName"])),
+    },
+    {
+        "slug": "joint-stock",
+        "short": "平安/广发/光大/华夏",
+        "h1": "2026平安银行、广发银行、光大银行与华夏银行优惠活动汇总",
+        "title": "2026平安银行/广发信用卡/光大阳光惠生活/华夏银行立减金与返现汇总",
+        "desc": "实时汇总平安银行口袋银行、广发银行发现精彩、光大银行阳光惠生活及华夏银行华彩生活最新首绑立减、微信支付宝满减、信用卡返现与商超餐饮优惠规则。",
+        "keywords": "平安银行优惠活动,广发信用卡满减,光大银行优惠,华夏银行信用卡优惠,平安口袋银行立减金,广发发现精彩返现",
+        "kind": "bank",
+        "match": lambda e: bool(re.search(r"平安银行|平安信用卡|^平安$|广发|光大|华夏", e["bankName"])),
     },
 )
 
@@ -597,7 +607,7 @@ def build_search_intent_keywords(entry, combined, bank_short, card_label, benefi
         (r"租车", ("境外租车优惠", "租车优惠券")),
         (r"交通|机票|高铁|火车|地铁|公交", ("出行优惠", "交通优惠")),
         (r"PlayStation|PS\s*Plus|PSN", ("PlayStation黑五优惠", "PS Plus会员优惠")),
-        (r"手机|平板|电脑|数码|Apple|iPhone|MacBook|三星", ("数码产品优惠", "手机电脑优惠")),
+        (r"(?<!手机)电脑|平板|数码|iPhone|iPad|MacBook|AirPods|华为手机|小米手机|三星手机|购机|买手机", ("数码产品优惠", "手机电脑优惠")),
         (r"外卖|美团|饿了么", ("外卖满减", "银行卡外卖优惠")),
         (r"\bChill\b", ("中銀 Chill Card", "Chill Card 10%回贈", "中銀信用卡Chill Card")),
         (r"Motion|信银|信銀", ("信銀國際 Motion 信用卡", "inMotion 信用卡回贈", "Motion信用卡優惠")),
@@ -914,7 +924,6 @@ def document(page_title, summary, url, kind, body, lastmod=None, date_published=
   <link rel="alternate" type="text/plain" href="https://bank.vooqqqm.com/llms.txt" title="LLMs.txt">
   <link rel="alternate" type="text/plain" href="https://bank.vooqqqm.com/llms-full.txt" title="LLMs-Full.txt">
   <link rel="alternate" type="application/json" href="https://bank.vooqqqm.com/activities/feed.json" title="银行优惠活动结构化数据">
-  <link rel="alternate" type="application/rss+xml" href="https://bank.vooqqqm.com/rss.xml" title="银行优惠活动 RSS 订阅">
   <link rel="stylesheet" href="{styles}">
   <link rel="stylesheet" href="/activities/styles.css?v=20261119-topiccards1">
   <script type="application/ld+json">{schema_text}</script>{adsense_script}
@@ -926,7 +935,7 @@ def document(page_title, summary, url, kind, body, lastmod=None, date_published=
   <header class="site-header">
     <div class="site-header-inner">
       <div class="site-brand-bar">
-        <a class="site-mobile-menu-btn" href="/index.html?menu=1" aria-label="打开左侧菜单栏">
+        <a class="site-mobile-menu-btn" href="/#menu" aria-label="打开左侧菜单栏">
           <svg class="site-mobile-menu-icon" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true">
             <path d="M3 5h14M3 10h14M3 15h14"></path>
           </svg>
@@ -939,7 +948,7 @@ def document(page_title, summary, url, kind, body, lastmod=None, date_published=
       </div>
       <nav class="site-nav" aria-label="主导航">
         <a class="site-nav-link" href="/">首页</a>
-        <a class="site-nav-link" href="/index.html?view=credit">信用卡活动</a>
+        <a class="site-nav-link" href="/activities/topics/credit-card.html">信用卡活动</a>
 {topic_menu()}
         <div class="site-nav-qr">
           <button type="button" class="site-nav-link site-nav-qr-btn" aria-haspopup="true" aria-expanded="false">微信小程序</button>
@@ -972,7 +981,7 @@ def document(page_title, summary, url, kind, body, lastmod=None, date_published=
       <a href="/contact.html">联系方式</a>
     </div>
   </footer>
-  <script>(function(){{function openM(){{var m=document.getElementById("mpQrModal");if(!m){{m=document.createElement("div");m.id="mpQrModal";m.className="mp-qr-modal hidden";m.setAttribute("aria-hidden","true");m.innerHTML='<div class="mp-qr-backdrop" data-close-mp-qr="true"></div><div class="mp-qr-dialog" role="dialog" aria-modal="true" aria-label="微信小程序二维码"><img src="/assets/miniprogram-qr.jpg" alt="好羊毛助手微信小程序码" width="250" height="264"><p class="mp-qr-title">好羊毛助手小程序</p><p class="mp-qr-hint">微信内可长按图片识别 · 或微信扫一扫</p><button type="button" class="mp-qr-close" data-close-mp-qr="true">关闭</button></div>';document.body.appendChild(m);}}m.classList.remove("hidden");m.setAttribute("aria-hidden","false");}}function closeM(){{var m=document.getElementById("mpQrModal");if(m){{m.classList.add("hidden");m.setAttribute("aria-hidden","true");}}}}document.addEventListener("click",function(e){{if(e.target.closest('[data-close-mp-qr="true"]')){{closeM();return;}}var q=e.target.closest(".site-nav-qr");document.querySelectorAll(".site-nav-qr.is-open").forEach(function(el){{if(el!==q)el.classList.remove("is-open");}});if(q&&e.target.closest(".site-nav-qr-btn")){{if(window.matchMedia("(max-width: 860px)").matches){{openM();return;}}var o=q.classList.toggle("is-open");var b=q.querySelector(".site-nav-qr-btn");if(b)b.setAttribute("aria-expanded",String(o));}}}});document.addEventListener("keydown",function(e){{if(e.key==="Escape")closeM();}});}})();</script>
+  <script>(function(){{function openM(){{var m=document.getElementById("mpQrModal");if(!m){{m=document.createElement("div");m.id="mpQrModal";m.className="mp-qr-modal hidden";m.setAttribute("aria-hidden","true");m.innerHTML='<div class="mp-qr-backdrop" data-close-mp-qr="true"></div><div class="mp-qr-dialog" role="dialog" aria-modal="true" aria-label="微信小程序二维码"><img src="/assets/miniprogram-qr.jpg" alt="好羊毛助手微信小程序码" width="250" height="264"><p class="mp-qr-title">好羊毛助手小程序</p><p class="mp-qr-hint">微信内可长按图片识别 · 或微信扫一扫</p><button type="button" class="mp-qr-close" data-close-mp-qr="true">关闭</button></div>';document.body.appendChild(m);}}m.classList.remove("hidden");m.setAttribute("aria-hidden","false");}}function closeM(){{var m=document.getElementById("mpQrModal");if(m){{m.classList.add("hidden");m.setAttribute("aria-hidden","true");}}}}document.addEventListener("click",function(e){{var pb=e.target.closest("[data-open-poster-id]");if(pb){{var pid=pb.getAttribute("data-open-poster-id");try{{sessionStorage.setItem("ym_interactive",pid);}}catch(_){{}}window.location.assign("/det"+"ail.html?id="+encodeURIComponent(pid));return;}}if(e.target.closest('[data-close-mp-qr="true"]')){{closeM();return;}}var q=e.target.closest(".site-nav-qr");document.querySelectorAll(".site-nav-qr.is-open").forEach(function(el){{if(el!==q)el.classList.remove("is-open");}});if(q&&e.target.closest(".site-nav-qr-btn")){{if(window.matchMedia("(max-width: 860px)").matches){{openM();return;}}var o=q.classList.toggle("is-open");var b=q.querySelector(".site-nav-qr-btn");if(b)b.setAttribute("aria-expanded",String(o));}}}});document.addEventListener("keydown",function(e){{if(e.key==="Escape")closeM();}});}})();</script>
 </body>
 </html>
 """
@@ -998,7 +1007,7 @@ def extract_rule_section(value, labels, limit=180):
     """Pull a concise, verified rule excerpt for the website-only editorial view."""
     for label in labels:
         match = re.search(
-            rf"【{re.escape(label)}】\s*(.*?)(?=\n\s*\n【|\Z)",
+            rf"【{re.escape(label)}】\s*(.*?)(?=\n\s*【|\Z)",
             value,
             re.S,
         )
@@ -1008,17 +1017,37 @@ def extract_rule_section(value, labels, limit=180):
 
 
 def build_editorial_review(entry):
-    """Create website-only interpretation without changing API or mini-program data."""
+    """Create website-only interpretation without duplicating the top summary verbatim."""
     seo = entry["seo"]
-    audience = extract_rule_section(entry["awardDesc"], ("参与对象", "参与资格", "适用对象"), 190)
-    if not audience:
-        audience = clean_line(entry["desc"])
+    audience = extract_rule_section(
+        entry["awardDesc"],
+        ("活动对象", "参与对象", "参与资格", "适用对象", "面向对象"),
+        190,
+    )
+    if not audience or audience == clean_line(entry["desc"]):
+        region_note = entry["region"] or "全国范围"
+        audience = (
+            f"面向持有{entry['bankName']}{seo['card_label']}、且符合「{region_note}」适用条件的实名个人客户；"
+            f"涉及新户首绑、受邀白名单或卡等级限制时以机构收银台校验为准。"
+        )
 
-    benefit_summary = clean_line(entry["desc"]).rstrip("。")
-    benefit = f"{benefit_summary}。实际计算口径、封顶金额、币种和合资格交易范围仍以活动官方规则为准。"
+    extracted_content = extract_rule_section(
+        entry["awardDesc"],
+        ("活动内容", "优惠内容", "奖励规则", "返现规则", "立减规则"),
+        200,
+    )
+    channel_note = entry["channel"] or entry["consumeChannel"] or "指定官方渠道"
+    if extracted_content and extracted_content != clean_line(entry["desc"]):
+        benefit = f"{extracted_content}（结算与封顶口径以主办方规则为准）。"
+    else:
+        benefit = (
+            f"在活动有效期（{entry['validFrom']} 至 {entry['validTo']}）内通过{channel_note}完成合资格交易，"
+            f"可享「{seo['discount_phrase']}」。实际单笔封顶、名额池扣减与退货冲正规则以官方结算页面显示为准。"
+        )
 
     reminders = []
     for labels in (
+        ("活动细则与限制", "活动细则", "注意事项"),
         ("不参与范围", "参与限制", "资格限制"),
         ("名额与次数", "名额限制", "次数限制"),
         ("费用与续费", "费用说明"),
@@ -1085,9 +1114,18 @@ def build_faq_items(entry):
         a1 = f"该活动已于 {entry['validTo']} 结束。原参与路径为：{clean_line(entry['pathDesc'])}。如需查看最新可领活动，请访问羊毛助手·羊毛线报活动站「{bank_short}优惠专区」。"
 
     q2 = f"「{title}」优惠力度是多少？有什么门槛或次数限制？"
-    quota_match = re.search(r"【名额与次数】\s*([^\n【]+)", entry["awardDesc"])
-    quota_note = f" 名额与次数规则：{clean_line(quota_match.group(1))}" if quota_match else " 活动名额通常有限，先到先得，具体限次以官方活动页为准。"
-    a2 = f"核心优惠：{seo['discount_phrase']}。{clean_line(entry['desc'])}{quota_note}"
+    rule_excerpt = extract_rule_section(
+        entry["awardDesc"],
+        ("名额与次数", "名额限制", "次数限制", "活动细则与限制", "参与限制"),
+        140,
+    )
+    quota_note = (
+        f"细则与限次要点：{rule_excerpt}"
+        if rule_excerpt
+        else "每日或每期优惠名额通常有限、先到先得，具体单户限享次数以支付收银台或领券页面实时提示为准。"
+    )
+    min_txt = f"，单笔消费门槛参考：{entry['minAmount']}元" if entry.get("minAmount") and entry["minAmount"] not in ("0", "0.00") else ""
+    a2 = f"本活动核心权益为「{seo['discount_phrase']}」{min_txt}。{quota_note}"
 
     q3 = f"这项{bank_short}{seo['card_label']}优惠什么时候截止？适用哪些地区？"
     a3 = (
@@ -1196,7 +1234,7 @@ def detail(entry, active_entries, page_published=None):
     # AI Direct Summary Box
     ai_summary_html = f"""              <section class="detail-section seo-ai-summary" id="ai-summary" aria-label="活动核心要点速览">
                 <div class="detail-section-head"><h2>活动核心要点速览</h2></div>
-                <p class="detail-section-copy"><strong>{escape(entry["bankName"])}「{escape(title)}」</strong>（状态：{status_badge}）：{escape(clean_line(entry["desc"]))}</p>
+                <p class="detail-section-copy"><strong>{escape(entry["bankName"])} · {escape(seo["card_label"])}优惠档案</strong>（当前状态：{status_badge} · 核验编号 #{activity_id}）：</p>
                 <ul class="seo-bullet-list">
                   <li><strong>核心优惠：</strong>{escape(seo["discount_phrase"])}（适用卡种：{escape(seo["card_label"])}）</li>
                   <li><strong>有效期限：</strong>{entry["validFrom"]} 至 {entry["validTo"]}</li>
@@ -1312,7 +1350,7 @@ def detail(entry, active_entries, page_published=None):
                 </ul>
                 <p class="detail-section-copy">本站按公开活动信息核验整理，最近更新于 {time_element(entry["lastmod"])}。活动资格、名额和领取入口以所属机构最新规则为准。</p>
 {publication_meta_html}                <p class="seo-card-meta">编辑与复核：羊毛助手编辑组 · <a class="detail-link" href="/editorial-policy.html">查看核验、更正与发布规范</a></p>
-                <a class="detail-link" href="/detail.html?id={activity_id}" rel="nofollow">打开交互式详情与活动海报图片</a>
+                <button type="button" class="detail-link" data-open-poster-id="{activity_id}" style="background:none;border:0;padding:0;font:inherit;cursor:pointer;text-align:left;">查看交互式详情与活动海报图片</button>
               </section>
               <aside class="telegram-subscribe detail-telegram-reminder" id="telegram-reminder" aria-label="订阅优惠更新">
                 <p>信用卡返现、微信立减金和港卡优惠更新。</p>
@@ -1334,7 +1372,7 @@ def detail(entry, active_entries, page_published=None):
         body,
         lastmod=entry["lastmod"],
         date_published=page_published,
-        indexable=not bool(duplicate_of),
+        indexable=(entry["status"] != "ended" and not bool(duplicate_of)),
         keywords=seo["keywords"],
         extra_graph=[breadcrumb_schema, faq_schema],
         canonical_url=canonical_url,
@@ -1344,6 +1382,9 @@ def detail(entry, active_entries, page_published=None):
 def preserve_detail(html, status):
     html = html.replace(f'content="{INDEX_ROBOTS}"', f'content="{ARCHIVE_ROBOTS}"', 1)
     html = html.replace('content="index,follow,max-image-preview:large"', f'content="{ARCHIVE_ROBOTS}"', 1)
+    html = html.replace('href="/index.html?menu=1"', 'href="/#menu"').replace('href="/index.html?view=credit"', 'href="/activities/topics/credit-card.html"')
+    html = re.sub(r'<a[^>]+href="/detail\.html\?id=(\d+)"[^>]*>.*?</a>', r'<button type="button" class="detail-link" data-open-poster-id="\1" style="background:none;border:0;padding:0;font:inherit;cursor:pointer;text-align:left;">查看交互式详情与活动海报图片</button>', html)
+    html = re.sub(r'\s*<link[^>]+application/rss\+xml[^>]+>', '', html)
     marker = STATUS_MARKER
     if marker not in html:
         html = html.replace('        <div class="detail-layout">', f'        {marker}\n        <div class="detail-layout">', 1)
@@ -1504,7 +1545,7 @@ class PublishedTravelOffers(HTMLParser):
         self.items.append({
             "id": detail_id if is_shared else f"web-overseas-{web_id}",
             "webId": None if is_shared else web_id,
-            "url": f"/activities/{detail_id}.html" if is_shared else f"/detail.html?web={web_id}&topic=travel-card-offers",
+            "url": f"/activities/{detail_id}.html" if is_shared else f"/activities/topics/travel-card-offers.html#{web_id}",
             "title": title,
             "institution": data.get("data-merchant") or title.split("·", 1)[0].strip(),
             "region": data.get("data-market") or paragraphs[0],
@@ -1563,7 +1604,7 @@ def overseas_hub_page(activities, as_of):
         ("shopping", "海淘购物",
          "查跨境网购和外币线上消费优惠。比较到手价时，把运费、税费、汇率及外币交易费一起计入，再确认发卡地区、指定商户与返现封顶。",
          "zh-CN",
-         (("搜索海淘优惠", "/index.html?q=海淘"), ("浏览境外刷卡与返现", "hk-overseas.html"))),
+         (("搜索海淘优惠", "/#q=海淘"), ("浏览境外刷卡与返现", "hk-overseas.html"))),
         ("travel", "出境旅行",
          "查机票、酒店、景点门票、租车和出行优惠。预订前区分下单与入住或出发日期，核对适用目的地、付款卡种、税费及退改条件。",
          "zh-CN",
@@ -1629,7 +1670,7 @@ def overseas_hub_page(activities, as_of):
         <a href="/">首页</a> / <a href="/activities/topics/">优惠专题</a> / <span aria-current="page">海外活动</span>
       </nav>
       <h1>{OVERSEAS_TOPIC["h1"]}</h1>
-      <p>{OVERSEAS_TOPIC["desc"]} <a href="/?category=overseas-deals">打开海外活动列表</a></p>
+      <p>{OVERSEAS_TOPIC["desc"]} <a href="/#category=overseas-deals">打开海外活动列表</a></p>
       <p class="seo-card-meta">本页精选按 {time_element(today)} 的有效期筛选。优惠名额与实际资格请以商户或发卡机构规则为准。</p>
       <nav class="topic-category-nav" aria-label="海外活动分类">
 {section_links}
@@ -1941,7 +1982,7 @@ def directory(entries, generated_on):
       <p>共 {len(entries)} 项有效活动（更新于 {generated_on.isoformat()}）。活动名额、参与资格与有效期以所属机构官方公告为准。</p>
       <h2>按银行与支付方式专题快速查找</h2>
       {topic_hub_nav_markup()}
-      <p><a href="/">返回首页使用多维筛选器</a> · <a href="/activities/topics/">查看全部20个专题汇总页</a> · <a href="/activities/archive.html">查看已结束的历史活动归档</a></p>
+      <p><a href="/">返回首页使用多维筛选器</a> · <a href="/activities/topics/">查看全部{len(TOPIC_SPECS)}个专题汇总页</a> · <a href="/activities/archive.html">查看已结束的历史活动归档</a></p>
       <ul class="activity-directory">
 {cards}
       </ul>
@@ -1980,7 +2021,7 @@ def archive_directory(entries, generated_on):
       </ul>
     </section>
   </main>"""
-    return document(page_title, summary, f"{DIRECTORY}archive.html", "CollectionPage", body, lastmod=generated_on.isoformat(), keywords=keywords)
+    return document(page_title, summary, f"{DIRECTORY}archive.html", "CollectionPage", body, lastmod=generated_on.isoformat(), indexable=False, keywords=keywords)
 
 
 def sitemap_xml(entries, topic_stats, generated_on):
@@ -1990,7 +2031,6 @@ def sitemap_xml(entries, topic_stats, generated_on):
         ("/", today_str),
         ("/activities/", today_str),
         ("/activities/topics/", today_str),
-        ("/activities/archive.html", today_str),
         ("/about.html", None),
         ("/editorial-policy.html", None),
         ("/terms.html", None),
@@ -2236,7 +2276,7 @@ def main():
     ]}
     directory_html = directory(active, args.as_of)
     archive_html = archive_directory(ended, args.as_of)
-    sitemap = sitemap_xml(public_entries, topic_stats, args.as_of)
+    sitemap = sitemap_xml(active, topic_stats, args.as_of)
     feed = ai_feed(public_entries, args.as_of)
     feed_json = json.dumps(feed, ensure_ascii=False, indent=2) + "\n"
     llms_text = llms_index(active, ended, topic_stats, args.as_of)
