@@ -1166,22 +1166,22 @@ def matching_topics_for_entry(entry):
 
 
 TP_SOURCE_MAP = {
-    "https://www.klook.com/zh-HK/tetris/promo/blackfridaycybermonday2026/": "https://klook.tpk.mx/TM8z1aaI",
-    "https://www.kkday.com/zh-cn/promo/CNKTO1111": "https://kkday.tpk.mx/RUq8AFuM",
-    "https://www.kkday.com/zh-hk/promo/hk-double11": "https://kkday.tpk.mx/Motcdezc",
+    "https://www.klook.com/zh-HK/tetris/promo/blackfridaycybermonday2026/": "https://klook.tpk.mx/s1G9p4NU",
+    "https://www.kkday.com/zh-cn/promo/CNKTO1111": "https://kkday.tpk.mx/ZzXyVZyJ",
+    "https://www.kkday.com/zh-hk/promo/hk-double11": "https://kkday.tpk.mx/3zWxQXaL",
 }
 
 TP_OVERSEAS_STRIP_HTML = (
     '<div class="seo-ai-summary" style="margin:0.85rem 0 1.1rem;padding:0.9rem 1rem;border-radius:10px;'
     'background:#f8fafc;border:1px solid #e2e8f0;font-size:0.9rem;line-height:1.65;">'
     '<strong>出境自由行实用预订工具（官方直达）：</strong>'
-    '门票与机场快线 <a href="https://klook.tpk.mx/beDSWy2v" target="_blank" rel="sponsored nofollow noopener noreferrer">Klook 客路港澳海外站</a> · '
-    '<a href="https://kkday.tpk.mx/uDVmVrIh" target="_blank" rel="sponsored nofollow noopener noreferrer">KKday 当地玩乐</a> ｜ '
-    '境外流量卡 <a href="https://airalo.tpk.mx/4n1WsmgB" target="_blank" rel="sponsored nofollow noopener noreferrer">Airalo 全球 eSIM</a> · '
-    '<a href="https://saily.tpk.mx/wCWm77Yn" target="_blank" rel="sponsored nofollow noopener noreferrer">Saily eSIM</a> · '
-    '<a href="https://yesim.tpk.mx/433RrOrL" target="_blank" rel="sponsored nofollow noopener noreferrer">Yesim 国际流量</a> ｜ '
-    '国际自驾与航延保障 <a href="https://qeeq.tpk.mx/w62pDgkb" target="_blank" rel="sponsored nofollow noopener noreferrer">QEEQ 租租车国际版</a> · '
-    '<a href="https://airhelp.tpk.mx/mw4UWeAw" target="_blank" rel="sponsored nofollow noopener noreferrer">AirHelp 国际航班延误索赔</a>'
+    '门票与机场快线 <a href="https://klook.tpk.mx/RncxI8D4" target="_blank" rel="sponsored nofollow noopener noreferrer">Klook 客路港澳海外站</a> · '
+    '<a href="https://kkday.tpk.mx/5bnE1ueR" target="_blank" rel="sponsored nofollow noopener noreferrer">KKday 当地玩乐</a> ｜ '
+    '境外流量卡 <a href="https://airalo.tpk.mx/eQJOJoKm" target="_blank" rel="sponsored nofollow noopener noreferrer">Airalo 全球 eSIM</a> · '
+    '<a href="https://saily.tpk.mx/X3TSLZTC" target="_blank" rel="sponsored nofollow noopener noreferrer">Saily eSIM</a> · '
+    '<a href="https://yesim.tpk.mx/iiBmlqmY" target="_blank" rel="sponsored nofollow noopener noreferrer">Yesim 国际流量</a> ｜ '
+    '国际自驾与航延保障 <a href="https://qeeq.tpk.mx/UjmSxALR" target="_blank" rel="sponsored nofollow noopener noreferrer">QEEQ 租租车国际版</a> · '
+    '<a href="https://airhelp.tpk.mx/sDqPGQU5" target="_blank" rel="sponsored nofollow noopener noreferrer">AirHelp 国际航班延误索赔</a>'
     '<div style="font-size:0.78rem;color:#64748b;margin-top:0.35rem;">'
     '提示：若参与下方银行联名立减（如指定银行专属订房入口），请务必点击对应银行活动链接下单以触发满减；上方日常工具含品牌合作推广链接（详见<a href="/disclaimer.html">免责与合作披露</a>）。'
     '</div></div>'
@@ -1450,9 +1450,9 @@ def detail(entry, active_entries, page_published=None):
                 <div class="detail-section-head"><h2>出境自由行实用预订与比价工具</h2></div>
                 <p class="detail-section-copy">准备前往港澳或海外出行时，可同步比价当地交通门票、境外流量 eSIM 与国际租车服务：</p>
                 <ul class="seo-bullet-list">
-                  <li><strong>当地门票与交通快线：</strong><a href="https://klook.tpk.mx/beDSWy2v" target="_blank" rel="sponsored nofollow noopener noreferrer">Klook 客路香港及海外活动预订</a> · <a href="https://kkday.tpk.mx/uDVmVrIh" target="_blank" rel="sponsored nofollow noopener noreferrer">KKday 景点一日游与交通通票</a> · <a href="https://tiqets.tpk.mx/9oTQlfjW" target="_blank" rel="sponsored nofollow noopener noreferrer">Tiqets 博物馆免排队门票</a></li>
-                  <li><strong>境外上网 eSIM 即买即用：</strong><a href="https://airalo.tpk.mx/4n1WsmgB" target="_blank" rel="sponsored nofollow noopener noreferrer">Airalo 全球 200+ 地区 eSIM</a> · <a href="https://saily.tpk.mx/wCWm77Yn" target="_blank" rel="sponsored nofollow noopener noreferrer">Saily 出境流量 eSIM</a> · <a href="https://yesim.tpk.mx/433RrOrL" target="_blank" rel="sponsored nofollow noopener noreferrer">Yesim 国际旅行流量</a></li>
-                  <li><strong>国际租车、接送机与航延维权：</strong><a href="https://qeeq.tpk.mx/w62pDgkb" target="_blank" rel="sponsored nofollow noopener noreferrer">QEEQ 国际租车比价</a> · <a href="https://kiwitaxi.tpk.mx/bGtHaMud" target="_blank" rel="sponsored nofollow noopener noreferrer">Kiwitaxi 全球专车接送机</a> · <a href="https://airhelp.tpk.mx/mw4UWeAw" target="_blank" rel="sponsored nofollow noopener noreferrer">AirHelp 国际航班延误索赔核查</a></li>
+                  <li><strong>当地门票与交通快线：</strong><a href="https://klook.tpk.mx/RncxI8D4" target="_blank" rel="sponsored nofollow noopener noreferrer">Klook 客路香港及海外活动预订</a> · <a href="https://kkday.tpk.mx/5bnE1ueR" target="_blank" rel="sponsored nofollow noopener noreferrer">KKday 景点一日游与交通通票</a> · <a href="https://tiqets.tpk.mx/xlilr903" target="_blank" rel="sponsored nofollow noopener noreferrer">Tiqets 博物馆免排队门票</a></li>
+                  <li><strong>境外上网 eSIM 即买即用：</strong><a href="https://airalo.tpk.mx/eQJOJoKm" target="_blank" rel="sponsored nofollow noopener noreferrer">Airalo 全球 200+ 地区 eSIM</a> · <a href="https://saily.tpk.mx/X3TSLZTC" target="_blank" rel="sponsored nofollow noopener noreferrer">Saily 出境流量 eSIM</a> · <a href="https://yesim.tpk.mx/iiBmlqmY" target="_blank" rel="sponsored nofollow noopener noreferrer">Yesim 国际旅行流量</a></li>
+                  <li><strong>国际租车、接送机与航延维权：</strong><a href="https://qeeq.tpk.mx/UjmSxALR" target="_blank" rel="sponsored nofollow noopener noreferrer">QEEQ 国际租车比价</a> · <a href="https://kiwitaxi.tpk.mx/pdXWt0gH" target="_blank" rel="sponsored nofollow noopener noreferrer">Kiwitaxi 全球专车接送机</a> · <a href="https://airhelp.tpk.mx/sDqPGQU5" target="_blank" rel="sponsored nofollow noopener noreferrer">AirHelp 国际航班延误索赔核查</a></li>
                 </ul>
                 <p class="seo-card-meta">注：若参加本页银行指定联名立减，请按上方「参与方式」从银行指定专属入口下单；本栏通用工具含品牌合作推广链接，不增加您的预订价格（详见<a class="detail-link" href="/disclaimer.html">免责与合作披露</a>）。</p>
               </section>"""
