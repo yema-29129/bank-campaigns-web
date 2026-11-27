@@ -116,7 +116,7 @@
     },
     {
       id: 'didi',
-      re: /滴滴|高德打车|T3出行|哈啰|曹操出行|享道出行|网约车|打车/,
+      re: /滴滴(?!充电)|高德打车|T3出行|哈啰|曹操出行|享道出行|网约车|打车/,
       domesticOnly: true,
       skipIfMatched: ['huaxiaozhu'],
       links: [
