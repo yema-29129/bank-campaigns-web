@@ -1205,74 +1205,74 @@ JTK_OVERSEAS_RE = re.compile(
 )
 
 JTK_RULES = (
-    ("watsons", re.compile(r"屈臣氏"), False, (), (("领屈臣氏美团闪购专场红包 ↗", "https://dpurl.cn/4RBDQ7Lz"),)),
-    ("luckin", re.compile(r"瑞幸"), False, (), (("瑞幸咖啡在线特惠点单领券 ↗", "https://kurl04.cn/t9v3C7"),)),
-    ("cotti", re.compile(r"库迪"), False, (), (("库迪咖啡在线特惠点单领券 ↗", "https://kurl04.cn/t9v3C8"),)),
-    ("starbucks", re.compile(r"星巴克"), False, (), (("星巴克在线特惠点单入口 ↗", "https://kurl04.cn/t9v3Cc"),)),
-    ("heytea", re.compile(r"喜茶"), False, (), (("喜茶在线特惠点单领券 ↗", "https://kurl04.cn/t9v3CA"),)),
-    ("nayuki", re.compile(r"奈雪"), False, (), (("奈雪的茶在线特惠点单领券 ↗", "https://kurl05.cn/t9v3CT"),)),
-    ("kfc", re.compile(r"肯德基|KFC", re.I), False, (), (("肯德基在线特惠点餐入口 ↗", "https://kurl04.cn/t9v3rN"),)),
-    ("pizzahut", re.compile(r"必胜客"), False, (), (("必胜客在线特惠点餐入口 ↗", "https://kurl04.cn/t9v3CF"),)),
-    ("burgerking", re.compile(r"汉堡王"), False, (), (("汉堡王在线特惠点餐入口 ↗", "https://kurl04.cn/t9v3CI"),)),
-    ("wallace", re.compile(r"华莱士"), False, (), (("华莱士在线特惠点餐入口 ↗", "https://kurl05.cn/t9v3Cp"),)),
-    ("mcd", re.compile(r"麦当劳|金拱门"), False, (), (("麦当劳与大牌快餐特惠点餐 ↗", "https://kurl04.cn/t9v3rC"),)),
-    ("pagoda", re.compile(r"百果园"), False, (), (("百果园水果外送特惠领券 ↗", "https://kurl05.cn/t9v3C6"),)),
-    ("meituan_medicine", re.compile(r"美团买药"), False, (), (("领美团买药专属立减券 ↗", "https://dpurl.cn/CBsTEG2z"),)),
-    ("meituan_shangou", re.compile(r"美团闪购|小象超市|美团买菜"), False, (), (("领美团闪购超市神价红包 ↗", "https://kurl04.cn/t9v3Vo"),)),
-    ("meituan_hotel", re.compile(r"美团酒店|美团民宿"), False, (), (("领美团酒店特惠订房红包 ↗", "https://kurl05.cn/t9v3VV"),)),
-    ("meituan_flight", re.compile(r"美团机票|美团火车票"), False, (), (("领美团机票出行补贴券 ↗", "https://dpurl.cn/dp8UNrtz"),)),
+    ("watsons", re.compile(r"屈臣氏"), False, (), (("领屈臣氏美团闪购官方红包 ↗", "https://dpurl.cn/4RBDQ7Lz"),)),
+    ("coffee_tea", re.compile(r"瑞幸|库迪|星巴克|喜茶|奈雪|霸王茶姬|古茗|茶百道|蜜雪冰城"), True, (), (
+        ("领美团咖啡茶饮到店团购券 ↗", "https://dpurl.cn/4eDhTsuz"),
+        ("领京东外卖大牌饮品补贴券 ↗", "https://u.jd.com/mGK9jkR"),
+    )),
+    ("fastfood", re.compile(r"肯德基|KFC|麦当劳|金拱门|必胜客|汉堡王|华莱士|萨莉亚|海底捞", re.I), True, (), (
+        ("领美团大牌餐饮团购优惠券 ↗", "https://dpurl.cn/4eDhTsuz"),
+        ("领美团外卖叠叠券红包 ↗", "https://dpurl.cn/XbWlvzWz"),
+    )),
+    ("meituan_medicine", re.compile(r"美团买药"), False, (), (("领美团买药官方立减券 ↗", "https://dpurl.cn/CBsTEG2z"),)),
+    ("meituan_shangou", re.compile(r"美团闪购|小象超市|美团买菜|百果园"), True, (), (("领美团闪购超市便利店红包 ↗", "https://dpurl.cn/oihbt42z"),)),
+    ("meituan_flight", re.compile(r"美团机票|美团火车票"), False, (), (("领美团机票官方出行补贴券 ↗", "https://dpurl.cn/dp8UNrtz"),)),
     ("meituan_waimai", re.compile(r"美团外卖"), False, (), (
         ("先领美团外卖红包神券 ↗", "https://dpurl.cn/XbWlvzWz"),
-        ("美团外卖赏金叠加红包 ↗", "https://kurl04.cn/t9v3VS"),
+        ("美团外卖叠叠券会场 ↗", "https://kurl04.cn/t9v3VS"),
     )),
-    ("dianping", re.compile(r"大众点评|美团团购|美团到店"), False, (), (("领美团到店餐饮团购优惠券 ↗", "https://dpurl.cn/4eDhTsuz"),)),
-    ("meituan_general", re.compile(r"美团"), False, ("meituan_medicine", "meituan_shangou", "meituan_hotel", "meituan_flight", "meituan_waimai", "dianping", "watsons"), (
-        ("先领美团外卖红包券（可叠加银行立减） ↗", "https://dpurl.cn/XbWlvzWz"),
-        ("美团吃喝玩乐综合红包 ↗", "https://kurl05.cn/t9v3Vi"),
+    ("dianping", re.compile(r"大众点评|美团团购|美团到店"), True, (), (("领美团到店餐饮团购1折起神券 ↗", "https://dpurl.cn/4eDhTsuz"),)),
+    ("meituan_general", re.compile(r"美团"), True, ("meituan_medicine", "meituan_shangou", "meituan_flight", "meituan_waimai", "dianping", "watsons", "coffee_tea", "fastfood"), (
+        ("先领美团外卖红包券（叠加银行立减） ↗", "https://dpurl.cn/XbWlvzWz"),
+        ("美团到店吃喝玩乐团购券 ↗", "https://dpurl.cn/4eDhTsuz"),
     )),
-    ("eleme", re.compile(r"饿了么"), False, (), (("先领饿了么无门槛叠加红包 ↗", "https://kurl04.cn/t9v3f2"),)),
-    ("taobao_shangou", re.compile(r"淘宝闪购"), False, (), (("领淘宝闪购红包与免单福利 ↗", "https://kurl04.cn/t9v3fu"),)),
-    ("taobao", re.compile(r"淘宝|天猫"), True, ("taobao_shangou",), (("领淘宝闪购日常补贴红包 ↗", "https://kurl04.cn/t9v3fu"),)),
-    ("jd_waimai", re.compile(r"京东外卖|京东秒送"), False, (), (("领京东外卖高额补贴券 ↗", "https://u.jd.com/mGK9jkR"),)),
+    ("eleme", re.compile(r"饿了么"), False, (), (("先领饿了么官方天天领红包 ↗", "https://u.ele.me/zXKAAwon"),)),
+    ("taobao", re.compile(r"淘宝闪购|淘宝|天猫"), True, (), (
+        ("领淘宝闪购活动补贴红包 ↗", "https://kurl04.cn/t9v3fu"),
+        ("领饿了么官方红包券 ↗", "https://u.ele.me/zXKAAwon"),
+    )),
+    ("jd_waimai", re.compile(r"京东外卖|京东秒送"), False, (), (("领京东外卖官方高额补贴券 ↗", "https://u.jd.com/mGK9jkR"),)),
     ("jd", re.compile(r"京东"), True, ("jd_waimai",), (
-        ("领京东精选补贴券（可叠加京东支付满减） ↗", "https://u.jd.com/mGKFazo"),
+        ("领京东精选补贴券（叠加京东支付满减） ↗", "https://u.jd.com/mGKFazo"),
         ("京东秒杀特价会场 ↗", "https://u.jd.com/mDKVXbd"),
     )),
-    ("pdd", re.compile(r"拼多多|多多支付|多多买菜"), True, (), (("进拼多多领券中心领补贴券 ↗", "https://p.pinduoduo.com/2KYkDekX?sc=EFAC"),)),
-    ("huaxiaozhu", re.compile(r"花小猪"), False, (), (("领花小猪打车立减券包 ↗", "https://kurl05.cn/t9v3QA"),)),
-    ("didi_daijia", re.compile(r"代驾"), False, (), (("领滴滴代驾专属立减券 ↗", "https://kurl04.cn/t9v3Q6"),)),
+    ("pdd", re.compile(r"拼多多|多多支付|多多买菜"), True, (), (("进拼多多官方领券中心领补贴券 ↗", "https://p.pinduoduo.com/2KYkDekX?sc=EFAC"),)),
+    ("huaxiaozhu", re.compile(r"花小猪"), False, (), (("领花小猪官方打车立减券包 ↗", "https://kurl05.cn/t9v3QA"),)),
+    ("didi_daijia", re.compile(r"代驾"), True, (), (("领滴滴代驾官方立减券 ↗", "https://kurl04.cn/t9v3Q6"),)),
     ("didi", re.compile(r"滴滴|高德打车|T3出行|哈啰|曹操出行|享道出行|网约车|打车"), True, ("huaxiaozhu",), (
-        ("先领滴滴打车出行立减券包 ↗", "https://kurl05.cn/t9v3vo"),
-        ("聚合网约车立减券包 ↗", "https://kurl05.cn/t9v3pZ"),
+        ("先领滴滴打车官方出行券包 ↗", "https://kurl05.cn/t9v3vo"),
+        ("滴滴网约车与代驾联合券包 ↗", "https://kurl05.cn/t9v3pZ"),
     )),
-    ("movie", re.compile(r"猫眼|淘票票|电影票|观影|万达影城"), True, (), (("全国影院特价电影票在线选座 ↗", "https://kurl05.cn/t9v3Cb"),)),
-    ("express", re.compile(r"顺丰|菜鸟裹裹|寄快递|京东快递|德邦|圆通|中通|韵达|申通"), True, (), (("全国顺丰/通达特价寄快递 5 折起 ↗", "https://kurl04.cn/t9v3Pw"),)),
     ("fliggy", re.compile(r"飞猪"), False, (), (
         ("领飞猪酒店渠道专享红包 ↗", "https://a.feizhu.com/25j5zj"),
-        ("飞猪大牌乐园门票券 ↗", "https://a.feizhu.com/3Sg31h"),
+        ("飞猪大牌乐园景点门票券 ↗", "https://a.feizhu.com/3Sg31h"),
     )),
-    ("tongcheng", re.compile(r"同程|艺龙"), False, (), (("领同程特价酒店优惠券 ↗", "https://kurl05.cn/t9v3Yn"),)),
-    ("hotel_cn", re.compile(r"携程|去哪儿|华住|亚朵|锦江|首旅如家"), True, (), (("领同程/美团/飞猪酒店比价红包 ↗", "https://kurl05.cn/t9v3QW"),)),
-    ("train_12306", re.compile(r"12306|火车票|高铁"), True, (), (("领火车票与接送站出行补贴券 ↗", "https://kurl04.cn/t9v3Ql"),)),
-    ("flight_cn", re.compile(r"南航|东航|国航|海航|深航|川航|厦航|吉祥航空|春秋航空"), True, (), (("领国内特价机票立减补贴券 ↗", "https://kurl05.cn/t9v3rF"),)),
-    ("vip_video", re.compile(r"爱奇艺|腾讯视频|优酷|芒果TV|哔哩哔哩|B站大会员|网易云音乐|QQ音乐|喜马拉雅|百度网盘|视频会员"), True, (), (("大牌视频音乐会员特惠直充 ↗", "https://kurl04.cn/t9v3PH"),)),
+    ("hotel_cn", re.compile(r"同程|艺龙|携程|去哪儿|美团酒店|华住|亚朵|锦江|首旅如家"), True, (), (
+        ("领同程艺龙特价酒店红包券 ↗", "https://kurl05.cn/t9v3Yn"),
+        ("领飞猪酒店渠道专享红包 ↗", "https://a.feizhu.com/25j5zj"),
+    )),
+    ("train_12306", re.compile(r"12306|火车票|高铁"), True, (), (("领火车票与接送站打车官方券包 ↗", "https://kurl04.cn/t9v3Ql"),)),
+    ("flight_cn", re.compile(r"南航|东航|国航|海航|深航|川航|厦航|吉祥航空|春秋航空"), True, (), (
+        ("领美团机票特惠补贴券 ↗", "https://dpurl.cn/dp8UNrtz"),
+        ("领滴滴国内特价机票券 ↗", "https://kurl05.cn/t9v3rF"),
+    )),
 )
 
 JTK_DOMESTIC_STRIP_HTML = (
     '<div class="seo-ai-summary" style="margin:0.85rem 0 1.1rem;padding:0.9rem 1rem;border-radius:10px;'
     'background:#fffaf5;border:1px dashed #fdba74;font-size:0.9rem;line-height:1.65;">'
-    '<strong>🎁 平台红包券叠加银行立减入口（联盟推广）：</strong>'
-    '外卖闪购 <a href="https://dpurl.cn/XbWlvzWz" target="_blank" rel="sponsored nofollow noopener noreferrer">美团外卖神券</a> · '
-    '<a href="https://kurl04.cn/t9v3Vo" target="_blank" rel="sponsored nofollow noopener noreferrer">美团闪购神价</a> · '
-    '<a href="https://kurl04.cn/t9v3f2" target="_blank" rel="sponsored nofollow noopener noreferrer">饿了么红包</a> · '
-    '<a href="https://kurl04.cn/t9v3fu" target="_blank" rel="sponsored nofollow noopener noreferrer">淘宝闪购</a> ｜ '
-    '网购出行 <a href="https://u.jd.com/mGKFazo" target="_blank" rel="sponsored nofollow noopener noreferrer">京东补贴券</a> · '
+    '<strong>🎁 官方平台红包券叠加银行立减入口（联盟推广）：</strong>'
+    '外卖团购 <a href="https://dpurl.cn/XbWlvzWz" target="_blank" rel="sponsored nofollow noopener noreferrer">美团外卖神券</a> · '
+    '<a href="https://dpurl.cn/oihbt42z" target="_blank" rel="sponsored nofollow noopener noreferrer">美团闪购红包</a> · '
+    '<a href="https://dpurl.cn/4eDhTsuz" target="_blank" rel="sponsored nofollow noopener noreferrer">美团餐饮团购券</a> · '
+    '<a href="https://u.ele.me/zXKAAwon" target="_blank" rel="sponsored nofollow noopener noreferrer">饿了么官方红包</a> · '
+    '<a href="https://u.jd.com/mGK9jkR" target="_blank" rel="sponsored nofollow noopener noreferrer">京东外卖补贴</a> ｜ '
+    '网购出行 <a href="https://u.jd.com/mGKFazo" target="_blank" rel="sponsored nofollow noopener noreferrer">京东精选补贴</a> · '
     '<a href="https://p.pinduoduo.com/2KYkDekX?sc=EFAC" target="_blank" rel="sponsored nofollow noopener noreferrer">拼多多领券</a> · '
     '<a href="https://kurl05.cn/t9v3vo" target="_blank" rel="sponsored nofollow noopener noreferrer">滴滴打车券包</a> · '
-    '<a href="https://kurl04.cn/t9v3rN" target="_blank" rel="sponsored nofollow noopener noreferrer">肯德基</a> / '
-    '<a href="https://kurl04.cn/t9v3C7" target="_blank" rel="sponsored nofollow noopener noreferrer">瑞幸点单</a>'
+    '<a href="https://a.feizhu.com/25j5zj" target="_blank" rel="sponsored nofollow noopener noreferrer">飞猪酒店红包</a>'
     '<div style="font-size:0.78rem;color:#9a3412;margin-top:0.35rem;">'
-    '省钱技巧：先领上方平台红包券，结账收银台选择对应银行卡/支付渠道即可享“平台券 + 银行立减”双重优惠（详见<a href="/disclaimer.html">合作披露</a>）。'
+    '省钱技巧：上方均为各平台官方直达领券页，先领平台红包券，结账收银台选对应银行卡/支付渠道可享双重叠加（详见<a href="/disclaimer.html">合作披露</a>）。'
     '</div></div>'
 )
 
