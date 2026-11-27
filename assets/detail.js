@@ -585,6 +585,7 @@ function renderDetail(activity) {
           </div>
           ${(!isPathUrlLink && pathUrl) ? `<div class="dx-clean-path-box">${escapeHtml(pathUrl)}</div>` : ''}
         ` : ''}
+        ${window.JutuikePartner ? window.JutuikePartner.render(activity) : ''}
 
         ${stepsHtml ? `
           <section class="dx-clean-section" id="participation">

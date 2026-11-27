@@ -1199,6 +1199,108 @@ def is_overseas_or_travel_entry(entry, entry_topics):
     ))
 
 
+JTK_OVERSEAS_RE = re.compile(
+    r"香港|澳門|澳门|境外|海外|台湾|台灣|日本|韩国|新加坡|美国|英国|欧洲|澳洲|加拿大|Agoda|Expedia|Booking|Klook|KKday",
+    re.I,
+)
+
+JTK_RULES = (
+    ("watsons", re.compile(r"屈臣氏"), False, (), (("领屈臣氏美团闪购专场红包 ↗", "https://dpurl.cn/4RBDQ7Lz"),)),
+    ("luckin", re.compile(r"瑞幸"), False, (), (("瑞幸咖啡在线特惠点单领券 ↗", "https://kurl04.cn/t9v3C7"),)),
+    ("cotti", re.compile(r"库迪"), False, (), (("库迪咖啡在线特惠点单领券 ↗", "https://kurl04.cn/t9v3C8"),)),
+    ("starbucks", re.compile(r"星巴克"), False, (), (("星巴克在线特惠点单入口 ↗", "https://kurl04.cn/t9v3Cc"),)),
+    ("heytea", re.compile(r"喜茶"), False, (), (("喜茶在线特惠点单领券 ↗", "https://kurl04.cn/t9v3CA"),)),
+    ("nayuki", re.compile(r"奈雪"), False, (), (("奈雪的茶在线特惠点单领券 ↗", "https://kurl05.cn/t9v3CT"),)),
+    ("kfc", re.compile(r"肯德基|KFC", re.I), False, (), (("肯德基在线特惠点餐入口 ↗", "https://kurl04.cn/t9v3rN"),)),
+    ("pizzahut", re.compile(r"必胜客"), False, (), (("必胜客在线特惠点餐入口 ↗", "https://kurl04.cn/t9v3CF"),)),
+    ("burgerking", re.compile(r"汉堡王"), False, (), (("汉堡王在线特惠点餐入口 ↗", "https://kurl04.cn/t9v3CI"),)),
+    ("wallace", re.compile(r"华莱士"), False, (), (("华莱士在线特惠点餐入口 ↗", "https://kurl05.cn/t9v3Cp"),)),
+    ("mcd", re.compile(r"麦当劳|金拱门"), False, (), (("麦当劳与大牌快餐特惠点餐 ↗", "https://kurl04.cn/t9v3rC"),)),
+    ("pagoda", re.compile(r"百果园"), False, (), (("百果园水果外送特惠领券 ↗", "https://kurl05.cn/t9v3C6"),)),
+    ("meituan_medicine", re.compile(r"美团买药"), False, (), (("领美团买药专属立减券 ↗", "https://dpurl.cn/CBsTEG2z"),)),
+    ("meituan_shangou", re.compile(r"美团闪购|小象超市|美团买菜"), False, (), (("领美团闪购超市神价红包 ↗", "https://kurl04.cn/t9v3Vo"),)),
+    ("meituan_hotel", re.compile(r"美团酒店|美团民宿"), False, (), (("领美团酒店特惠订房红包 ↗", "https://kurl05.cn/t9v3VV"),)),
+    ("meituan_flight", re.compile(r"美团机票|美团火车票"), False, (), (("领美团机票出行补贴券 ↗", "https://dpurl.cn/dp8UNrtz"),)),
+    ("meituan_waimai", re.compile(r"美团外卖"), False, (), (
+        ("先领美团外卖红包神券 ↗", "https://dpurl.cn/XbWlvzWz"),
+        ("美团外卖赏金叠加红包 ↗", "https://kurl04.cn/t9v3VS"),
+    )),
+    ("dianping", re.compile(r"大众点评|美团团购|美团到店"), False, (), (("领美团到店餐饮团购优惠券 ↗", "https://dpurl.cn/4eDhTsuz"),)),
+    ("meituan_general", re.compile(r"美团"), False, ("meituan_medicine", "meituan_shangou", "meituan_hotel", "meituan_flight", "meituan_waimai", "dianping", "watsons"), (
+        ("先领美团外卖红包券（可叠加银行立减） ↗", "https://dpurl.cn/XbWlvzWz"),
+        ("美团吃喝玩乐综合红包 ↗", "https://kurl05.cn/t9v3Vi"),
+    )),
+    ("eleme", re.compile(r"饿了么"), False, (), (("先领饿了么无门槛叠加红包 ↗", "https://kurl04.cn/t9v3f2"),)),
+    ("taobao_shangou", re.compile(r"淘宝闪购"), False, (), (("领淘宝闪购红包与免单福利 ↗", "https://kurl04.cn/t9v3fu"),)),
+    ("taobao", re.compile(r"淘宝|天猫"), True, ("taobao_shangou",), (("领淘宝闪购日常补贴红包 ↗", "https://kurl04.cn/t9v3fu"),)),
+    ("jd_waimai", re.compile(r"京东外卖|京东秒送"), False, (), (("领京东外卖高额补贴券 ↗", "https://u.jd.com/mGK9jkR"),)),
+    ("jd", re.compile(r"京东"), True, ("jd_waimai",), (
+        ("领京东精选补贴券（可叠加京东支付满减） ↗", "https://u.jd.com/mGKFazo"),
+        ("京东秒杀特价会场 ↗", "https://u.jd.com/mDKVXbd"),
+    )),
+    ("pdd", re.compile(r"拼多多|多多支付|多多买菜"), True, (), (("进拼多多领券中心领补贴券 ↗", "https://p.pinduoduo.com/2KYkDekX?sc=EFAC"),)),
+    ("huaxiaozhu", re.compile(r"花小猪"), False, (), (("领花小猪打车立减券包 ↗", "https://kurl05.cn/t9v3QA"),)),
+    ("didi_daijia", re.compile(r"代驾"), False, (), (("领滴滴代驾专属立减券 ↗", "https://kurl04.cn/t9v3Q6"),)),
+    ("didi", re.compile(r"滴滴|高德打车|T3出行|哈啰|曹操出行|享道出行|网约车|打车"), True, ("huaxiaozhu",), (
+        ("先领滴滴打车出行立减券包 ↗", "https://kurl05.cn/t9v3vo"),
+        ("聚合网约车立减券包 ↗", "https://kurl05.cn/t9v3pZ"),
+    )),
+    ("movie", re.compile(r"猫眼|淘票票|电影票|观影|万达影城"), True, (), (("全国影院特价电影票在线选座 ↗", "https://kurl05.cn/t9v3Cb"),)),
+    ("express", re.compile(r"顺丰|菜鸟裹裹|寄快递|京东快递|德邦|圆通|中通|韵达|申通"), True, (), (("全国顺丰/通达特价寄快递 5 折起 ↗", "https://kurl04.cn/t9v3Pw"),)),
+    ("fliggy", re.compile(r"飞猪"), False, (), (
+        ("领飞猪酒店渠道专享红包 ↗", "https://a.feizhu.com/25j5zj"),
+        ("飞猪大牌乐园门票券 ↗", "https://a.feizhu.com/3Sg31h"),
+    )),
+    ("tongcheng", re.compile(r"同程|艺龙"), False, (), (("领同程特价酒店优惠券 ↗", "https://kurl05.cn/t9v3Yn"),)),
+    ("hotel_cn", re.compile(r"携程|去哪儿|华住|亚朵|锦江|首旅如家"), True, (), (("领同程/美团/飞猪酒店比价红包 ↗", "https://kurl05.cn/t9v3QW"),)),
+    ("train_12306", re.compile(r"12306|火车票|高铁"), True, (), (("领火车票与接送站出行补贴券 ↗", "https://kurl04.cn/t9v3Ql"),)),
+    ("flight_cn", re.compile(r"南航|东航|国航|海航|深航|川航|厦航|吉祥航空|春秋航空"), True, (), (("领国内特价机票立减补贴券 ↗", "https://kurl05.cn/t9v3rF"),)),
+    ("vip_video", re.compile(r"爱奇艺|腾讯视频|优酷|芒果TV|哔哩哔哩|B站大会员|网易云音乐|QQ音乐|喜马拉雅|百度网盘|视频会员"), True, (), (("大牌视频音乐会员特惠直充 ↗", "https://kurl04.cn/t9v3PH"),)),
+)
+
+JTK_DOMESTIC_STRIP_HTML = (
+    '<div class="seo-ai-summary" style="margin:0.85rem 0 1.1rem;padding:0.9rem 1rem;border-radius:10px;'
+    'background:#fffaf5;border:1px dashed #fdba74;font-size:0.9rem;line-height:1.65;">'
+    '<strong>🎁 平台红包券叠加银行立减入口（联盟推广）：</strong>'
+    '外卖闪购 <a href="https://dpurl.cn/XbWlvzWz" target="_blank" rel="sponsored nofollow noopener noreferrer">美团外卖神券</a> · '
+    '<a href="https://kurl04.cn/t9v3Vo" target="_blank" rel="sponsored nofollow noopener noreferrer">美团闪购神价</a> · '
+    '<a href="https://kurl04.cn/t9v3f2" target="_blank" rel="sponsored nofollow noopener noreferrer">饿了么红包</a> · '
+    '<a href="https://kurl04.cn/t9v3fu" target="_blank" rel="sponsored nofollow noopener noreferrer">淘宝闪购</a> ｜ '
+    '网购出行 <a href="https://u.jd.com/mGKFazo" target="_blank" rel="sponsored nofollow noopener noreferrer">京东补贴券</a> · '
+    '<a href="https://p.pinduoduo.com/2KYkDekX?sc=EFAC" target="_blank" rel="sponsored nofollow noopener noreferrer">拼多多领券</a> · '
+    '<a href="https://kurl05.cn/t9v3vo" target="_blank" rel="sponsored nofollow noopener noreferrer">滴滴打车券包</a> · '
+    '<a href="https://kurl04.cn/t9v3rN" target="_blank" rel="sponsored nofollow noopener noreferrer">肯德基</a> / '
+    '<a href="https://kurl04.cn/t9v3C7" target="_blank" rel="sponsored nofollow noopener noreferrer">瑞幸点单</a>'
+    '<div style="font-size:0.78rem;color:#9a3412;margin-top:0.35rem;">'
+    '省钱技巧：先领上方平台红包券，结账收银台选择对应银行卡/支付渠道即可享“平台券 + 银行立减”双重优惠（详见<a href="/disclaimer.html">合作披露</a>）。'
+    '</div></div>'
+)
+
+
+def match_jutuike_offers(entry):
+    title = entry["seo"]["search_title"]
+    region = entry.get("region", "")
+    text = f"{title} {entry.get('desc', '')} {entry.get('pathDesc', '')} {entry.get('channel', '')}"
+    is_overseas = bool(JTK_OVERSEAS_RE.search(f"{region} {title}"))
+    matched_ids = set()
+    out = []
+    seen_urls = set()
+    for rule_id, pattern, domestic_only, skip_ids, links in JTK_RULES:
+        if domestic_only and is_overseas:
+            continue
+        if skip_ids and any(sid in matched_ids for sid in skip_ids):
+            continue
+        if pattern.search(text):
+            matched_ids.add(rule_id)
+            for label, href in links:
+                if href not in seen_urls:
+                    seen_urls.add(href)
+                    out.append((label, href))
+                    if len(out) >= 3:
+                        return out
+    return out
+
+
 def render_source_item(src):
     host = urlsplit(src).hostname
     partner_href = TP_SOURCE_MAP.get(src)
@@ -1220,6 +1322,34 @@ def detail(entry, active_entries, page_published=None):
         sources = "\n".join(render_source_item(src) for src in entry["sources"])
     else:
         sources = "                <li>当前记录按机构公开海报或App活动页整理，实际入口请按上方「参与方式」指引前往所属机构官方渠道核实。</li>"
+
+    jtk_matches = match_jutuike_offers(entry)
+    jtk_side_html = ""
+    jtk_inline_html = ""
+    if jtk_matches:
+        side_items = "\n".join(
+            f'                <li><a class="detail-link" href="{escape(href)}" target="_blank" rel="sponsored nofollow noopener noreferrer" style="color:#c2410c;font-weight:600;">🎁 {escape(label)}</a></li>'
+            for label, href in jtk_matches
+        )
+        jtk_side_html = (
+            f"\n{side_items}\n"
+            '                <li style="font-size:0.78rem;color:#9a3412;">联盟推广提示：先领平台优惠券，结账用本活动对应银行卡可享双重叠加优惠。</li>'
+        )
+        inline_btns = " ".join(
+            f'<a href="{escape(href)}" target="_blank" rel="sponsored nofollow noopener noreferrer" '
+            f'style="display:inline-flex;align-items:center;padding:6px 12px;border-radius:8px;'
+            f'background:#fff7ed;border:1px solid #fdba74;color:#c2410c;font-size:0.88rem;font-weight:600;'
+            f'text-decoration:none;margin:0 8px 6px 0;">🎁 {escape(label)}</a>'
+            for label, href in jtk_matches
+        )
+        jtk_inline_html = (
+            '\n                <div class="jtk-partner-box" style="margin-top:0.85rem;padding:0.75rem 0.95rem;'
+            'border-radius:10px;background:#fffaf5;border:1px dashed #fdba74;">'
+            f'<div>{inline_btns}</div>'
+            '<p class="seo-card-meta" style="margin:0.3rem 0 0;color:#9a3412;">'
+            '联盟推广福利：可先点击上方领平台红包券，前往收银台选择本活动对应银行卡付款享双重省钱（详见<a class="detail-link" href="/disclaimer.html">合作披露</a>）。'
+            '</p></div>'
+        )
 
     facts = [
         fact("活动机构", escape(entry["bankName"])),
@@ -1387,7 +1517,7 @@ def detail(entry, active_entries, page_published=None):
               </section>
               <section class="detail-section" id="participation">
                 <div class="detail-section-head"><h2>参与方式与领取路径</h2></div>
-{prose(entry["pathDesc"])}
+{prose(entry["pathDesc"])}{jtk_inline_html}
               </section>
               <section class="detail-section" id="faq">
                 <div class="detail-section-head"><h2>常见问题解答（FAQ）</h2></div>
@@ -1402,7 +1532,7 @@ def detail(entry, active_entries, page_published=None):
               <section class="detail-side-panel" id="activity-notes">
                 <div class="detail-side-head"><h2>活动来源与核对</h2></div>
                 <ul class="activity-sources">
-{sources}
+{sources}{jtk_side_html}
                 </ul>
                 <p class="detail-section-copy">本站按公开活动信息核验整理，最近更新于 {time_element(entry["lastmod"])}。活动资格、名额和领取入口以所属机构最新规则为准。</p>
 {publication_meta_html}                <p class="seo-card-meta">编辑与复核：羊毛助手编辑组 · <a class="detail-link" href="/editorial-policy.html">查看核验、更正与发布规范</a></p>
@@ -1911,7 +2041,7 @@ def build_topic_page(spec, active_entries, ended_entries, generated_on):
       <div class="seo-ai-summary">
         <p><strong>专题数据速览（更新于 {generated_on.isoformat()}）：</strong>当前共有 <strong>{len(matched_active)}</strong> 项正在进行的{escape(spec["short"])}活动（信用卡专属约 {credit_cnt} 项，借记卡及通用约 {debit_cnt} 项；主要覆盖机构：{escape(top_banks_txt)}）。点击任一活动卡片即可查看完整领取入口、名额限制与核销规则；也可<a href="/">返回首页使用多维实时筛选器</a>。</p>
       </div>
-      {TP_OVERSEAS_STRIP_HTML if spec["slug"] in ("hk-overseas", "travel-fuel") else ""}
+      {TP_OVERSEAS_STRIP_HTML if spec["slug"] in ("hk-overseas", "travel-fuel") else (JTK_DOMESTIC_STRIP_HTML if spec["slug"] in ("jd-douyin-meituan", "wechat-pay", "alipay", "unionpay", "credit-card") else "")}
       <h2>全部优惠专题快速切换</h2>
       {topic_hub_nav_markup(spec["slug"])}
 {comparison_table_html}

@@ -1784,6 +1784,7 @@ function renderCleanDetailBody(data, rulesNotice = '') {
         </div>
         ${(!isHttpPath && pathUrl) ? `<div class="clean-path-box">${escapeHtml(pathUrl)}</div>` : ''}
       ` : ''}
+      ${window.JutuikePartner ? window.JutuikePartner.render(data) : ''}
 
       ${stepsHtml ? `
         <section class="clean-section">
