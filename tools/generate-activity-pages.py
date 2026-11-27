@@ -1165,6 +1165,51 @@ def matching_topics_for_entry(entry):
     return matched[:4]
 
 
+TP_SOURCE_MAP = {
+    "https://www.klook.com/zh-HK/tetris/promo/blackfridaycybermonday2026/": "https://klook.tpk.mx/TM8z1aaI",
+    "https://www.kkday.com/zh-cn/promo/CNKTO1111": "https://kkday.tpk.mx/RUq8AFuM",
+    "https://www.kkday.com/zh-hk/promo/hk-double11": "https://kkday.tpk.mx/Motcdezc",
+}
+
+TP_OVERSEAS_STRIP_HTML = (
+    '<div class="seo-ai-summary" style="margin:0.85rem 0 1.1rem;padding:0.9rem 1rem;border-radius:10px;'
+    'background:#f8fafc;border:1px solid #e2e8f0;font-size:0.9rem;line-height:1.65;">'
+    '<strong>出境自由行实用预订工具（官方直达）：</strong>'
+    '门票与机场快线 <a href="https://klook.tpk.mx/beDSWy2v" target="_blank" rel="sponsored nofollow noopener noreferrer">Klook 客路港澳海外站</a> · '
+    '<a href="https://kkday.tpk.mx/uDVmVrIh" target="_blank" rel="sponsored nofollow noopener noreferrer">KKday 当地玩乐</a> ｜ '
+    '境外流量卡 <a href="https://airalo.tpk.mx/4n1WsmgB" target="_blank" rel="sponsored nofollow noopener noreferrer">Airalo 全球 eSIM</a> · '
+    '<a href="https://saily.tpk.mx/wCWm77Yn" target="_blank" rel="sponsored nofollow noopener noreferrer">Saily eSIM</a> · '
+    '<a href="https://yesim.tpk.mx/433RrOrL" target="_blank" rel="sponsored nofollow noopener noreferrer">Yesim 国际流量</a> ｜ '
+    '国际自驾与航延保障 <a href="https://qeeq.tpk.mx/w62pDgkb" target="_blank" rel="sponsored nofollow noopener noreferrer">QEEQ 租租车国际版</a> · '
+    '<a href="https://airhelp.tpk.mx/mw4UWeAw" target="_blank" rel="sponsored nofollow noopener noreferrer">AirHelp 国际航班延误索赔</a>'
+    '<div style="font-size:0.78rem;color:#64748b;margin-top:0.35rem;">'
+    '提示：若参与下方银行联名立减（如指定银行专属订房入口），请务必点击对应银行活动链接下单以触发满减；上方日常工具含品牌合作推广链接（详见<a href="/disclaimer.html">免责与合作披露</a>）。'
+    '</div></div>'
+)
+
+
+def is_overseas_or_travel_entry(entry, entry_topics):
+    if any(t["slug"] in ("hk-overseas", "travel-fuel") for t in entry_topics):
+        return True
+    haystack = f"{entry['seo']['search_title']} {entry.get('region', '')} {entry.get('desc', '')}"
+    return bool(re.search(
+        r"Klook|KKday|Agoda|Trip\.com|Expedia|Booking|香港|澳門|澳门|境外|海外|海淘|日本|韩国|新加坡|欧洲|签证|八达通|八達通|eSIM",
+        haystack,
+        re.I,
+    ))
+
+
+def render_source_item(src):
+    host = urlsplit(src).hostname
+    partner_href = TP_SOURCE_MAP.get(src)
+    if partner_href:
+        return (
+            f'                <li><a class="detail-link" href="{escape(partner_href)}" '
+            f'target="_blank" rel="sponsored nofollow noopener noreferrer">直达官方活动预订页（{host}）</a></li>'
+        )
+    return f'                <li><a class="detail-link" href="{escape(src)}" rel="nofollow noopener">查看活动来源（{host}）</a></li>'
+
+
 def detail(entry, active_entries, page_published=None):
     seo = entry["seo"]
     title = seo["search_title"]
@@ -1172,10 +1217,7 @@ def detail(entry, active_entries, page_published=None):
     url = f"{DIRECTORY}{activity_id}.html"
 
     if entry["sources"]:
-        sources = "\n".join(
-            f'                <li><a class="detail-link" href="{escape(src)}" rel="nofollow noopener">查看活动来源（{urlsplit(src).hostname}）</a></li>'
-            for src in entry["sources"]
-        )
+        sources = "\n".join(render_source_item(src) for src in entry["sources"])
     else:
         sources = "                <li>当前记录按机构公开海报或App活动页整理，实际入口请按上方「参与方式」指引前往所属机构官方渠道核实。</li>"
 
@@ -1272,6 +1314,19 @@ def detail(entry, active_entries, page_published=None):
     }
 
     # Related internal links
+    partner_tools_html = ""
+    if is_overseas_or_travel_entry(entry, entry_topics):
+        partner_tools_html = f"""              <section class="detail-section" id="partner-booking-tools">
+                <div class="detail-section-head"><h2>出境自由行实用预订与比价工具</h2></div>
+                <p class="detail-section-copy">准备前往港澳或海外出行时，可同步比价当地交通门票、境外流量 eSIM 与国际租车服务：</p>
+                <ul class="seo-bullet-list">
+                  <li><strong>当地门票与交通快线：</strong><a href="https://klook.tpk.mx/beDSWy2v" target="_blank" rel="sponsored nofollow noopener noreferrer">Klook 客路香港及海外活动预订</a> · <a href="https://kkday.tpk.mx/uDVmVrIh" target="_blank" rel="sponsored nofollow noopener noreferrer">KKday 景点一日游与交通通票</a> · <a href="https://tiqets.tpk.mx/9oTQlfjW" target="_blank" rel="sponsored nofollow noopener noreferrer">Tiqets 博物馆免排队门票</a></li>
+                  <li><strong>境外上网 eSIM 即买即用：</strong><a href="https://airalo.tpk.mx/4n1WsmgB" target="_blank" rel="sponsored nofollow noopener noreferrer">Airalo 全球 200+ 地区 eSIM</a> · <a href="https://saily.tpk.mx/wCWm77Yn" target="_blank" rel="sponsored nofollow noopener noreferrer">Saily 出境流量 eSIM</a> · <a href="https://yesim.tpk.mx/433RrOrL" target="_blank" rel="sponsored nofollow noopener noreferrer">Yesim 国际旅行流量</a></li>
+                  <li><strong>国际租车、接送机与航延维权：</strong><a href="https://qeeq.tpk.mx/w62pDgkb" target="_blank" rel="sponsored nofollow noopener noreferrer">QEEQ 国际租车比价</a> · <a href="https://kiwitaxi.tpk.mx/bGtHaMud" target="_blank" rel="sponsored nofollow noopener noreferrer">Kiwitaxi 全球专车接送机</a> · <a href="https://airhelp.tpk.mx/mw4UWeAw" target="_blank" rel="sponsored nofollow noopener noreferrer">AirHelp 国际航班延误索赔核查</a></li>
+                </ul>
+                <p class="seo-card-meta">注：若参加本页银行指定联名立减，请按上方「参与方式」从银行指定专属入口下单；本栏通用工具含品牌合作推广链接，不增加您的预订价格（详见<a class="detail-link" href="/disclaimer.html">免责与合作披露</a>）。</p>
+              </section>"""
+
     related = pick_related(entry, active_entries, limit=6)
     related_html = ""
     if related:
@@ -1340,6 +1395,7 @@ def detail(entry, active_entries, page_published=None):
 {faq_dom}
                 </div>
               </section>
+{partner_tools_html}
 {related_html}
             </div>
             <aside class="detail-side">
@@ -1675,6 +1731,7 @@ def overseas_hub_page(activities, as_of):
       <nav class="topic-category-nav" aria-label="海外活动分类">
 {section_links}
       </nav>
+      {TP_OVERSEAS_STRIP_HTML}
       <details id="selection-rules">
         <summary>哪些优惠会收录？</summary>
         <p>收录有官方来源、参与资格、实际优惠和有效期明确的香港、澳门、跨境网购及出境旅行优惠。按实际使用场景归类，发卡地区和账户资格请查看活动详情。常驻列表只展示有效期内的活动，黑五专属促销在季节专题查看。</p>
@@ -1854,6 +1911,7 @@ def build_topic_page(spec, active_entries, ended_entries, generated_on):
       <div class="seo-ai-summary">
         <p><strong>专题数据速览（更新于 {generated_on.isoformat()}）：</strong>当前共有 <strong>{len(matched_active)}</strong> 项正在进行的{escape(spec["short"])}活动（信用卡专属约 {credit_cnt} 项，借记卡及通用约 {debit_cnt} 项；主要覆盖机构：{escape(top_banks_txt)}）。点击任一活动卡片即可查看完整领取入口、名额限制与核销规则；也可<a href="/">返回首页使用多维实时筛选器</a>。</p>
       </div>
+      {TP_OVERSEAS_STRIP_HTML if spec["slug"] in ("hk-overseas", "travel-fuel") else ""}
       <h2>全部优惠专题快速切换</h2>
       {topic_hub_nav_markup(spec["slug"])}
 {comparison_table_html}
@@ -2283,26 +2341,35 @@ def main():
     llms_full_text = llms_full(public_entries, args.as_of)
     rss_text = rss_xml(active, args.as_of)
 
+    def write_if_changed(path: Path, text: str):
+        if path.exists():
+            try:
+                if path.read_text(encoding="utf-8") == text:
+                    return
+            except OSError:
+                pass
+        path.write_text(text, encoding="utf-8")
+
     OUTPUT.mkdir(exist_ok=True)
     TOPICS_OUTPUT.mkdir(exist_ok=True)
     well_known = OUTPUT.parent / ".well-known"
     well_known.mkdir(exist_ok=True)
     for activity_id, html in pages.items():
-        (OUTPUT / f"{activity_id}.html").write_text(html, encoding="utf-8")
+        write_if_changed(OUTPUT / f"{activity_id}.html", html)
     for slug, html in topic_pages.items():
-        (TOPICS_OUTPUT / f"{slug}.html").write_text(html, encoding="utf-8")
+        write_if_changed(TOPICS_OUTPUT / f"{slug}.html", html)
     write_overseas_pages(feed["activities"], args.as_of)
-    (TOPICS_OUTPUT / "index.html").write_text(topics_home_html, encoding="utf-8")
+    write_if_changed(TOPICS_OUTPUT / "index.html", topics_home_html)
 
-    (OUTPUT / "index.html").write_text(directory_html, encoding="utf-8")
-    (OUTPUT / "archive.html").write_text(archive_html, encoding="utf-8")
-    (OUTPUT / "feed.json").write_text(feed_json, encoding="utf-8")
-    (OUTPUT.parent / "sitemap.xml").write_text(sitemap, encoding="utf-8")
-    (OUTPUT.parent / "rss.xml").write_text(rss_text, encoding="utf-8")
-    (OUTPUT.parent / "llms.txt").write_text(llms_text, encoding="utf-8")
-    (well_known / "llms.txt").write_text(llms_text, encoding="utf-8")
-    (OUTPUT.parent / "llms-full.txt").write_text(llms_full_text, encoding="utf-8")
-    manifest_path.write_text(json.dumps(manifest, indent=2) + "\n", encoding="utf-8")
+    write_if_changed(OUTPUT / "index.html", directory_html)
+    write_if_changed(OUTPUT / "archive.html", archive_html)
+    write_if_changed(OUTPUT / "feed.json", feed_json)
+    write_if_changed(OUTPUT.parent / "sitemap.xml", sitemap)
+    write_if_changed(OUTPUT.parent / "rss.xml", rss_text)
+    write_if_changed(OUTPUT.parent / "llms.txt", llms_text)
+    write_if_changed(well_known / "llms.txt", llms_text)
+    write_if_changed(OUTPUT.parent / "llms-full.txt", llms_full_text)
+    write_if_changed(manifest_path, json.dumps(manifest, indent=2) + "\n")
     print(
         f"Wrote {len(active)} current/upcoming pages, {len(ended)} historical pages, "
         f"{len(topic_pages) + 1} topic hub pages, and {len(published) - len(selected)} preserved pages."
